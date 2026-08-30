@@ -598,6 +598,107 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 @keyframes lvshake{ 0%,100%{transform:translateX(0);} 20%{transform:translateX(-8px);} 40%{transform:translateX(7px);} 60%{transform:translateX(-5px);} 80%{transform:translateX(4px);} }
 /* ===== /BLOCK: LEVEL-FLOW ===== */
 
+/* ===================== P2 · 宠物页（字灵「墨墨」） ===================== */
+.pet-page{ height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:var(--sp-5) var(--sp-4) var(--sp-6); }
+.pet-stage{
+  position:relative; width:100%; max-width:300px; margin:0 auto;
+  aspect-ratio:1/1; border-radius:var(--r-xl); overflow:hidden;
+  border:var(--bw-ui) solid var(--c-line); box-shadow:var(--sh-2);
+  background:var(--c-cream);
+}
+.pet-bg{ position:absolute; inset:0; width:100%; height:100%; }
+.pet-slot{ position:absolute; inset:0; display:grid; place-items:center; }
+.pet-slot .pet{ width:80%; height:80%; }
+.pet-praise{
+  position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
+  background:rgba(255,255,255,.92); color:var(--c-pri-d);
+  font-size:var(--fs-body); font-weight:800; padding:8px 16px; border-radius:var(--r-pill);
+  border:2px solid var(--c-pri); box-shadow:var(--sh-1); white-space:nowrap;
+  animation:petpraise .5s var(--ease-tap) both;
+}
+@keyframes petpraise{ 0%{ transform:translate(-50%,14px) scale(.7); opacity:0; } 60%{ transform:translate(-50%,-4px) scale(1.06); opacity:1; } 100%{ transform:translate(-50%,0) scale(1); } }
+
+.pet-card{
+  max-width:340px; margin:var(--sp-5) auto 0; padding:var(--sp-5);
+  background:var(--c-surface-2); border-radius:var(--r-xl); box-shadow:var(--sh-2);
+  display:flex; flex-direction:column; gap:var(--sp-4); align-items:center;
+}
+.pet-name{ font-size:var(--fs-h2); font-weight:800; color:var(--c-ink); display:flex; align-items:center; gap:10px; }
+.pet-lv{ font-size:var(--fs-mini); font-weight:800; color:#fff; background:var(--c-lav); padding:4px 12px; border-radius:var(--r-pill); }
+.pet-bar{ position:relative; width:100%; height:22px; border-radius:var(--r-pill); background:var(--c-track); overflow:hidden; border:2px solid var(--c-line); }
+.pet-bar-fill{ height:100%; border-radius:var(--r-pill); background:linear-gradient(90deg,#B9B4CC,#7C5CFF); transition:width var(--dur-show) var(--ease-soft); }
+.pet-bar-txt{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:var(--fs-mini); font-weight:800; color:var(--c-ink); text-shadow:0 1px 0 rgba(255,255,255,.6); }
+.pet-stagetxt{ font-size:var(--fs-cap); color:var(--c-ink-2); }
+.pet-btns{ display:flex; gap:var(--sp-3); width:100%; }
+.pet-feed, .pet-stroke{
+  flex:1; min-height:var(--tap-comfort); padding:0 var(--sp-4); border-radius:var(--r-pill);
+  font-size:var(--fs-btn); font-weight:800; cursor:pointer; border:var(--bw-btn-2) solid var(--btn-edge);
+  background:var(--btn-pri-bg); color:#fff; box-shadow:var(--sh-btn); transition:transform var(--dur-tap) var(--ease-tap);
+}
+.pet-feed small{ font-weight:700; opacity:.9; }
+.pet-stroke{ flex:0 0 auto; background:var(--c-surface); color:var(--c-ink); border-color:var(--c-line); box-shadow:var(--sh-1); }
+.pet-feed:active, .pet-stroke:active{ transform:translateY(3px); box-shadow:var(--sh-btn-down); }
+.pet-hint{ font-size:var(--fs-mini); color:var(--c-ink-3); }
+
+/* ---- 宠物动效（美术 §15.6；循环动画全部可被 prefers-reduced-motion 关掉）---- */
+.pk-body, .pk-egg{ transform-box:view-box; transform-origin:60px 120px; animation:pk-breathe 2600ms cubic-bezier(.45,0,.55,1) infinite; }
+@keyframes pk-breathe{ 0%,100%{ transform:translateY(0) scaleY(1); } 50%{ transform:translateY(-2.5px) scaleY(1.022); } }
+.pk-eyes{ transform-box:fill-box; transform-origin:center; animation:pk-blink 4200ms cubic-bezier(.45,0,.55,1) infinite; }
+@keyframes pk-blink{ 0%,92%,100%{ transform:scaleY(1); } 95%{ transform:scaleY(.08); } 97%{ transform:scaleY(1); } }
+.pk-halo{ transform-box:view-box; transform-origin:60px 30px; animation:pk-halo 6000ms linear infinite; }
+@keyframes pk-halo{ to{ stroke-dashoffset:-104; } }
+.pk-orbit{ transform-box:view-box; transform-origin:60px 86px; animation:pk-orbit 4000ms linear infinite; }
+.pk-orbit-in{ transform-box:fill-box; transform-origin:center; animation:pk-orbit-in 4000ms linear infinite; }
+@keyframes pk-orbit{ to{ transform:rotate(360deg); } }
+@keyframes pk-orbit-in{ to{ transform:rotate(-360deg); } }
+.pk-think{ animation:pk-pulse 1600ms ease-in-out infinite; }
+@keyframes pk-pulse{ 0%,100%{ opacity:.35; } 50%{ opacity:1; } }
+.pk-zzz text{ animation:pk-zzz 2400ms ease-out infinite; }
+.pk-zzz text:nth-child(2){ animation-delay:300ms; }
+.pk-zzz text:nth-child(3){ animation-delay:600ms; }
+@keyframes pk-zzz{ 0%{ opacity:0; transform:translate(0,6px); } 40%{ opacity:1; } 100%{ opacity:0; transform:translate(6px,-14px); } }
+.pk-spark{ transform-box:fill-box; transform-origin:center; animation:pk-spark 700ms cubic-bezier(.16,1,.3,1) infinite; }
+@keyframes pk-spark{ 0%{ transform:translate(0,0) scale(.3); opacity:0; } 25%{ opacity:1; } 100%{ transform:translate(var(--dx),var(--dy)) scale(0); opacity:0; } }
+.pet[data-mood="excited"] .pk-all{ transform-box:view-box; transform-origin:60px 124px; animation:pk-hop .8s cubic-bezier(.34,1.56,.64,1) infinite; }
+@keyframes pk-hop{ 0%,100%{ transform:translateY(0); } 25%{ transform:translateY(-14px); } 50%{ transform:translateY(0); } 75%{ transform:translateY(-6px); } }
+.pk-hat, .pk-scarf, .pk-wing, .pk-crown{ animation:pk-wear 200ms ease-out; }
+@keyframes pk-wear{ from{ opacity:0; transform:scale(.8); } to{ opacity:1; transform:scale(1); } }
+@media (prefers-reduced-motion: reduce){
+  .pk-body,.pk-egg,.pk-eyes,.pk-halo,.pk-orbit,.pk-orbit-in,.pk-think,.pk-zzz text,.pk-spark,.pet[data-mood="excited"] .pk-all,.pk-hat,.pk-scarf,.pk-wing,.pk-crown{ animation:none !important; }
+  .pk-spark{ display:none; }
+}
+
+/* ===================== P2 · 汉字图鉴 ===================== */
+.dex{ height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:var(--sp-5) var(--sp-4) var(--sp-6); }
+.dex-hd{ position:sticky; top:0; z-index:2; background:var(--c-surface); border-radius:var(--r-lg);
+  padding:var(--sp-4) var(--sp-5); margin-bottom:var(--sp-5); box-shadow:var(--sh-1);
+  display:flex; flex-direction:column; gap:6px; }
+.dex-hd-t{ font-size:var(--fs-h2); font-weight:800; color:var(--c-ink); }
+.dex-total{ font-size:var(--fs-body); color:var(--c-ink-2); } .dex-total b{ color:var(--c-pri-d); font-size:var(--fs-h3); }
+.dex-track{ height:12px; border-radius:var(--r-pill); background:var(--c-track); overflow:hidden; border:2px solid var(--c-line); }
+.dex-track-fill{ height:100%; background:linear-gradient(90deg,#FFC93C,#E86F33); transition:width var(--dur-show) var(--ease-soft); }
+.dex-zone{ margin-bottom:var(--sp-6); }
+.dex-zone-t{ font-size:var(--fs-h3); font-weight:800; color:var(--c-lav-d); margin:0 0 var(--sp-3); }
+.dex-lv{ margin-bottom:var(--sp-4); }
+.dex-lv-t{ font-size:var(--fs-cap); font-weight:800; color:var(--c-ink-2); margin-bottom:8px; }
+.dex-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+.dex-cell{ position:relative; display:flex; flex-direction:column; align-items:center; gap:2px;
+  padding:10px 4px; border-radius:var(--r-md); background:var(--c-surface-2);
+  border:2px solid var(--c-line); box-shadow:var(--sh-1); }
+.dex-cell .dex-pic{ width:100%; display:flex; justify-content:center; }
+.dex-cell .dex-pic svg{ width:100%; max-width:52px; height:auto; }
+.dex-cell .dex-c{ font-family:var(--font-hanzi); font-size:30px; color:var(--c-hanzi); line-height:1; }
+.dex-cell .dex-py{ font-size:var(--fs-mini); color:var(--c-ink-3); }
+.dex-cell.known{ background:var(--c-ok-l); border-color:var(--ok-line); }
+.dex-cell.known .dex-c{ color:var(--c-ink); }
+.dex-cell.todo{ opacity:.92; }
+.dex-cell.locked{ background:var(--c-lock-bg); border-color:var(--c-lock-2); }
+.dex-cell.locked .dex-pic, .dex-cell.locked .dex-c, .dex-cell.locked .dex-py{ filter:grayscale(1); opacity:.45; }
+.dex-badge{ position:absolute; top:4px; right:5px; font-size:13px; font-weight:800; line-height:1; }
+.dex-badge.ok{ color:var(--c-ok-d); }
+.dex-badge.lock{ font-size:12px; }
+.dex-badge.todo{ color:var(--c-ink-3); }
+
 </style>
 <!-- ===== /BLOCK: CSS-TOKENS ===== -->
 </head>
@@ -1187,12 +1288,14 @@ if(typeof document !== "undefined" && document.addEventListener){
 var KEY    = "wb_shizi_v2";          /* v2 本地键 */
 var KEY_V1 = "wb_shizi_v1";          /* v1 本地键：只读一遍用于迁移，绝不删除/覆盖 */
 var STAGE_THRESH = [10,25,45,70,100,140,190,250,320,400];   /* v1 10 关制门槛，保留 */
-var PET_STAGES = [                                           /* GDD §5.2 */
-  {lv:1, bond:0,   name:"蛋宝宝", scale:.75},
-  {lv:2, bond:50,  name:"墨墨·幼", scale:.85},
-  {lv:3, bond:150, name:"墨墨·灵", scale:1},
-  {lv:4, bond:300, name:"墨墨·辉", scale:1.15},
-  {lv:5, bond:500, name:"墨墨·圣", scale:1.3}
+/* GDD §5.2 + 美术 §15.2：五阶段参数表。bond 即「亲密度」(intimacy)；
+   theme/hi/line/belly 供 petSVG 生成器上色（美术 §15.5）。 */
+var PET_STAGES = [
+  {lv:1, name:"蛋宝宝",  bond:0,   scale:.75, theme:"#B9B4CC", hi:"#DCD8EA", line:"#736E90", belly:"#F2F0F8"},
+  {lv:2, name:"墨墨·幼", bond:50,  scale:.85, theme:"#A79BD6", hi:"#CFC6EC", line:"#6B5FA4", belly:"#EFEBFA"},
+  {lv:3, name:"墨墨·灵", bond:150, scale:1.00,theme:"#9B6DFF", hi:"#C6ABFF", line:"#6A45C4", belly:"#EDE4FF"},
+  {lv:4, name:"墨墨·辉", bond:300, scale:1.15,theme:"#7C5CFF", hi:"#B69EFF", line:"#5238C4", belly:"#E8E0FF"},
+  {lv:5, name:"墨墨·圣", bond:500, scale:1.30,theme:"#5B3FE0", hi:"#9E8BFF", line:"#3A2599", belly:"#E2DBFF"}
 ];
 function bondToLevel(bond){ var lv=1, i; for(i=0;i<PET_STAGES.length;i++) if(bond>=PET_STAGES[i].bond) lv=PET_STAGES[i].lv; return lv; }
 
@@ -2008,6 +2111,9 @@ function showPage(id){
     tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
   }
   if(id === 'page-map') scrollToCurrent();
+  else if(id === 'page-pet')  renderPet();
+  else if(id === 'page-dex')  renderDex();
+  else if(id === 'page-chest') renderChest();
 }
 function bindTabs(){
   var tabs = document.querySelectorAll('.tab'), i;
@@ -2124,10 +2230,6 @@ function stubHTML(o){
 }
 function renderStubs(){
   var defs = [
-    {id:'page-pet', key:'stub.pet', icon:'🐣',
-     title:'字灵墨墨', desc:'陪你一起长大的汉字小精灵。可以喂它、摸它、给它戴帽子。', tag:'P2 施工中'},
-    {id:'page-dex', key:'stub.dex', icon:'📖',
-     title:'汉字图鉴', desc:'学过的字都会点亮在这里，集齐 100 个就集齐啦！', tag:'P3 施工中'},
     {id:'page-chest', key:'stub.chest', icon:'🎁',
      title:'宝箱小屋', desc:'集齐 3 块钥匙碎片，就能开一次宝箱，开出金色奖券。', tag:'P3 施工中'}
   ], i;
@@ -2137,17 +2239,383 @@ function renderStubs(){
 
 /* ===== JS-BLOCK: PET ===== */
 /* TODO(ENG-001-P2): 宠物养成系统，见 GDD §5 / 美术 §15 */
-function petSVG(level, mood){ /* 桩：返回空 svg */ return '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" data-page-node-id="'+nid('pet.svg')+'"></svg>'; }
-function renderPet(){ /* 桩 */ }
-function feedPet(){ /* 桩 */ }
-function petPet(){ /* 桩 */ }
+/* 阶段阈值（索引 0–4）：<50→0, <150→1, <300→2, <500→3, ≥500→4（GDD §5.2）。
+   注意：用户 P2 描述里的 state.pet.intimacy / state.pet.stage 即本实现的
+   state.pet.bond（亲密度）/ state.pet.level（1–5）。沿用 P0/P1 既有字段，不新增平行字段以免破坏迁移。 */
+var PET_BOND_THRESH = [0,50,150,300,500];
+function petStage(bond){ bond = bond||0; for(var i=PET_BOND_THRESH.length-1;i>=0;i--){ if(bond>=PET_BOND_THRESH[i]) return i; } return 0; }
+
+/* ---- 装扮件（美术 §15.4，零位图，参数化 SVG 片段）---- */
+var PET_HATS = {
+  flower: function(){ var o='', i, ang=[0,72,144,216,288];
+    for(i=0;i<5;i++){ o+='<ellipse cx="0" cy="-9" rx="4.6" ry="7" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.6" transform="rotate('+ang[i]+')"/>'; }
+    return '<g class="pk-hat" transform="translate(60,44)">'+o+'<circle r="4.6" fill="#FFC93C" stroke="#B87400" stroke-width="1.6"/></g>'; },
+  leaf: function(){
+    return '<g class="pk-hat" transform="translate(60,44)">'+
+      '<path d="M0 2 C -10 -4 -14 -16 -6 -20 C 0 -15 2 -6 0 2 Z" fill="#8ED46E" stroke="#377020" stroke-width="1.8" stroke-linejoin="round" transform="rotate(-25)"/>'+
+      '<path d="M0 2 C 10 -4 14 -16 6 -20 C 0 -15 -2 -6 0 2 Z" fill="#A3E081" stroke="#377020" stroke-width="1.8" stroke-linejoin="round" transform="rotate(25)"/>'+
+      '<circle r="3" fill="#FFC93C" stroke="#B87400" stroke-width="1.4"/></g>'; },
+  crown: function(){ var o='', i, x=[-14,-7,0,7,14], tri='';
+    for(i=0;i<5;i++){ tri+='<path d="M'+(x[i]-5)+' 2 L'+x[i]+' '+(i===2?-14:-9)+' L'+(x[i]+5)+' 2 Z" fill="#FFC93C" stroke="#B87400" stroke-width="1.6" stroke-linejoin="round"/>'; }
+    return '<g class="pk-hat" transform="translate(60,44)">'+tri+
+      '<rect x="-16" y="2" width="32" height="7" rx="3.5" fill="#FFD86B" stroke="#B87400" stroke-width="1.6"/>'+
+      '<circle cx="-8" cy="5.5" r="2.4" fill="#FF6B9D"/><circle cx="0" cy="5.5" r="2.4" fill="#3DA5E0"/><circle cx="8" cy="5.5" r="2.4" fill="#8ED46E"/></g>'; }
+};
+var PET_SCARFS = {
+  rainbow: function(){ return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FF6B9D" stroke-width="7" stroke-linecap="round"/>'+
+      '<path d="M-30 7 q30 14 60 0" fill="none" stroke="#FFC93C" stroke-width="7" stroke-linecap="round"/>'+
+      '<path d="M-30 14 q30 14 60 0" fill="none" stroke="#3DA5E0" stroke-width="7" stroke-linecap="round"/></g>'; },
+  star: function(){ var o='', i, sx=[-24,-12,0,12,24];
+    for(i=0;i<5;i++){ o+='<path transform="translate('+sx[i]+',11)" d="M0 -4.4 l1.3 2.7 3 .4 -2.2 2.1 .5 3L0 2.7l-2.6 1.9 .5-3L-4.3 -1.3 l3-.4z" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'; }
+    return '<g class="pk-scarf" transform="translate(60,104)"><path d="M-30 0 q30 14 60 0" fill="none" stroke="#9B6DFF" stroke-width="8" stroke-linecap="round"/>'+o+'</g>'; }
+};
+var PET_WINGS = {
+  small: function(){ return '<g class="pk-wing">'+
+      '<ellipse cx="26" cy="80" rx="15" ry="22" fill="url(#pkWing)" stroke="#9B6DFF" stroke-width="2.2" transform="rotate(-18 26 80)"/>'+
+      '<ellipse cx="94" cy="80" rx="15" ry="22" fill="url(#pkWing)" stroke="#9B6DFF" stroke-width="2.2" transform="rotate(18 94 80)"/></g>'; }
+};
+/* 相位：用负 delay 让重绘后动画不跳帧 */
+function ph(t, period){ return t ? -(t % period) : 0; }
+
+/* ---- 字灵「墨墨」参数化 SVG 生成器（美术 §15.5，已通过 node --check + SVG 校验）---- */
+function petSVG(opt){
+  opt = opt || {};
+  var lv    = Math.min(5, Math.max(1, opt.level || 1));
+  var mood  = opt.mood || 'happy';
+  var wears = opt.wears || {};
+  var t     = opt.t || 0;
+  var chars = opt.chars || ['日','月','山','水','火'];
+  var S = PET_STAGES[lv-1];
+  var lineW = (lv === 5) ? 3 : 2.6;
+  var lineC = (lv === 5) ? '#FFC93C' : S.line;
+  var phBreath = ph(t, 2600), phBlink = ph(t, 4200), phOrbit = ph(t, 4000), phHalo = ph(t, 6000);
+  var out = '';
+  out += '<svg class="pet pet-lv'+lv+'" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" '+
+         'data-level="'+lv+'" data-mood="'+mood+'" aria-hidden="true">';
+  out += '<defs>'+
+    '<radialGradient id="pkBody'+lv+'" cx="36%" cy="26%" r="82%">'+
+      '<stop offset="0" stop-color="'+S.hi+'"/><stop offset="1" stop-color="'+S.theme+'"/></radialGradient>'+
+    '<linearGradient id="pkWing" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="rgba(255,255,255,.9)"/><stop offset="1" stop-color="rgba(155,109,255,.6)"/></linearGradient>'+
+    '<radialGradient id="pkGlow" cx="50%" cy="50%" r="50%">'+
+      '<stop offset="0" stop-color="#FFE9A8" stop-opacity=".55"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient>'+
+  '</defs>';
+  out += '<g class="pk-all" transform="translate(60,120) scale('+S.scale+') translate(-60,-120)">';
+  out += '<g class="pk-hop">';
+  out += '<ellipse cx="60" cy="124" rx="30" ry="6" fill="#5A3C28" opacity=".13"/>';
+  if(lv >= 4){
+    out += '<g class="pk-halo" style="animation-delay:'+phHalo+'ms">'+
+      '<ellipse cx="60" cy="30" rx="24" ry="7.5" fill="none" stroke="#FFD86B" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="34 18"/></g>';
+    out += '<circle cx="60" cy="86" r="52" fill="url(#pkGlow)" class="pk-aura"/>';
+  }
+  if(lv === 1){
+    out += '<g class="pk-egg" style="animation-delay:'+phBreath+'ms">'+
+      '<ellipse cx="60" cy="82" rx="31" ry="39" fill="url(#pkBody1)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>'+
+      '<path d="M42 60 l9 8 -7 7 10 7" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<path d="M72 58 l-8 9 8 6 -7 8" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<path d="M36 92 l10 -6 8 8" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<circle cx="50" cy="76" r="4.2" fill="#3B2A22"/><circle cx="70" cy="76" r="4.2" fill="#3B2A22"/>'+
+      '<circle cx="51.4" cy="74.6" r="1.5" fill="#FFFFFF"/><circle cx="71.4" cy="74.6" r="1.5" fill="#FFFFFF"/>'+
+      '<ellipse cx="42" cy="88" rx="6" ry="4" fill="#FF9AA6" opacity=".5"/>'+
+      '<ellipse cx="78" cy="88" rx="6" ry="4" fill="#FF9AA6" opacity=".5"/></g>';
+  }
+  if(lv === 2){
+    out += '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+    out += '<ellipse cx="60" cy="76" rx="28" ry="27" fill="url(#pkBody2)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+    out += '<ellipse cx="42" cy="66" rx="7" ry="13" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-22 42 66)"/>';
+    out += '<ellipse cx="78" cy="66" rx="7" ry="13" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(22 78 66)"/>';
+    out += '<ellipse cx="26" cy="86" rx="9" ry="6" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.2" transform="rotate(-20 26 86)"/>';
+    out += '<ellipse cx="94" cy="86" rx="9" ry="6" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.2" transform="rotate(20 94 86)"/>';
+    out += '</g>';
+    out += '<path d="M26 96 Q60 108 94 96 L92 106 Q84 118 60 119 Q36 118 28 106 Z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  }
+  if(lv >= 3){
+    if(wears.wing && PET_WINGS[wears.wing]) out += PET_WINGS[wears.wing](lineC);
+    out += '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+    out += '<path d="M88 104 C 106 112 116 98 108 82" fill="none" stroke="'+lineC+'" stroke-width="15" stroke-linecap="round"/>';
+    out += '<path d="M88 104 C 106 112 116 98 108 82" fill="none" stroke="'+S.theme+'" stroke-width="10.5" stroke-linecap="round"/>';
+    out += '<ellipse cx="41" cy="48" rx="8.5" ry="17" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-24 41 48)"/>';
+    out += '<ellipse cx="79" cy="48" rx="8.5" ry="17" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(24 79 48)"/>';
+    out += '<ellipse cx="41" cy="50" rx="4" ry="9" fill="'+S.belly+'" transform="rotate(-24 41 50)"/>';
+    out += '<ellipse cx="79" cy="50" rx="4" ry="9" fill="'+S.belly+'" transform="rotate(24 79 50)"/>';
+    out += '<ellipse cx="60" cy="84" rx="32" ry="33" fill="url(#pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+    out += '<ellipse cx="60" cy="94" rx="19" ry="17" fill="'+S.belly+'" opacity=".9"/>';
+    out += '</g>';
+  }
+  if(lv >= 2){
+    var cy = (lv === 2) ? 74 : 82, eyes, mouth;
+    if(mood === 'sleepy'){
+      eyes = '<path d="M40 '+cy+' q8 -7 16 0" fill="none" stroke="#3B2A22" stroke-width="4" stroke-linecap="round"/>'+
+             '<path d="M64 '+cy+' q8 -7 16 0" fill="none" stroke="#3B2A22" stroke-width="4" stroke-linecap="round"/>';
+      mouth = '<path d="M55 '+(cy+14)+' q5 4 10 0" fill="none" stroke="#3B2A22" stroke-width="2.6" stroke-linecap="round"/>';
+    } else if(mood === 'hungry'){
+      eyes = '<circle cx="46" cy="'+cy+'" r="6.2" fill="#3B2A22"/><circle cx="47.6" cy="'+(cy+3)+'" r="2.2" fill="#FFFFFF"/>'+
+             '<circle cx="74" cy="'+cy+'" r="6.2" fill="#3B2A22"/><circle cx="75.6" cy="'+(cy+3)+'" r="2.2" fill="#FFFFFF"/>';
+      mouth = '<path d="M53 '+(cy+16)+' q7 -7 14 0" fill="none" stroke="#3B2A22" stroke-width="2.6" stroke-linecap="round"/>';
+    } else if(mood === 'excited'){
+      eyes = '<circle cx="46" cy="'+cy+'" r="7" fill="#3B2A22"/><circle cx="48.4" cy="'+(cy-2.6)+'" r="2.6" fill="#FFFFFF"/>'+
+             '<circle cx="74" cy="'+cy+'" r="7" fill="#3B2A22"/><circle cx="76.4" cy="'+(cy-2.6)+'" r="2.6" fill="#FFFFFF"/>';
+      mouth = '<path d="M51 '+(cy+9)+' q9 12 18 0 z" fill="#C4544A" stroke="#3B2A22" stroke-width="2.2" stroke-linejoin="round"/>';
+    } else {
+      eyes = '<path d="M40 '+(cy+2)+' q8 -10 16 0" fill="none" stroke="#3B2A22" stroke-width="4" stroke-linecap="round"/>'+
+             '<path d="M64 '+(cy+2)+' q8 -10 16 0" fill="none" stroke="#3B2A22" stroke-width="4" stroke-linecap="round"/>';
+      mouth = '<path d="M52 '+(cy+9)+' q8 11 16 0 z" fill="#C4544A" stroke="#3B2A22" stroke-width="2.2" stroke-linejoin="round"/>';
+    }
+    out += '<g class="pk-face">';
+    out += '<g class="pk-eyes" style="animation-delay:'+phBlink+'ms">'+eyes+'</g>';
+    out += mouth;
+    out += '<ellipse cx="32" cy="'+(cy+11)+'" rx="7" ry="4.5" fill="#FF9AA6" opacity=".5"/>';
+    out += '<ellipse cx="88" cy="'+(cy+11)+'" rx="7" ry="4.5" fill="#FF9AA6" opacity=".5"/>';
+    out += '</g>';
+    if(mood === 'hungry'){
+      out += '<g class="pk-think"><text x="60" y="'+(cy+34)+'" text-anchor="middle" font-size="16" font-weight="800" fill="#6B6455">…</text></g>';
+      out += '<g class="pk-lookat" transform="translate(104,'+(cy-24)+')"><circle r="11" fill="#FF6B5B" stroke="#C43324" stroke-width="2"/>'+
+             '<path d="M0 -11 q5 -7 9 -8 q-1 7 -6 9 z" fill="#8ED46E" stroke="#377020" stroke-width="1.8"/></g>';
+    }
+    if(mood === 'sleepy'){
+      out += '<g class="pk-zzz"><text x="96" y="46" font-size="13" font-weight="800" fill="#6B6455">Z</text>'+
+             '<text x="105" y="34" font-size="10" font-weight="800" fill="#6B6455">z</text>'+
+             '<text x="112" y="25" font-size="8" font-weight="800" fill="#6B6455">z</text></g>';
+    }
+    if(mood === 'excited'){
+      var sp='', a, ang2, dx, dy;
+      for(a=0;a<8;a++){ ang2=a*Math.PI/4; dx=Math.round(Math.cos(ang2)*46); dy=Math.round(Math.sin(ang2)*46);
+        sp += '<circle class="pk-spark" cx="60" cy="84" r="3.4" fill="#FFC94D" style="--dx:'+dx+'px;--dy:'+dy+'px;animation-delay:'+(a*40)+'ms"/>'; }
+      out += '<g class="pk-sparks">'+sp+'</g>';
+    }
+  }
+  if(wears.hat && PET_HATS[wears.hat] && lv >= 2) out += PET_HATS[wears.hat](lineC);
+  if(wears.scarf && PET_SCARFS[wears.scarf] && lv >= 2) out += PET_SCARFS[wears.scarf]();
+  if(lv === 5){
+    out += '<g class="pk-crown" transform="translate(60,42)">'+
+      '<path d="M-13 2 L-9 -11 L-4.5 -1 L0 -13 L4.5 -1 L9 -11 L13 2 Z" fill="#FFC93C" stroke="#B87400" stroke-width="2" stroke-linejoin="round"/>'+
+      '<rect x="-14" y="2" width="28" height="6" rx="3" fill="#FFD86B" stroke="#B87400" stroke-width="2"/></g>';
+  }
+  if(lv === 5){
+    var orb='', i2, d5;
+    for(i2=0;i2<5;i2++){ d5=phOrbit-(i2*800);
+      orb += '<g class="pk-orbit" style="animation-delay:'+d5+'ms"><g class="pk-orbit-in" style="animation-delay:'+d5+'ms" transform="translate(60,22)">'+
+                 '<circle r="10" fill="#FFE9A8" stroke="#B87400" stroke-width="2"/>'+
+                 '<text y="4.5" text-anchor="middle" font-size="12" font-weight="800" font-family="Kaiti SC,STKaiti,KaiTi,PingFang SC,serif" fill="#7A5200">'+chars[i2]+'</text>'+
+               '</g></g>'; }
+    out += '<g class="pk-satellites">'+orb+'</g>';
+  }
+  if(lv === 4){
+    var or3='', i3, d3;
+    for(i3=0;i3<3;i3++){ d3=phOrbit-(i3*1333);
+      or3 += '<g class="pk-orbit" style="animation-delay:'+d3+'ms"><circle cx="60" cy="26" r="5" fill="#FFE9A8" stroke="#B87400" stroke-width="1.6"/></g>'; }
+    out += '<g class="pk-satellites">'+or3+'</g>';
+  }
+  out += '</g></g></svg>';
+  return out;
+}
+/* 场景背景（独立层，放在宠物 SVG 之后面；美术 §15.5） */
+function petBgSVG(id){
+  var o = '<svg class="pet-bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+  if(id === 'forest'){
+    var i, tx=[36,100,164], th=[52,74,60];
+    o += '<rect width="200" height="200" fill="#EFF7E6"/>';
+    for(i=0;i<3;i++){ o += '<g opacity=".35" transform="translate('+tx[i]+','+(200-th[i])+')">'+
+           '<rect x="-4" y="'+th[i]*0.45+'" width="8" height="'+(th[i]*0.55)+'" rx="4" fill="#8A5A2B"/>'+
+           '<circle cx="0" cy="'+th[i]*0.28+'" r="'+(th[i]*0.34)+'" fill="#377020"/>'+
+           '<circle cx="-'+th[i]*0.22+'" cy="'+th[i]*0.42+'" r="'+(th[i]*0.24)+'" fill="#377020"/>'+
+           '<circle cx="'+th[i]*0.22+'" cy="'+th[i]*0.42+'" r="'+(th[i]*0.24)+'" fill="#377020"/></g>'; }
+    o += '<rect y="176" width="200" height="24" fill="#8ED46E" opacity=".5"/>';
+  } else if(id === 'space'){
+    var seed=20260830, r, sx, sy, sr;
+    function rnd(){ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; }
+    o += '<defs><linearGradient id="spG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E2A5E"/><stop offset="1" stop-color="#5B4B9E"/></linearGradient></defs>';
+    o += '<rect width="200" height="200" fill="url(#spG)"/>';
+    for(r=0;r<20;r++){ sx=Math.round(rnd()*196)+2; sy=Math.round(rnd()*196)+2; sr=(rnd()*1.4+0.7).toFixed(1);
+      o += '<circle cx="'+sx+'" cy="'+sy+'" r="'+sr+'" fill="#FFF6DF" opacity="'+(rnd()*0.5+0.4).toFixed(2)+'"/>'; }
+    o += '<path d="M158 40 a22 22 0 1 0 16 34 a26 26 0 1 1 -16 -34 Z" fill="#FFE9A8" opacity=".85"/>';
+  } else {
+    o += '<rect width="200" height="200" fill="#FFF1E0"/>';
+    o += '<circle cx="100" cy="164" r="52" fill="#FFE6D5" opacity=".7"/>';
+  }
+  return o + '</svg>';
+}
+/* 取孩子已掌握的前 n 个字（供 Lv5 环绕小字灵显示），无则回退默认字 */
+function learnedCharsTop(n){
+  n = n||5; var out=[], z, k, L, chs, j;
+  for(z=0; z<4 && out.length<n; z++){
+    for(k=0;k<5 && out.length<n;k++){
+      L = state.game.levels["L"+(z*5+k+1)];
+      if(L && L.cleared){ chs = levelChars(z*5+k); for(j=0;j<chs.length && out.length<n;j++) out.push(chs[j].c); }
+    }
+  }
+  var fb = ["日","月","山","水","火","木","土","人","口","心"];
+  while(out.length<n) out.push(fb[out.length]);
+  return out;
+}
+
+/* ---- 纯逻辑：喂食一次（不碰 DOM，便于单测）。用户 P2：每次消耗 1 🍎、+10 亲密度；GDD §5.4 每日上限 5 次 ---- */
+function applyFeed(s){
+  if(!s || !s.pet) return {ok:false, reason:"nopet"};
+  if(s.pet.fedToday >= 5) return {ok:false, reason:"cap"};
+  if((s.energy||0) < 1)  return {ok:false, reason:"noenergy"};
+  var prev = petStage(s.pet.bond);
+  s.energy -= 1;
+  s.pet.bond += 10;
+  s.pet.fedToday += 1;
+  s.pet.level = bondToLevel(s.pet.bond);
+  var now = petStage(s.pet.bond);
+  return {ok:true, prevStage:prev, stage:now, leveledUp: now>prev, bond:s.pet.bond, energy:s.energy, name:PET_STAGES[now].name};
+}
+/* ---- 纯逻辑：抚摸一次（+1 亲密度，每日上限 10，GDD §5.4）---- */
+function applyPetStroke(s){
+  if(!s || !s.pet) return {ok:false, reason:"nopet"};
+  if(s.pet.petToday >= 10) return {ok:false, reason:"cap"};
+  var prev = petStage(s.pet.bond);
+  s.pet.bond += 1;
+  s.pet.petToday += 1;
+  s.pet.level = bondToLevel(s.pet.bond);
+  var now = petStage(s.pet.bond);
+  return {ok:true, prevStage:prev, stage:now, leveledUp: now>prev, bond:s.pet.bond, name:PET_STAGES[now].name};
+}
+
+var PET_LINES_HAPPY = ["你真棒！","我好喜欢和你一起学！","这个字好有趣呀～","哇，你好厉害！","我们继续吧！"];
+var _petMood = "happy", _petPraise = "";
+
+/* ---- UI：渲染宠物页 ---- */
+function renderPet(){
+  var host = $("page-pet"); if(!host) return;
+  var bond = state.pet.bond||0, st = petStage(bond), lv = st+1, S = PET_STAGES[st];
+  var lo = PET_BOND_THRESH[st], hi = (st<4 ? PET_BOND_THRESH[st+1] : PET_BOND_THRESH[4]);
+  var pct = st>=4 ? 100 : Math.max(0, Math.min(100, Math.round((bond-lo)/(hi-lo)*100)));
+  var mood = (_petMood && _petMood!=="happy") ? _petMood : "happy";
+  var wearBg = state.pet.wears && state.pet.wears.bg;
+  var bgId = (wearBg==="space"||wearBg==="forest") ? wearBg : "";
+  var stageTxt = st>=4 ? "已是最高形态啦，墨墨·圣！" : ("再 "+Math.max(0,(hi-bond))+" 亲密度就长大");
+  var html =
+    '<div class="pet-page" data-page-node-id="'+nid('pet.page')+'">'+
+      '<div class="pet-stage" data-page-node-id="'+nid('pet.stage')+'">'+
+        petBgSVG(bgId)+
+        '<div class="pet-slot">'+petSVG({level:lv, mood:mood, wears:state.pet.wears||{}, t:Date.now(), chars:learnedCharsTop(5)})+'</div>'+
+        (mood==="excited" ? '<div class="pet-praise" data-page-node-id="'+nid('pet.praise')+'">'+_petPraise+'</div>' : '')+
+      '</div>'+
+      '<div class="pet-card" data-page-node-id="'+nid('pet.card')+'">'+
+        '<div class="pet-name" data-page-node-id="'+nid('pet.name')+'">'+(state.pet.name||"墨墨")+
+          ' <span class="pet-lv" data-page-node-id="'+nid('pet.lvtag')+'">'+S.name+' · Lv'+lv+'</span></div>'+
+        '<div class="pet-bar" data-page-node-id="'+nid('pet.bar')+'">'+
+          '<div class="pet-bar-fill" style="width:'+pct+'%"></div>'+
+          '<span class="pet-bar-txt">亲密度 '+bond+(st>=4?' / 满级':' / '+hi)+'</span>'+
+        '</div>'+
+        '<div class="pet-stagetxt">'+stageTxt+'</div>'+
+        '<div class="pet-btns">'+
+          '<button class="pet-feed" id="petFeed" type="button" data-page-node-id="'+nid('pet.feed')+'">'+
+            '🍎 喂能量果<small> (剩 '+(state.energy||0)+' 个)</small></button>'+
+          '<button class="pet-stroke" id="petStroke" type="button" data-page-node-id="'+nid('pet.stroke')+'">✋ 摸摸它</button>'+
+        '</div>'+
+        '<div class="pet-hint" data-page-node-id="'+nid('pet.hint')+'">今天还能喂 '+(5-(state.pet.fedToday||0))+' 次 · 摸 '+(10-(state.pet.petToday||0))+' 次</div>'+
+      '</div>'+
+    '</div>';
+  setHTML(host, html);
+  var fb = $("petFeed");   if(fb) fb.addEventListener('click', feedPet);
+  var fs = $("petStroke"); if(fs) fs.addEventListener('click', petPet);
+}
+function feedPet(){
+  var r = applyFeed(state);
+  if(!r.ok){
+    if(r.reason==="noenergy") toast("能量果不够啦，先去学字赚 🍎 吧～");
+    else if(r.reason==="cap") toast("墨墨今天吃饱啦，明天再来好不好？");
+    return;
+  }
+  if(r.leveledUp){ _petMood="excited"; _petPraise="叮！我长大啦，变成「"+r.name+"」！"; }
+  else { _petMood="happy"; _petPraise=""; }
+  if(SFX && SFX.coin) SFX.coin(); else if(SFX) SFX.tap();
+  syncSave();
+  renderPet();
+  if(r.leveledUp){ setTimeout(function(){ _petMood="happy"; _petPraise=""; renderPet(); }, 2600); }
+}
+function petPet(){
+  var r = applyPetStroke(state);
+  if(!r.ok){ if(r.reason==="cap") toast("墨墨今天被摸够啦，好幸福～"); return; }
+  _petMood = r.leveledUp ? "excited" : "happy";
+  _petPraise = r.leveledUp ? "叮！我长大啦，变成「"+r.name+"」！" : "";
+  if(SFX) SFX.tap();
+  if(typeof speak==="function") speak(pick(PET_LINES_HAPPY));
+  syncSave();
+  renderPet();
+  if(r.leveledUp){ setTimeout(function(){ _petMood="happy"; _petPraise=""; renderPet(); }, 2600); }
+}
 /* ===== /JS-BLOCK: PET ===== */
 
 /* ===== JS-BLOCK: DEX ===== */
 /* TODO(ENG-001-P3): 100 字图鉴（未解锁 / 已解锁 / 已掌握 三态），见 GDD §6 */
-function codexCellSVG(ch, st){ /* 桩 */ return ''; }
-function renderDex(){ /* 桩 */ }
-function openCharDetail(ch){ /* 桩 */ }
+/* P2 · 图鉴（GDD §6）。分组：4 区 × 5 关 = 100 字。
+   复用 CHAR_DICT / levelChars / ZONE_CFG / picSVG（不复制象形数据）。
+   每字状态：known（关卡已通关=已学会）/ todo（已解锁未通关）/ locked（未解锁）。 */
+function codexGroups(s){
+  s = s || state;
+  var groups = [], z, k, n, L, cleared, locked, chs, ch, cells, lv0;
+  for(z=0; z<4; z++){
+    var zone = { name: ZONE_CFG[z].name, levels:[] };
+    for(k=0; k<5; k++){
+      lv0 = z*5 + k; n = lv0+1;
+      L = (s.game && s.game.levels && s.game.levels["L"+n]) || {};
+      cleared = !!L.cleared;
+      locked  = n > (s.game.unlockedThrough||1);
+      chs = levelChars(lv0);
+      cells = [];
+      for(var ci=0; ci<chs.length; ci++){
+        ch = chs[ci];
+        cells.push({ c:ch.c, py:ch.py, cleared:cleared, locked:locked,
+                     st: cleared ? "known" : (locked ? "locked" : "todo") });
+      }
+      zone.levels.push({ n:n, cleared:cleared, locked:locked, chars:cells });
+    }
+    groups.push(zone);
+  }
+  return groups;
+}
+function codexKnownCount(s){
+  var g = codexGroups(s), n=0, z, lv;
+  for(z=0; z<g.length; z++) for(lv=0; lv<g[z].levels.length; lv++)
+    if(g[z].levels[lv].cleared) n += g[z].levels[lv].chars.length;
+  return n;
+}
+function renderDex(){
+  var host = $("page-dex"); if(!host) return;
+  var g = codexGroups(state), known = codexKnownCount(state), total = CHAR_DICT.length;
+  var html = '<div class="dex" data-page-node-id="'+nid('dex.page')+'">'+
+    '<div class="dex-hd" data-page-node-id="'+nid('dex.hd')+'">'+
+      '<div class="dex-hd-t">汉字图鉴</div>'+
+      '<div class="dex-total">已认识 <b>'+known+'</b> / '+total+' 字</div>'+
+      '<div class="dex-track"><div class="dex-track-fill" style="width:'+Math.round(known/total*100)+'%"></div></div>'+
+    '</div>';
+  for(var z=0; z<g.length; z++){
+    var zone = g[z];
+    html += '<section class="dex-zone" data-page-node-id="'+nid('dex.zone.'+z)+'">'+
+      '<h3 class="dex-zone-t" data-page-node-id="'+nid('dex.zone.'+z+'.t')+'">'+zone.name+'</h3>';
+    for(var li=0; li<zone.levels.length; li++){
+      var Lv = zone.levels[li];
+      html += '<div class="dex-lv" data-page-node-id="'+nid('dex.lv.'+Lv.n)+'">'+
+        '<div class="dex-lv-t" data-page-node-id="'+nid('dex.lv.'+Lv.n+'.t')+'">第 '+Lv.n+' 关'+
+          (Lv.cleared?' · 已学会':(Lv.locked?' · 未解锁':''))+'</div>'+
+        '<div class="dex-grid">';
+      for(var ci=0; ci<Lv.chars.length; ci++){
+        var c = Lv.chars[ci];
+        html += '<div class="dex-cell '+c.st+'" data-c="'+c.c+'" data-page-node-id="'+nid('codex.cell.'+c.c)+'">'+
+          '<div class="dex-pic">'+picSVG(c.c)+'</div>'+
+          '<div class="dex-c">'+c.c+'</div>'+
+          '<div class="dex-py">'+c.py+'</div>'+
+          (c.st==="known" ? '<div class="dex-badge ok">✓</div>' :
+           (c.st==="locked" ? '<div class="dex-badge lock">🔒</div>' : '<div class="dex-badge todo">·</div>'))+
+        '</div>';
+      }
+      html += '</div></div>';
+    }
+    html += '</section>';
+  }
+  html += '</div>';
+  setHTML(host, html);
+  [].forEach.call(host.querySelectorAll('.dex-cell.known'), function(el){
+    el.addEventListener('click', function(){ if(typeof speak==="function") speak(el.getAttribute('data-c')); });
+  });
+}
+function openCharDetail(ch){ if(ch && typeof speak==="function") speak(ch.c); }
 /* ===== /JS-BLOCK: DEX ===== */
 
 /* ===== JS-BLOCK: CHEST ===== */
@@ -2581,6 +3049,9 @@ var __SZ__ = {
   computeStars:computeStars, levelReward:levelReward, applyLevelResult:applyLevelResult,
   openLevel:openLevel, closeLevel:closeLevel,
   MAP_W:MAP_W, MAP_H:MAP_H, PET_STAGES:PET_STAGES,
+  PET_BOND_THRESH:PET_BOND_THRESH, petStage:petStage, applyFeed:applyFeed, applyPetStroke:applyPetStroke,
+  petSVG:petSVG, petBgSVG:petBgSVG, learnedCharsTop:learnedCharsTop,
+  codexGroups:codexGroups, codexKnownCount:codexKnownCount, renderPet:renderPet, renderDex:renderDex, feedPet:feedPet,
   getState:function(){ return state; }, setState:function(s){ state = s; },
   getHASV2:function(){ return HAS_V2_FIELDS; }, setHASV2:function(v){ HAS_V2_FIELDS = !!v; }
 };
