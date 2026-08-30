@@ -699,6 +699,115 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .dex-badge.lock{ font-size:12px; }
 .dex-badge.todo{ color:var(--c-ink-3); }
 
+
+/* ===================== P3 · 小游戏 G3/G4/G5 ===================== */
+.g3-target{ display:flex; flex-direction:column; align-items:center; gap:6px; margin:10px 0 4px; }
+.g3-pic{ cursor:pointer; }
+.g3-tchar{ font-family:var(--font-hanzi); font-size:72px; line-height:1; color:var(--c-hanzi); cursor:pointer; }
+.g3-lab{ font-size:var(--fs-cap); font-weight:700; color:var(--c-ink-2); }
+.g3-holes{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin:18px 0; }
+.g3-hole{ width:96px; height:96px; border-radius:24px; border:3px solid var(--c-line); background:var(--c-surface);
+  box-shadow:var(--sh-1); display:flex; align-items:center; justify-content:center; cursor:pointer;
+  font-family:var(--font-hanzi); font-size:52px; color:var(--c-hanzi); }
+.g3-hole.g3-hit{ animation:g3hit .3s ease forwards; }
+.g3-hole.g3-shake{ animation:lvshake .42s ease; }
+@keyframes g3hit{ 0%{transform:scale(1)} 45%{transform:scale(1.25) rotate(8deg)} 100%{transform:scale(0); opacity:0} }
+.g3-bar{ height:14px; background:var(--c-track); border-radius:99px; overflow:hidden; margin:6px 8px 0; }
+.g3-fill{ height:100%; width:100%; background:var(--c-ok); transition:width .12s linear; }
+.g3-fill.g3-warn{ background:var(--c-warn); }
+.g3-fill.g3-danger{ background:var(--c-err); }
+
+.g4-grid{ display:grid; gap:10px; margin:14px auto; max-width:440px; }
+.g4-cell{ aspect-ratio:1; min-height:64px; border-radius:16px; border:3px solid var(--c-line); background:var(--c-surface-2);
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-hanzi); font-size:40px; color:var(--c-hanzi); cursor:pointer; }
+.g4-cell.path{ background:var(--c-cream); border-color:var(--c-road); }
+.g4-cell.cur{ box-shadow:0 0 0 4px var(--c-ok); animation:g4pulse 1.2s infinite; }
+.g4-cell.hint{ box-shadow:0 0 0 6px var(--c-gold); animation:g4hint 1s infinite; }
+.g4-cell.g4-shake{ animation:lvshake .42s ease; }
+.g4-cell.start, .g4-cell.end{ font-size:30px; }
+.g4-lab{ text-align:center; font-size:var(--fs-h3); font-weight:800; color:var(--c-ink); }
+.g4-tgt{ color:var(--c-pri-d); }
+@keyframes g4pulse{ 0%,100%{box-shadow:0 0 0 4px var(--c-ok)} 50%{box-shadow:0 0 0 9px var(--c-ok-l)} }
+@keyframes g4hint{ 0%,100%{box-shadow:0 0 0 4px var(--c-gold)} 50%{box-shadow:0 0 0 12px rgba(242,193,78,.25)} }
+
+.g5-top{ display:flex; align-items:center; justify-content:center; gap:8px; margin:14px 0; }
+.g5-left{ display:flex; flex-direction:column; align-items:center; cursor:pointer; }
+.g5-tc{ font-size:56px; color:var(--c-hanzi); }
+.g5-mid{ flex:0 0 60px; height:4px; background:repeating-linear-gradient(90deg,var(--c-line) 0 8px,transparent 8px 16px); }
+.g5-right{ width:90px; height:90px; border-radius:16px; border:3px dashed var(--c-line); display:flex; align-items:center; justify-content:center; }
+.g5-ph{ font-size:40px; color:var(--c-ink-3); }
+.g5-cands{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:14px 0; }
+.g5-cand{ width:84px; height:84px; border-radius:18px; border:3px solid var(--c-line); background:var(--c-surface);
+  box-shadow:var(--sh-1); display:flex; align-items:center; justify-content:center; cursor:pointer;
+  font-family:var(--font-hanzi); font-size:44px; color:var(--c-hanzi); }
+.g5-cand.picked{ border-color:var(--c-ok); background:var(--c-ok-l); animation:g3hit .3s ease; }
+.g5-cand.gone{ opacity:.4; background:var(--c-disabled-bg); cursor:default; }
+.g5-lab, .g5-fb{ text-align:center; }
+.g5-fb{ min-height:24px; font-weight:800; color:var(--c-pri-d); }
+
+/* ===================== P3 · 宝箱小屋 + 金色奖券 ===================== */
+.chest-page{ padding:18px; }
+.chest-hd{ font-size:var(--fs-h2); font-weight:800; text-align:center; color:var(--c-ink); }
+.chest-keys{ display:flex; gap:12px; justify-content:center; margin:12px 0; }
+.ck{ display:flex; align-items:center; gap:6px; background:var(--c-surface); border:2px solid var(--c-line);
+  border-radius:99px; padding:6px 14px; font-weight:800; color:var(--c-ink); }
+.chest-stage{ display:flex; flex-direction:column; align-items:center; gap:14px; margin:10px 0; }
+.chest-open{ min-width:200px; }
+.chest-tickets-hd{ text-align:center; font-weight:800; color:var(--c-ink); margin:14px 0 6px; }
+.chest-tickets{ display:flex; flex-direction:column; gap:10px; }
+.chest-empty{ text-align:center; color:var(--c-ink-3); }
+.ticket-reveal{ display:flex; flex-direction:column; align-items:center; gap:10px; animation:tpop .5s cubic-bezier(.34,1.3,.5,1); }
+@keyframes tpop{ 0%{transform:scale(.4); opacity:0} 100%{transform:scale(1); opacity:1} }
+
+.pticket{ display:flex; align-items:center; gap:10px; background:var(--c-surface); border:2px solid var(--c-line);
+  border-radius:14px; padding:8px 12px; }
+.pt-name{ font-weight:800; color:var(--c-ink); flex:1 1 auto; }
+.pt-code{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; color:var(--c-ink-2); letter-spacing:1px; }
+
+/* --- §19 宝箱 3 档（HTML + CSS 3D，来自美术规格.md §19.5） --- */
+.chest3d{ position:relative; width:200px; height:190px; margin:0 auto; perspective:600px; perspective-origin:50% 34%;
+  --c-b1:#D89A57; --c-b2:#B4762F; --c-band:#C98A45; --c-lock:#F2C14E; --c-line:#6B4420; }
+.chest3d--rare { --c-b1:#9B6DFF; --c-b2:#6A45C4; --c-band:#B69EFF; --c-lock:#FFC93C; --c-line:#2C1B78; }
+.chest3d--shiny{ --c-b1:#FFD86B; --c-b2:#E5A419; --c-band:#FFF0B8; --c-lock:#FF6B9D; --c-line:#A56600; }
+.chest3d svg{ display:block; width:100%; height:100%; overflow:visible; }
+.c-base{ position:absolute; left:0; right:0; bottom:0; height:112px; z-index:1; }
+.c-lid{ position:absolute; left:0; right:0; bottom:104px; height:82px; z-index:3;
+  transform-origin:bottom center; transform-style:preserve-3d; transform:rotateX(0deg);
+  transition:transform .62s cubic-bezier(.34,1.3,.5,1); }
+.c-prize{ position:absolute; left:50%; bottom:118px; width:120px; height:64px;
+  transform:translateX(-50%) translateY(14px) scale(.8); opacity:0; z-index:2; display:grid; place-items:center;
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1) .26s, opacity .34s ease .26s; font-size:20px; font-weight:800; color:#3B2A1E; }
+.c-beam{ position:absolute; left:50%; bottom:96px; width:76px; height:0; transform:translateX(-50%); z-index:2;
+  background:linear-gradient(to top, rgba(255,255,255,0), #FFE9A8 45%, rgba(255,255,255,0)); border-radius:38px 38px 0 0; opacity:0;
+  transition:height .5s cubic-bezier(.2,.9,.3,1) .2s, opacity .3s ease .2s; }
+.c-glow{ position:absolute; left:50%; top:52%; width:210px; height:210px; transform:translate(-50%,-50%) scale(.4); z-index:0;
+  background:radial-gradient(circle, rgba(255,233,168,.85) 0%, rgba(255,233,168,0) 68%); opacity:0; transition:transform .6s ease, opacity .5s ease; }
+.chest3d.is-open .c-lid  { transform:rotateX(-70deg); }
+.chest3d.is-open .c-prize{ transform:translateX(-50%) translateY(-16px) scale(1); opacity:1; }
+.chest3d.is-open .c-beam { height:160px; opacity:1; }
+.chest3d.is-open .c-glow { transform:translate(-50%,-50%) scale(1); opacity:1; }
+.chest3d.is-ready{ animation:chestbreathe 1.8s ease-in-out infinite; }
+@keyframes chestbreathe{ 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-5px) scale(1.02);} }
+
+/* --- §19.4 金色奖券 --- */
+.ticket{ position:relative; width:300px; max-width:86vw; margin:14px auto; padding:16px 22px 18px;
+  border:3px solid #FFC93C; border-radius:18px; background:linear-gradient(160deg,#FFFDF3 0%, #FFF3D0 100%);
+  box-shadow:0 0 0 4px rgba(255,201,60,.18), 0 10px 24px rgba(180,116,0,.20), inset 0 0 22px rgba(255,233,168,.75);
+  text-align:center; color:#3B2A1E; }
+.ticket::before{ content:''; position:absolute; inset:7px; border:2px dashed rgba(184,116,0,.45); border-radius:12px; pointer-events:none; }
+.t-notch{ position:absolute; top:50%; width:20px; height:20px; margin-top:-10px; background:#FFF7ED; border:3px solid #FFC93C; border-radius:50%; }
+.t-notch--l{ left:-13px;  clip-path:inset(0 0 0 50%); }
+.t-notch--r{ right:-13px; clip-path:inset(0 50% 0 0); }
+.t-head{ font-size:13px; font-weight:800; letter-spacing:1px; color:#A56600; margin-bottom:6px; }
+.t-ico { font-size:16px; margin-right:4px; }
+.t-name{ font-size:22px; font-weight:800; line-height:1.3; margin-bottom:10px; }
+.t-code{ display:inline-block; padding:6px 14px; border-radius:10px; background:#FFFDF3; border:2px dashed rgba(184,116,0,.55);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:16px; letter-spacing:2px; font-weight:700; color:#8A5A2B; user-select:all; }
+.t-date{ margin-top:10px; font-size:12px; font-weight:700; color:#7D6647; }
+.t-stamp{ position:absolute; right:14px; top:12px; padding:4px 10px; border-radius:8px; background:#E8E3D3; color:#6B6455; font-size:12px; font-weight:800; transform:rotate(-12deg); }
+.ticket.is-redeemed{ filter:saturate(.5); opacity:.78; }
+.ticket.is-redeemed .t-code{ text-decoration:line-through; }
+
 </style>
 <!-- ===== /BLOCK: CSS-TOKENS ===== -->
 </head>
@@ -843,10 +952,15 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
     </div>
   </div>
 
+  <div class="panel-sec" data-nid="panel.sec.tickets">
+    <h3 data-nid="panel.sec.tickets.t">🎟️ 待核销奖券</h3>
+    <div id="parentTicketsList" data-nid="panel.tickets.list"></div>
+  </div>
+
   <div class="panel-sec" data-nid="panel.sec.todo">
     <h3 data-nid="panel.sec.todo.t">待办（后续阶段接入）</h3>
     <p class="todo" data-nid="panel.todo.txt">
-      TODO(ENG-001-P3)：4 位 PIN 闸门 · 待核销奖券 · 奖池设置 · 学习报告 ·
+      TODO(ENG-001-P3)：4 位 PIN 闸门 · 奖池设置 · 学习报告 ·
       每日时长/休息提醒 · 导出备份 / 导入恢复 · 清空全部数据（须先自动导出）。
       见 GDD §10 家长中心 / §12.6 第 12 条。
     </p>
@@ -1196,7 +1310,7 @@ function _initVoices(){
   }
 }
 function ttsOK(){ return ('speechSynthesis' in window); }
-if('speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged=_initVoices; _initVoices(); }
+if(typeof window !== "undefined" && 'speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged=_initVoices; _initVoices(); }
 function spkSVG(){
   return '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
 }
@@ -2156,6 +2270,7 @@ function openParent(){
   var p = $("parentPanel"), s = $("scrim");
   if(p){ p.classList.add('on'); p.setAttribute('aria-hidden', 'false'); }
   if(s) s.classList.add('on');
+  renderParentTickets();   /* P3：打开即刷新待核销列表 */
   SFX.tap();
 }
 function closeParent(){
@@ -2618,13 +2733,512 @@ function renderDex(){
 function openCharDetail(ch){ if(ch && typeof speak==="function") speak(ch.c); }
 /* ===== /JS-BLOCK: DEX ===== */
 
-/* ===== JS-BLOCK: CHEST ===== */
-/* TODO(ENG-001-P3): 宝箱 3 档 + 金色奖券 + 家长核销，见 GDD §4 / 美术 §19 */
-function chestSVG(kind, open){ /* 桩 */ return ''; }
-function renderChest(){ /* 桩 */ }
-function openChest(){ /* 桩 */ }
-function ticketSVG(coupon){ /* 桩 */ return ''; }
-/* ===== /JS-BLOCK: CHEST ===== */
+/* ===== JS-BLOCK: MINIGAMES (P3) ===== */
+/* G3 拍字地鼠 / G4 认字小路 / G5 连线成词，接入 S2 轮换（GAME_ROTATION）。
+   设计：每个新游戏自管内部循环，结束后回调 done（= nextGameOrS3）；正确性折叠进
+   LV.combo / LV.maxCombo，从而与 computeStars(quizFirstCorrect, quizTotal, hintsUsed, maxCombo)
+   三星契约保持一致（契约本身不变，见 P1 §3.5）。
+   防挫败（GDD §9.1）：拍错/走错/连错都不惩罚、不阻断，可重试到对为止。 */
+
+var GAME_ROTATION = [
+  /*L1*/["G1","G2"],["G1","G3"],["G2","G3"],["G2","G4"],["G3","G1"],
+  /*L6*/["G1","G5"],["G2","G1"],["G3","G4"],["G4","G2"],["G5","G3"],
+  /*L11*/["G4","G1"],["G4","G5"],["G5","G3"],["G5","G2"],["G3","G4"],
+  /*L16*/["G1","G5"],["G2","G3"],["G3","G1"],["G4","G5"],["G5","G2"]
+];
+
+var MG_TIMERS = [];
+var MG_ROUTER = null;
+function mgClearTimers(){
+  for(var i=0;i<MG_TIMERS.length;i++){ clearTimeout(MG_TIMERS[i]); clearInterval(MG_TIMERS[i]); }
+  MG_TIMERS.length = 0;
+}
+function mgClearHost(){
+  if(MG_ROUTER){ var h=$('levelHost'); if(h) h.removeEventListener('click', MG_ROUTER); }
+  MG_ROUTER = null;
+}
+function mgCorrect(){ LV.combo++; if(LV.combo>LV.maxCombo) LV.maxCombo=LV.combo; }
+function mgWrong(){ LV.combo = 0; }
+/* 纯函数：给定对错序列，返回最大连击（与 mgCorrect/mgWrong 等价，供单测验证逻辑） */
+function simCombo(seq){
+  var combo=0, max=0;
+  for(var i=0;i<seq.length;i++){ if(seq[i]){ combo++; if(combo>max) max=combo; } else combo=0; }
+  return max;
+}
+
+/* 字库查找表 + 组词伙伴表（G5 用，零新增数据，运行时由 CHAR_DICT.w 推导） */
+var _DICT_MAP = null;
+function chObj(c){ if(!_DICT_MAP){ _DICT_MAP={}; CHAR_DICT.forEach(function(o){ _DICT_MAP[o.c]=o; }); } return _DICT_MAP[c]; }
+var _COMBO = null;
+function buildCombo(){
+  if(_COMBO) return _COMBO;
+  var inDict={}; CHAR_DICT.forEach(function(o){ inDict[o.c]=1; });
+  _COMBO={};
+  CHAR_DICT.forEach(function(o){
+    var set={};
+    (o.w||[]).forEach(function(word){
+      for(var i=0;i<word.length;i++){ var p=word[i]; if(p!==o.c && inDict[p]) set[p]=1; }
+    });
+    _COMBO[o.c]=Object.keys(set);
+  });
+  return _COMBO;
+}
+
+function runMinigame(g, done){
+  mgClearTimers(); mgClearHost();
+  if(g.type==='g3') return mgG3(g, done);
+  if(g.type==='g4') return mgG4(g, done);
+  if(g.type==='g5') return mgG5(g, done);
+}
+
+/* ---------- G3 拍字地鼠 ---------- */
+function mgG3(g, done){
+  var host = $('levelHost');
+  var idx = currentLevelIdx();
+  var maxMoles = idx<8 ? 1 : (idx<14 ? 2 : 3);
+  var stayMs   = idx<8 ? 2000 : (idx<14 ? 1500 : 1100);
+  var TOTAL = 30000;
+  var queue = shuffle(LV.chars).concat(shuffle(LV.chars)).concat(shuffle(LV.chars));
+  var qPos = 0, hits = 0;
+  var distractorPool = LV.pool.concat(LV.distract);
+  var endTime = 0, holesEl, fillEl, tcharEl, tpicEl, router;
+
+  function curTarget(){ return queue[qPos % queue.length]; }
+  function updateTarget(){
+    var t = curTarget();
+    if(tcharEl) tcharEl.textContent = t.c;
+    if(tpicEl)  tpicEl.innerHTML = picSVG(t.c);
+    speak(t.c);
+  }
+  function spawnRound(){
+    if(!holesEl) return;
+    var t = curTarget();
+    var others = shuffle(distractorPool.filter(function(c){ return c.c !== t.c; })).slice(0, maxMoles-1);
+    var moles = shuffle([t].concat(others)).slice(0, maxMoles);
+    var html = '';
+    for(var i=0;i<maxMoles;i++){
+      var m = moles[i];
+      html += '<button class="g3-hole" data-ch="'+(m?m.c:'')+'">'+(m?('<span class="lv-ch">'+m.c+'</span>'):'')+'</button>';
+    }
+    holesEl.innerHTML = html;
+  }
+  function tick(){
+    var rem = endTime - Date.now();
+    if(rem <= 0){ endGame(); return; }
+    var pct = Math.max(0, rem/TOTAL*100);
+    if(fillEl){
+      fillEl.style.width = pct + '%';
+      fillEl.className = 'g3-fill' + (rem<=10000?' g3-warn':'') + (rem<=5000?' g3-danger':'');
+    }
+  }
+  function onHole(btn){
+    var ch = btn.getAttribute('data-ch');
+    if(ch === curTarget().c){
+      btn.classList.add('g3-hit'); SFX.right(); hits++; mgCorrect(); qPos++;
+      setTimeout(spawnRound, 260); setTimeout(updateTarget, 120);
+    } else {
+      btn.classList.add('g3-shake'); SFX.wrong(); mgWrong();
+      setTimeout(function(){ if(btn) btn.classList.remove('g3-shake'); }, 420);
+    }
+  }
+  function endGame(){
+    mgClearTimers(); mgClearHost();
+    var html = '<div class="lv-s4">'+
+      '<div class="lv-hero" style="font-size:48px">🎉</div>'+
+      '<div class="lv-hd-t" style="font-size:var(--fs-h2)">拍中 '+hits+' 个！</div>'+
+      '<div class="lv-s4tip">你真棒！</div>'+
+      '<button class="lv-btn" id="mgNext">继续 ➜</button></div>';
+    host.innerHTML = lvWrap(html);
+    SFX.clear();
+    host.querySelector('#mgNext').addEventListener('click', function(){ done(); });
+    speak('拍中 '+hits+' 个！');
+  }
+  function init(){
+    var t0 = curTarget();
+    var html =
+      '<header class="lv-hd"><button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
+        '<div class="lv-hd-t">拍字地鼠</div>'+
+        '<button class="lv-hint" data-act="speak" aria-label="重听">🔊</button></header>'+
+      '<div class="g3">'+
+        '<div class="g3-target">'+
+          '<div class="g3-pic" data-act="speak">'+picSVG(t0.c)+'</div>'+
+          '<div class="g3-tchar" data-act="speak">'+t0.c+'</div>'+
+          '<div class="g3-lab">拍一拍这个字！</div>'+
+        '</div>'+
+        '<div class="g3-holes"></div>'+
+        '<div class="g3-bar"><div class="g3-fill"></div></div>'+
+      '</div>';
+    host.innerHTML = lvWrap(html);
+    bindExit(host);
+    tcharEl = host.querySelector('.g3-tchar'); tpicEl = host.querySelector('.g3-pic');
+    holesEl = host.querySelector('.g3-holes'); fillEl = host.querySelector('.g3-fill');
+    router = function(e){
+      var sp = e.target.closest && e.target.closest('[data-act="speak"]');
+      if(sp){ speak(curTarget().c); return; }
+      var btn = e.target.closest && e.target.closest('.g3-hole');
+      if(btn && !btn.disabled) onHole(btn);
+    };
+    host.addEventListener('click', router); MG_ROUTER = router;
+    spawnRound();
+    endTime = Date.now() + TOTAL;
+    MG_TIMERS.push(setInterval(tick, 120));
+    MG_TIMERS.push(setInterval(spawnRound, stayMs));
+    setTimeout(function(){ speak(curTarget().c); }, 260);
+  }
+  init();
+}
+
+/* ---------- G4 认字小路 ---------- */
+function mgG4(g, done){
+  var host = $('levelHost');
+  var idx = currentLevelIdx();
+  var cols = idx<8 ? 3 : (idx<14 ? 4 : 5);
+  var rows = idx<8 ? 4 : (idx<14 ? 5 : 5);
+  var steps = idx<8 ? 5 : (idx<14 ? 7 : 9);
+  var total = cols*rows;
+  function neighbors(cell){
+    var r = Math.floor(cell/cols), c = cell%cols, out=[];
+    if(r>0) out.push(cell-cols); if(r<rows-1) out.push(cell+cols);
+    if(c>0) out.push(cell-1); if(c<cols-1) out.push(cell+1);
+    return out;
+  }
+  function genPath(){
+    for(var attempt=0; attempt<300; attempt++){
+      var visited={}, path=[], start=rand(total);
+      path.push(start); visited[start]=1; var ok=true;
+      for(var s=0;s<steps;s++){
+        var nb = neighbors(path[path.length-1]).filter(function(n){ return !visited[n]; });
+        if(!nb.length){ ok=false; break; }
+        var nx = nb[rand(nb.length)]; path.push(nx); visited[nx]=1;
+      }
+      if(ok && path.length===steps+1) return path;
+    }
+    /* 兜底：蛇形遍历，保证路径全程相邻（极少触发） */
+    var p=[], dir=1;
+    for(var rr=0; rr<rows && p.length<=steps; rr++){
+      if(dir>0){ for(c=0;c<cols && p.length<=steps;c++) p.push(rr*cols+c); }
+      else { for(c=cols-1;c>=0 && p.length<=steps;c--) p.push(rr*cols+c); }
+      dir=-dir;
+    }
+    return p;
+  }
+  var path = genPath();
+  var pathCh={}, used={}; path.forEach(function(c){ used[c]=1; });
+  for(var i=0;i<path.length;i++){ pathCh[path[i]] = LV.chars[i % LV.chars.length]; }
+  var gridCh={}, distractorPool = LV.pool.concat(LV.distract);
+  for(var cell=0; cell<total; cell++){
+    if(used[cell]) continue;
+    var adj = neighbors(cell).filter(function(n){ return used[n]; });
+    var bad={}; adj.forEach(function(n){ if(pathCh[n]) bad[pathCh[n].c]=1; });
+    var cand = shuffle(distractorPool.filter(function(c){ return !bad[c.c]; }));
+    gridCh[cell] = cand[0] || LV.pool[0];
+  }
+  var cur = path[0], step = 0, hintTimer = null, router;
+  function targetCh(){ return pathCh[ path[step+1] ]; }
+  function render(){
+    var cellHTML='';
+    for(var c=0; c<total; c++){
+      var isPath = used[c], ch = isPath ? pathCh[c] : gridCh[c];
+      var cls = 'g4-cell' + (isPath?' path':'');
+      if(c===path[0]) cls+=' start';
+      if(c===path[path.length-1]) cls+=' end';
+      if(c===cur) cls+=' cur';
+      var mark = (c===path[0])?'🏁':(c===path[path.length-1])?'🎯':(ch?ch.c:'');
+      cellHTML += '<button class="'+cls+'" data-cell="'+c+'">'+mark+'</button>';
+    }
+    var html =
+      '<header class="lv-hd"><button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
+        '<div class="lv-hd-t">认字小路</div><div style="width:64px"></div></header>'+
+      '<div class="g4">'+
+        '<div class="g4-lab">走到「<span class="g4-tgt">'+targetCh().c+'</span>」</div>'+
+        '<div class="g4-grid" style="grid-template-columns:repeat('+cols+',1fr)">'+cellHTML+'</div>'+
+      '</div>';
+    host.innerHTML = lvWrap(html);
+    bindExit(host); attachRouter(); resetHint();
+    if(step>=path.length-1) win();
+  }
+  function onTap(cell){
+    if(step>=path.length-1) return;
+    var next = path[step+1];
+    if(cell===next){
+      cur=next; step++; mgCorrect(); SFX.right(); speak(targetCh()?targetCh().c:'');
+      render();
+    } else {
+      var el = host.querySelector('[data-cell="'+cell+'"]');
+      if(el){ el.classList.add('g4-shake'); setTimeout(function(){ if(el) el.classList.remove('g4-shake'); }, 420); }
+      SFX.wrong(); mgWrong();
+    }
+  }
+  function attachRouter(){
+    if(MG_ROUTER) host.removeEventListener('click', MG_ROUTER);
+    router = function(e){
+      var ex = e.target.closest && e.target.closest('[data-act="exit"]'); if(ex) return;
+      var ce = e.target.closest && e.target.closest('.g4-cell');
+      if(ce) onTap(parseInt(ce.getAttribute('data-cell'),10));
+    };
+    host.addEventListener('click', router); MG_ROUTER = router;
+  }
+  function resetHint(){
+    if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+    var prev = host.querySelector('.g4-cell.hint'); if(prev) prev.classList.remove('hint');
+    hintTimer = setTimeout(function(){
+      var el = host.querySelector('[data-cell="'+path[step+1]+'"]'); if(el) el.classList.add('g4-hint');
+    }, 12000);
+    MG_TIMERS.push(hintTimer);
+  }
+  function win(){
+    mgClearTimers(); mgClearHost();
+    var html = '<div class="lv-s4"><div class="lv-hero" style="font-size:48px">🎯</div>'+
+      '<div class="lv-hd-t" style="font-size:var(--fs-h2)">到达终点！</div>'+
+      '<div class="lv-s4tip">你认字小路走得真稳！</div>'+
+      '<button class="lv-btn" id="mgNext">继续 ➜</button></div>';
+    host.innerHTML = lvWrap(html); SFX.clear();
+    host.querySelector('#mgNext').addEventListener('click', function(){ done(); });
+    speak('到达终点！');
+  }
+  render();
+}
+
+/* ---------- G5 连线成词 ---------- */
+function mgG5(g, done){
+  var host = $('levelHost');
+  var idx = currentLevelIdx();
+  var qCount = idx<8 ? 4 : (idx<14 ? 5 : 6);
+  var COMBO = buildCombo();
+  var valid = LV.chars.filter(function(c){
+    var ps = (COMBO[c.c]||[]).filter(function(p){ return chObj(p); });
+    return ps.length>0;
+  });
+  if(valid.length < qCount){
+    for(var di=0; di<CHAR_DICT.length && valid.length<qCount; di++){
+      var o = CHAR_DICT[di];
+      var ps2 = (COMBO[o.c]||[]).filter(function(p){ return chObj(p); });
+      if(ps2.length>0 && !valid.some(function(v){ return v.c===o.c; })) valid.push(o);
+    }
+  }
+  qCount = Math.min(qCount, valid.length);
+  if(qCount===0){ done(); return; }
+  valid = shuffle(valid).slice(0, qCount);
+  var qi = 0, router, curTargetChar=null, curCorrect=null, curCands=null;
+  function buildQuestion(){
+    curTargetChar = valid[qi];
+    var partners = (COMBO[curTargetChar.c]||[]).filter(function(p){ return chObj(p); });
+    curCorrect = chObj(pick(partners));
+    var comboSet={}; (COMBO[curTargetChar.c]||[]).forEach(function(p){ comboSet[p]=1; });
+    var distPool = LV.pool.concat(LV.distract).filter(function(c){ return c.c!==curTargetChar.c && c.c!==curCorrect.c && !comboSet[c.c]; });
+    var distract = shuffle(distPool).slice(0, Math.max(2, 5-1));
+    var cands = shuffle([curCorrect].concat(distract));
+    cands.forEach(function(c){ c.gone=false; }); curCands = cands;
+    var html =
+      '<header class="lv-hd"><button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
+        '<div class="lv-hd-t">连线成词</div><div style="width:64px"></div></header>'+
+      '<div class="g5">'+
+        '<div class="g5-lab">和「'+curTargetChar.c+'」组词的是哪个字？</div>'+
+        '<div class="g5-top">'+
+          '<div class="g5-left" data-act="speak">'+picSVG(curTargetChar.c)+'<div class="lv-hero g5-tc">'+curTargetChar.c+'</div></div>'+
+          '<div class="g5-mid"><div class="g5-line"></div></div>'+
+          '<div class="g5-right" id="g5Word"><span class="g5-ph">？</span></div>'+
+        '</div>'+
+        '<div class="g5-cands">'+
+          cands.map(function(c,ci){ return '<button class="g5-cand" data-ci="'+ci+'" data-ch="'+c.c+'"><span class="lv-ch">'+c.c+'</span></button>'; }).join('')+
+        '</div>'+
+        '<div class="g5-fb" id="g5fb"></div>'+
+      '</div>';
+    host.innerHTML = lvWrap(html);
+    bindExit(host); attachRouter(); bindSpeak(host, curTargetChar.c);
+    speak(curTargetChar.c);
+  }
+  function onCand(ci){
+    var c = curCands[ci];
+    if(!c || c.gone) return;
+    if(c.c === curCorrect.c){
+      c.gone = true;
+      var btn = host.querySelector('[data-ci="'+ci+'"]'); if(btn) btn.classList.add('picked');
+      SFX.right(); mgCorrect();
+      var word = host.querySelector('#g5Word');
+      if(word) word.innerHTML = '<span class="lv-ch">'+curTargetChar.c+'</span><span class="lv-ch">'+curCorrect.c+'</span>';
+      speak(curTargetChar.c + curCorrect.c);
+      qi++;
+      setTimeout(function(){ if(qi>=qCount) finish(); else buildQuestion(); }, 720);
+    } else {
+      c.gone = true;
+      var b2 = host.querySelector('[data-ci="'+ci+'"]'); if(b2){ b2.classList.add('gone'); b2.disabled=true; }
+      SFX.wrong(); mgWrong();
+      var fb = host.querySelector('#g5fb'); if(fb) fb.textContent = pick(GENTLE);
+    }
+  }
+  function attachRouter(){
+    if(MG_ROUTER) host.removeEventListener('click', MG_ROUTER);
+    router = function(e){
+      var ex = e.target.closest && e.target.closest('[data-act="exit"]'); if(ex) return;
+      var ce = e.target.closest && e.target.closest('.g5-cand');
+      if(ce && !ce.disabled) onCand(parseInt(ce.getAttribute('data-ci'),10));
+    };
+    host.addEventListener('click', router); MG_ROUTER = router;
+  }
+  function finish(){
+    mgClearTimers(); mgClearHost();
+    var html = '<div class="lv-s4"><div class="lv-hero" style="font-size:48px">🔗</div>'+
+      '<div class="lv-hd-t" style="font-size:var(--fs-h2)">连成 '+qCount+' 个词！</div>'+
+      '<div class="lv-s4tip">你认识好多词啦！</div>'+
+      '<button class="lv-btn" id="mgNext">继续 ➜</button></div>';
+    host.innerHTML = lvWrap(html); SFX.clear();
+    host.querySelector('#mgNext').addEventListener('click', function(){ done(); });
+    speak('连成 '+qCount+' 个词！');
+  }
+  buildQuestion();
+}
+
+/* ===== /JS-BLOCK: MINIGAMES (P3) ===== */
+
+/* ===== JS-BLOCK: CHEST (P3) ===== */
+/* 宝箱小屋 + 金色奖券（GDD §4.6 / 美术 §19）。复用既有 state.coupons 作为奖券列表
+   （GDD §4.6 的奖券对象即 coupons 元素），不另增 state.chests，以免与既有迁移/normalize 冲突。 */
+var P3_REWARDS = [
+  {id:'r1', name:'去公园玩一次'},
+  {id:'r2', name:'多讲一个睡前故事'},
+  {id:'r3', name:'买一本喜欢的绘本'}
+];
+function chestRewardPool(s){
+  var pool = (s && s.settingsNew && s.settingsNew.chestPool) || {};
+  var arr = Object.keys(pool).map(function(k){ return pool[k]; });
+  return arr.length ? arr : null;
+}
+function couponCode(rewardId, ts){
+  var b = "ACDEFGHJKLMNPQRTUVWXY3479";
+  var h = (rewardId.charCodeAt(rewardId.length-1)*7919 + ts) >>> 0;
+  var s = "";
+  for(var i=0;i<4;i++){ s += b[h%24]; h = Math.floor(h/24) ^ (h*7>>>0); h >>>= 0; }
+  return "SZ-" + s;
+}
+function fmtDate(ts){
+  var d = new Date(ts||Date.now());
+  function p(n){ return (n<10?'0':'')+n; }
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+/* 纯逻辑：扣 1 钥匙、生成奖券并入 coupons。无 DOM，便于单测（vm 沙箱）。 */
+function doOpenChest(s){
+  if(!s || s.keys < 1) return {ok:false};
+  s.keys -= 1;
+  var pool = chestRewardPool(s) || P3_REWARDS;
+  var rw = pick(pool);
+  var gotAt = Date.now();
+  var code = couponCode(rw.id, gotAt);
+  var ticket = { id:'c_'+gotAt+'_'+rand(99), rewardId:rw.id, name:rw.name, gotAt:gotAt, code:code, used:false, usedAt:null };
+  s.coupons = s.coupons || [];
+  s.coupons.push(ticket);
+  s.chest = s.chest || {opened:0, log:[]};
+  s.chest.opened = (s.chest.opened||0) + 1;
+  return {ok:true, ticket:ticket};
+}
+function chestHTML(tier){
+  var T = { normal:{b1:'#D89A57', b2:'#B4762F', band:'#C98A45', lock:'#F2C14E', line:'#6B4420', gem:'',  arcs:1},
+            rare:  {b1:'#9B6DFF', b2:'#6A45C4', band:'#B69EFF', lock:'#FFC93C', line:'#2C1B78', gem:'#FF6B9D', arcs:1},
+            shiny: {b1:'#FFD86B', b2:'#E5A419', band:'#FFF0B8', lock:'#FF6B9D', line:'#A56600', gem:'#3DA5E0', arcs:3} }[tier||'normal'];
+  var arcs='', a;
+  for(a=0;a<T.arcs;a++){
+    var off=a*5;
+    arcs += '<path d="M'+(26-off)+' '+(42-off)+' a'+(26-off)+' '+(26-off)+' 0 0 1 '+(48+off*2)+' 0" fill="none" stroke="'+T.lock+'" stroke-width="'+(4-a*0.8).toFixed(1)+'" opacity="'+(0.8-a*0.18).toFixed(2)+'"/>';
+  }
+  return ''+
+  '<div class="chest3d chest3d--'+(tier||'normal')+'" data-page-node-id="chest" role="img" aria-label="'+(tier==='shiny'?'闪光':tier==='rare'?'稀有':'普通')+'宝箱">'+
+    '<div class="c-beam"></div><div class="c-glow"></div>'+
+    '<div class="c-base"><svg viewBox="0 0 100 62" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+      '<defs><linearGradient id="cbG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+T.b1+'"/><stop offset="1" stop-color="'+T.b2+'"/></linearGradient></defs>'+
+      '<path d="M10 8 h80 v40 a8 8 0 0 1 -8 8 H18 a8 8 0 0 1 -8 -8 Z" fill="url(#cbG)" stroke="'+T.line+'" stroke-width="3.5" stroke-linejoin="round"/>'+
+      '<rect x="6" y="2" width="88" height="14" rx="7" fill="'+T.band+'" stroke="'+T.line+'" stroke-width="3.5"/>'+
+      '<rect x="44" y="10" width="12" height="24" rx="4" fill="'+T.lock+'" stroke="#B87400" stroke-width="2.5"/>'+
+      '<circle cx="50" cy="21" r="3" fill="'+T.line+'"/>'+
+      (T.gem?'<circle cx="26" cy="34" r="5" fill="'+T.gem+'" stroke="#FFFFFF" stroke-width="2"/><circle cx="74" cy="34" r="5" fill="'+T.gem+'" stroke="#FFFFFF" stroke-width="2"/>':'')+
+    '</svg></div>'+
+    '<div class="c-lid"><svg viewBox="0 0 100 46" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+      '<defs><linearGradient id="clG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+T.b1+'"/><stop offset="1" stop-color="'+T.b2+'"/></linearGradient></defs>'+
+      '<path d="M10 44 a40 34 0 0 1 80 0 Z" fill="url(#clG)" stroke="'+T.line+'" stroke-width="3.5" stroke-linejoin="round"/>'+ arcs +
+    '</svg></div>'+
+    '<div class="c-prize"></div><div class="c-sparks"></div>'+
+  '</div>';
+}
+function ticketHTML(t){
+  return ''+
+  '<div class="ticket'+(t.redeemed?' is-redeemed':'')+'" data-page-node-id="ticket-'+t.code+'">'+
+    '<div class="t-notch t-notch--l"></div><div class="t-notch t-notch--r"></div>'+
+    '<div class="t-head"><span class="t-ico">&#127915;</span>金色奖券</div>'+
+    '<div class="t-name">'+t.name+'</div>'+
+    '<div class="t-code">'+t.code+'</div>'+
+    '<div class="t-date">'+t.date+(t.redeemed?' · 已兑现':'')+'</div>'+
+    (t.redeemed?'<div class="t-stamp">已兑现</div>':'')+
+  '</div>';
+}
+function renderChest(){
+  var host = $('page-chest'); if(!host) return;
+  var keys = state.keys||0, shards = state.shards||0, canOpen = keys>=1;
+  var tier = canOpen ? 'shiny' : 'normal';
+  var chest = chestHTML(tier);
+  if(canOpen) chest = chest.replace('chest3d chest3d--'+tier, 'chest3d chest3d--'+tier+' is-ready');
+  var tickets = (state.coupons||[]).slice().reverse();
+  var tHTML = tickets.length ? tickets.map(function(t){
+    return ticketHTML({name:t.name, code:t.code, date:fmtDate(t.gotAt), redeemed:!!t.used});
+  }).join('') : '<div class="chest-empty">还没有奖券，去开宝箱吧！</div>';
+  var html =
+    '<div class="chest-page">'+
+      '<div class="chest-hd">🎁 宝箱小屋</div>'+
+      '<div class="chest-keys">'+
+        '<div class="ck"><span class="ck-ic">'+ICON.key(28)+'</span>钥匙 <b>'+keys+'</b></div>'+
+        '<div class="ck"><span class="ck-ic">'+ICON.shard(28)+'</span>碎片 <b>'+shards+'/3</b></div>'+
+      '</div>'+
+      '<div class="chest-stage" id="chestStage">'+
+        '<div class="chest3d-wrap" id="chestWrap">'+chest+'</div>'+
+        '<button class="lv-btn chest-open" id="chestOpen" '+(canOpen?'':'disabled')+'>'+(canOpen?'开宝箱 🔓':'还差钥匙 🔒')+'</button>'+
+      '</div>'+
+      '<div class="chest-tickets-hd">我的奖券</div>'+
+      '<div class="chest-tickets" id="chestTickets">'+tHTML+'</div>'+
+    '</div>';
+  setHTML(host, html);
+  var ob = host.querySelector('#chestOpen');
+  if(ob) ob.addEventListener('click', function(){ openChest(); });
+}
+function openChest(){
+  if(state.keys < 1){ toast('还差一把钥匙哦～'); return; }
+  var res = doOpenChest(state);
+  if(!res.ok) return;
+  save();
+  var wrap = $('chestWrap');
+  if(wrap){ var cd = wrap.querySelector('.chest3d'); if(cd) cd.classList.add('is-open'); }
+  SFX.chest();
+  setTimeout(function(){ showTicketReveal(res.ticket); }, 720);
+}
+function showTicketReveal(ticket){
+  var stage = $('chestStage'); if(!stage) return;
+  stage.innerHTML = '<div class="ticket-reveal">'+ ticketHTML({name:ticket.name, code:ticket.code, date:fmtDate(ticket.gotAt), redeemed:false}) +
+    '<div class="lv-s4tip">把这张券拿给爸爸妈妈核销吧！</div>'+
+    '<button class="lv-btn" id="ticketOk">收下啦 ✅</button></div>';
+  SFX.levelup(); speak('恭喜你获得一张金色奖券！');
+  var ok = stage.querySelector('#ticketOk');
+  if(ok) ok.addEventListener('click', function(){ renderChest(); });
+}
+function renderParentTickets(){
+  var list = $('parentTicketsList'); if(!list) return;
+  var pending = (state.coupons||[]).filter(function(c){ return !c.used; });
+  if(!pending.length){ list.innerHTML = '<div class="hint">暂无待核销奖券 🎉</div>'; return; }
+  list.innerHTML = pending.map(function(c){
+    var realIdx = state.coupons.indexOf(c);
+    return '<div class="pticket" data-idx="'+realIdx+'">'+
+      '<div class="pt-name">🎟️ '+c.name+'</div>'+
+      '<div class="pt-code">'+c.code+'</div>'+
+      '<button class="btn btn-sec pt-redeem" data-idx="'+realIdx+'">核销</button>'+
+    '</div>';
+  }).join('');
+  [].forEach.call(list.querySelectorAll('.pt-redeem'), function(b){
+    b.addEventListener('click', function(){ redeemCoupon(parseInt(b.getAttribute('data-idx'),10)); });
+  });
+}
+function redeemCoupon(idx){
+  var c = state.coupons && state.coupons[idx];
+  if(!c || c.used) return;
+  c.used = true; c.usedAt = Date.now();
+  save(); renderParentTickets();
+}
+/* ===== /JS-BLOCK: CHEST (P3) ===== */
 
 /* ===== JS-BLOCK: LEVEL-FLOW (P1) ===== */
 /* 核心循环：地图节点 → openLevel(idx) → S1 学字 → S2 小游戏 ×2 → S3 小考 → S4 演出结算。
@@ -2746,6 +3360,7 @@ function openLevel(idx){
   renderS1();
 }
 function closeLevel(){
+  mgClearTimers(); mgClearHost();   /* P3：清掉小游戏可能遗留的计时器/点击路由 */
   var host = $('levelHost');
   if(host){ host.classList.remove('on'); host.setAttribute('aria-hidden','true'); host.innerHTML=''; }
   LV = null;
@@ -2802,17 +3417,21 @@ function qG2(t){
     hint: function(){ speak(t.c); }
   };
 }
+function gameName(type){
+  return ({g1:'听音找字', g2:'字图配对', g3:'拍字地鼠', g4:'认字小路', g5:'连线成词'})[type] || '小游戏';
+}
 function startS2(){
   LV.stage = 'S2';
   LV.gameNo = 0; LV.qInGame = 0;
-  var t1 = shuffle(LV.chars).slice(0,4);
-  var t2 = shuffle(LV.chars).slice(0,4);
-  LV.games = [ {type:'g1', targets:t1}, {type:'g2', targets:t2} ];
+  /* P3：按 GDD §7.7 轮换表选本关两个小游戏（G1–G5 轮换），默认 G1/G2 兜底。
+     用本关真实下标 LV.idx（而非全局 currentLevel），避免回放已通关关卡时选错轮换 */
+  var rot = GAME_ROTATION[LV.idx] || ['G1','G2'];
+  LV.games = rot.map(function(t){ return {type: t.toLowerCase(), targets: shuffle(LV.chars).slice(0,4)}; });
   renderGameIntro(0);
 }
 function renderGameIntro(no){
   var host = $('levelHost');
-  var name = no===0 ? '听音找字' : '字图配对';
+  var name = gameName(LV.games[no].type);
   var html =
     '<header class="lv-hd">'+
       '<button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
@@ -2831,9 +3450,14 @@ function renderGameIntro(no){
 }
 function renderGameQuestion(){
   var g = LV.games[LV.gameNo];
+  /* P3：G3/G4/G5 是自管内部循环的小游戏，跑完回调 nextGameOrS3 */
+  if(g.type==='g3' || g.type==='g4' || g.type==='g5'){
+    runMinigame(g, nextGameOrS3);
+    return;
+  }
   var t = g.targets[LV.qInGame];
   var q = (g.type==='g1') ? qG1(t) : qG2(t);
-  q.title = (g.type==='g1'?'听音找字':'字图配对') + ' · 第 '+(LV.qInGame+1)+' / '+g.targets.length;
+  q.title = gameName(g.type) + ' · 第 '+(LV.qInGame+1)+' / '+g.targets.length;
   lvAsk(q, 'auto', function(correct){
     if(correct){ LV.gameCorrect++; LV.combo++; }
     else { LV.combo = 0; }
@@ -3048,6 +3672,10 @@ var __SZ__ = {
   levelChars:levelChars, currentLevelIdx:currentLevelIdx,
   computeStars:computeStars, levelReward:levelReward, applyLevelResult:applyLevelResult,
   openLevel:openLevel, closeLevel:closeLevel,
+  /* P3 导出：供单测 vm 沙箱使用的纯逻辑 */
+  GAME_ROTATION:GAME_ROTATION, doOpenChest:doOpenChest, simCombo:simCombo,
+  couponCode:couponCode, buildCombo:buildCombo, renderChest:renderChest,
+  renderParentTickets:renderParentTickets, redeemCoupon:redeemCoupon,
   MAP_W:MAP_W, MAP_H:MAP_H, PET_STAGES:PET_STAGES,
   PET_BOND_THRESH:PET_BOND_THRESH, petStage:petStage, applyFeed:applyFeed, applyPetStroke:applyPetStroke,
   petSVG:petSVG, petBgSVG:petBgSVG, learnedCharsTop:learnedCharsTop,
