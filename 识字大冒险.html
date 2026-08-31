@@ -762,24 +762,24 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .pet-bar-fill{ height:100%; border-radius:var(--r-pill); background:linear-gradient(90deg,#B9B4CC,#7C5CFF); transition:width var(--dur-show) var(--ease-soft); }
 .pet-bar-txt{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:var(--fs-mini); font-weight:800; color:var(--c-ink); text-shadow:0 1px 0 rgba(255,255,255,.6); }
 .pet-stagetxt{ font-size:var(--fs-cap); color:var(--c-ink-2); }
-.pet-btns{ display:flex; gap:var(--sp-3); width:100%; }
-.pet-feed, .pet-stroke{
-  flex:1; min-height:var(--tap-comfort); padding:0 var(--sp-4); border-radius:var(--r-pill);
-  font-size:var(--fs-btn); font-weight:800; cursor:pointer; border:var(--bw-btn-2) solid var(--btn-edge);
-  background:var(--btn-pri-bg); color:#fff; box-shadow:var(--sh-btn); transition:transform var(--dur-tap) var(--ease-tap);
+.pet-btns{ display:flex; gap:var(--sp-3); width:100%; align-items:stretch; }
+.pet-feed, .pet-stroke, .pet-dress{
+  flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  min-height:92px; padding:var(--sp-2) var(--sp-1); border-radius:var(--r-card);
+  font-size:var(--fs-body); font-weight:800; line-height:1.25; text-align:center;
+  cursor:pointer; border:var(--bw-btn-2) solid var(--btn-edge);
+  box-shadow:var(--sh-btn); transition:transform var(--dur-tap) var(--ease-tap);
 }
-.pet-feed small{ font-weight:700; opacity:.9; }
-.pet-stroke{ flex:0 0 auto; background:var(--c-surface); color:var(--c-ink); border-color:var(--c-line); box-shadow:var(--sh-1); }
-.pet-feed:active, .pet-stroke:active{ transform:translateY(3px); box-shadow:var(--sh-btn-down); }
-.pet-hint{ font-size:var(--fs-mini); color:var(--c-ink-3); }
+.pet-feed{ background:var(--btn-pri-bg); color:#fff; }
+.pet-stroke{ background:var(--c-surface); color:var(--c-ink); border-color:var(--c-line); box-shadow:var(--sh-1); }
+.pet-dress{ background:var(--c-lav); color:#fff; }
+.pet-feed small, .pet-stroke small, .pet-dress small{ display:block; font-size:var(--fs-mini); font-weight:700; opacity:.85; margin-top:2px; }
+.pet-feed:active, .pet-stroke:active, .pet-dress:active{ transform:translateY(3px); box-shadow:var(--sh-btn-down); }
+.pb-ic{ font-size:28px; line-height:1; filter:drop-shadow(0 1px 0 rgba(0,0,0,.1)); }
+.pb-txt{ display:block; }
+.pet-hint{ font-size:var(--fs-mini); color:var(--c-ink-3); text-align:center; }
 
 /* ---- P4 · 装扮商店 ---- */
-.pet-dress{
-  flex:0 0 auto; min-height:var(--tap-comfort); padding:0 var(--sp-4); border-radius:var(--r-pill);
-  font-size:var(--fs-btn); font-weight:800; cursor:pointer; border:var(--bw-btn-2) solid var(--btn-edge);
-  background:var(--c-lav); color:#fff; box-shadow:var(--sh-btn); transition:transform var(--dur-tap) var(--ease-tap);
-}
-.pet-dress:active{ transform:translateY(3px); box-shadow:var(--sh-btn-down); }
 .pet-costume{
   max-width:340px; margin:var(--sp-5) auto 0; padding:var(--sp-4);
   background:var(--c-surface-2); border-radius:var(--r-xl); box-shadow:var(--sh-2);
@@ -3019,9 +3019,11 @@ function renderPet(keepScroll){
         '<div class="pet-stagetxt">'+stageTxt+'</div>'+
         '<div class="pet-btns">'+
           '<button class="pet-feed" id="petFeed" type="button" data-page-node-id="'+nid('pet.feed')+'">'+
-            '🍎 喂能量果<small> (剩 '+(state.energy||0)+' 个)</small></button>'+
-          '<button class="pet-stroke" id="petStroke" type="button" data-page-node-id="'+nid('pet.stroke')+'">✋ 摸摸它</button>'+
-          '<button class="pet-dress" id="petDress" type="button" data-page-node-id="'+nid('pet.dress')+'">🎀 装扮</button>'+
+            '<span class="pb-ic">🍎</span><span class="pb-txt">喂能量果</span><small>剩 '+(state.energy||0)+' 个</small></button>'+
+          '<button class="pet-stroke" id="petStroke" type="button" data-page-node-id="'+nid('pet.stroke')+'">'+
+            '<span class="pb-ic">✋</span><span class="pb-txt">摸摸它</span></button>'+
+          '<button class="pet-dress" id="petDress" type="button" data-page-node-id="'+nid('pet.dress')+'">'+
+            '<span class="pb-ic">🎀</span><span class="pb-txt">装扮</span></button>'+
         '</div>'+
         '<div class="pet-hint" data-page-node-id="'+nid('pet.hint')+'">今天还能喂 '+(5-(state.pet.fedToday||0))+' 次 · 摸 '+(10-(state.pet.petToday||0))+' 次</div>'+
       '</div>'+
