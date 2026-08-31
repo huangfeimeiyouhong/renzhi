@@ -807,6 +807,8 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .g4-cell.g4-shake{ animation:lvshake .42s ease; }
 /* 起点/终点用小徽章，不再遮挡汉字（否则孩子看不到目标字） */
 .g4-badge{ position:absolute; top:-8px; right:-8px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:var(--c-surface); border:2px solid var(--c-road); border-radius:50%; font-size:14px; box-shadow:var(--sh-1); pointer-events:none; }
+/* 当前这一步的目标格：橙色高亮，永远与被点中的格子相邻（不再钉在终点误导） */
+.g4-badge.tgt{ background:var(--c-pri); border-color:var(--c-pri-d); color:#fff; }
 .g4-lab{ text-align:center; font-size:var(--fs-h3); font-weight:800; color:var(--c-ink); }
 .g4-tgt{ color:var(--c-pri-d); }
 @keyframes g4pulse{ 0%,100%{box-shadow:0 0 0 4px var(--c-ok)} 50%{box-shadow:0 0 0 9px var(--c-ok-l)} }
@@ -3333,24 +3335,29 @@ function mgG4(g, done){
     gridCh[cell] = cand[0] || LV.pool[0];
   }
   var cur = path[0], step = 0, hintTimer = null, router;
-  function targetCh(){ return pathCh[ path[step+1] ]; }
+  /* 返回"下一步要走的相邻格子"对应的字；已到终点时返回 null（不再调用 .c 以免崩溃）。 */
+  function targetCh(){ var ni = path[step+1]; return (ni==null) ? null : pathCh[ni]; }
   function render(){
     var cellHTML='';
     for(var c=0; c<total; c++){
       var isPath = used[c], ch = isPath ? pathCh[c] : gridCh[c];
       var cls = 'g4-cell' + (isPath?' path':'');
       if(c===path[0]) cls+=' start';
-      if(c===path[path.length-1]) cls+=' end';
       if(c===cur) cls+=' cur';
+      /* 🎯 永远标在当前"下一步相邻目标"上，保证一定在可点击的周边格，不会乱指到终点。 */
+      var isTarget = (step < path.length-1) && (c===path[step+1]);
       var mark = ch ? ch.c : '';
-      var badge = (c===path[0]) ? '<span class="g4-badge">🏁</span>' : (c===path[path.length-1]) ? '<span class="g4-badge">🎯</span>' : '';
+      var badge = (c===path[0]) ? '<span class="g4-badge">🏁</span>'
+                : isTarget ? '<span class="g4-badge tgt">🎯</span>'
+                : '';
       cellHTML += '<button class="'+cls+'" data-cell="'+c+'">'+badge+mark+'</button>';
     }
+    var tgt = targetCh();
     var html =
       '<header class="lv-hd"><button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
         '<div class="lv-hd-t">认字小路</div><div style="width:64px"></div></header>'+
       '<div class="g4">'+
-        '<div class="g4-lab">走到「<span class="g4-tgt">'+targetCh().c+'</span>」</div>'+
+        '<div class="g4-lab">'+(tgt ? '走到「<span class="g4-tgt">'+tgt.c+'</span>」' : '到达终点！')+'</div>'+
         '<div class="g4-grid" style="grid-template-columns:repeat('+cols+',1fr)">'+cellHTML+'</div>'+
       '</div>';
     host.innerHTML = lvWrap(html);
