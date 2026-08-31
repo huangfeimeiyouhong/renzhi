@@ -3310,8 +3310,21 @@ function mgG4(g, done){
   }
   var path = genPath();
   var pathCh={}, used={}; path.forEach(function(c){ used[c]=1; });
-  for(var i=0;i<path.length;i++){ pathCh[path[i]] = LV.chars[i % LV.chars.length]; }
-  var gridCh={}, distractorPool = LV.pool.concat(LV.distract);
+  /* 路径上每个字必须唯一，否则"走到『竹』"会出现两个竹，孩子点最近那个不一定是目标。 */
+  var distractorPool = LV.pool.concat(LV.distract);
+  var usedChars = {};
+  for(var i=0;i<path.length;i++){
+    var ch;
+    if(i < LV.chars.length){
+      ch = LV.chars[i];
+    } else {
+      var cand = shuffle(distractorPool.filter(function(c){ return !usedChars[c.c]; }));
+      ch = cand[0] || distractorPool.filter(function(c){ return !usedChars[c.c]; })[0] || LV.pool[0];
+    }
+    usedChars[ch.c] = 1;
+    pathCh[path[i]] = ch;
+  }
+  var gridCh={};
   for(var cell=0; cell<total; cell++){
     if(used[cell]) continue;
     var adj = neighbors(cell).filter(function(n){ return used[n]; });
