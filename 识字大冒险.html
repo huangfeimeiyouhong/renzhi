@@ -1384,7 +1384,114 @@ var CHAR_DICT = [
   {c:"在",py:"zài",w:["在家","现在","正在","自在"],d:"小苗长在土里"},
   {c:"来",py:"lái",w:["来到","回来","过来","将来"],d:"走过来了"},
   {c:"去",py:"qù",w:["出去","回去","去年","上去"],d:"离开这里去那边"},
-  {c:"吃",py:"chī",w:["吃饭","好吃","小吃","吃东西"],d:"张开嘴巴吃饭"}
+  {c:"吃",py:"chī",w:["吃饭","好吃","小吃","吃东西"],d:"张开嘴巴吃饭"},
+  /* --- 自然与景物（19） --- */
+  {c:"雪",py:"xuě",w:["雪花","下雪","雪人","白雪"],d:"天上飘下的白雪花"},
+  {c:"电",py:"diàn",w:["闪电","电灯","电话","电车"],d:"亮亮的闪电"},
+  {c:"河",py:"hé",w:["小河","河水","大河","河边"],d:"流淌的小河"},
+  {c:"海",py:"hǎi",w:["大海","海边","海水","海浪"],d:"很大很大的水"},
+  {c:"沙",py:"shā",w:["沙子","沙滩","沙包","风沙"],d:"细细软软的沙"},
+  {c:"泥",py:"ní",w:["泥土","泥巴","泥人","水泥"],d:"湿湿的泥巴"},
+  {c:"林",py:"lín",w:["树林","森林","竹林","林子"],d:"很多很多树"},
+  {c:"叶",py:"yè",w:["叶子","树叶","绿叶","落叶"],d:"树上的小叶子"},
+  {c:"金",py:"jīn",w:["金色","金鱼","金子","金银"],d:"黄黄的闪光金子"},
+  {c:"玉",py:"yù",w:["玉石","白玉","玉佩","玉米"],d:"温润好看的玉"},
+  {c:"气",py:"qì",w:["空气","生气","气球","天气"],d:"看不见的空气"},
+  {c:"路",py:"lù",w:["马路","小路","路上","路口"],d:"可以走路的路"},
+  {c:"桥",py:"qiáo",w:["小桥","木桥","大桥","桥上"],d:"跨过河的小桥"},
+  {c:"房",py:"fáng",w:["房子","房间","新房","房东"],d:"住人的房子"},
+  {c:"屋",py:"wū",w:["屋子","屋顶","房屋","里屋"],d:"有屋顶的屋子"},
+  {c:"窗",py:"chuāng",w:["窗户","窗口","窗台","窗外"],d:"透光的窗户"},
+  {c:"墙",py:"qiáng",w:["墙壁","围墙","城墙","墙头"],d:"房子四面的墙"},
+  {c:"灯",py:"dēng",w:["电灯","台灯","灯笼","灯光"],d:"照亮的小灯"},
+  {c:"雷",py:"léi",w:["打雷","雷声","雷雨","春雷"],d:"轰隆隆的雷声"},
+  /* --- 家居与物品（21） --- */
+  {c:"桌",py:"zhuō",w:["桌子","书桌","餐桌","课桌"],d:"吃饭写字的桌子"},
+  {c:"椅",py:"yǐ",w:["椅子","坐椅","木椅","椅背"],d:"可以坐的椅子"},
+  {c:"床",py:"chuáng",w:["小床","床单","床上","木床"],d:"睡觉的小床"},
+  {c:"杯",py:"bēi",w:["杯子","水杯","茶杯","干杯"],d:"喝水的小杯"},
+  {c:"碗",py:"wǎn",w:["饭碗","大碗","碗里","洗碗"],d:"吃饭的碗"},
+  {c:"筷",py:"kuài",w:["筷子","碗筷","竹筷","木筷"],d:"夹菜的筷子"},
+  {c:"锅",py:"guō",w:["锅子","铁锅","火锅","下锅"],d:"煮饭的锅"},
+  {c:"衣",py:"yī",w:["衣服","上衣","雨衣","大衣"],d:"穿在身上的衣服"},
+  {c:"鞋",py:"xié",w:["鞋子","皮鞋","拖鞋","鞋带"],d:"脚上穿的鞋"},
+  {c:"帽",py:"mào",w:["帽子","草帽","戴帽","头盔"],d:"戴在头上的帽"},
+  {c:"袜",py:"wà",w:["袜子","短袜","穿袜","袜底"],d:"脚上的袜子"},
+  {c:"包",py:"bāo",w:["书包","背包","包子","皮包"],d:"装东西的包"},
+  {c:"笔",py:"bǐ",w:["铅笔","画笔","毛笔","笔尖"],d:"写字的笔"},
+  {c:"纸",py:"zhǐ",w:["白纸","纸张","纸上","纸巾"],d:"写画的纸"},
+  {c:"尺",py:"chǐ",w:["尺子","直尺","皮尺","卷尺"],d:"量长短的尺"},
+  {c:"球",py:"qiú",w:["皮球","足球","气球","篮球"],d:"圆圆的球"},
+  {c:"旗",py:"qí",w:["红旗","彩旗","国旗","旗帜"],d:"飘扬的小旗"},
+  {c:"钟",py:"zhōng",w:["闹钟","时钟","钟声","挂钟"],d:"会响的钟"},
+  {c:"鼓",py:"gǔ",w:["小鼓","打鼓","大鼓","鼓声"],d:"咚咚响的鼓"},
+  {c:"扇",py:"shàn",w:["扇子","风扇","折扇","蒲扇"],d:"扇风的小扇"},
+  {c:"镜",py:"jìng",w:["镜子","眼镜","放大镜","花镜"],d:"照脸的镜子"},
+  /* --- 身体（8） --- */
+  {c:"牙",py:"yá",w:["牙齿","牙刷","门牙","长牙"],d:"嘴巴里的小牙"},
+  {c:"舌",py:"shé",w:["舌头","舌尖","口舌","舔舌"],d:"嘴里的舌头"},
+  {c:"鼻",py:"bí",w:["鼻子","鼻孔","鼻尖","鼻涕"],d:"闻味道的鼻子"},
+  {c:"眉",py:"méi",w:["眉毛","眉头","弯眉","画眉"],d:"眼睛上的眉毛"},
+  {c:"脸",py:"liǎn",w:["脸蛋","笑脸","洗脸","小脸"],d:"头前面的脸"},
+  {c:"发",py:"fà",w:["头发","黑发","理发","白发"],d:"头上的头发"},
+  {c:"身",py:"shēn",w:["身体","全身","转身","身上"],d:"整个身体"},
+  {c:"肚",py:"dù",w:["肚子","肚皮","小肚","挺肚"],d:"圆圆的肚子"},
+  /* --- 动物（12） --- */
+  {c:"狗",py:"gǒu",w:["小狗","狗狗","狗熊","热狗"],d:"汪汪叫的小狗"},
+  {c:"猪",py:"zhū",w:["小猪","猪圈","肥猪","猪八戒"],d:"胖胖的小猪"},
+  {c:"猴",py:"hóu",w:["猴子","小猴","猴山","猴哥"],d:"爱爬树的猴子"},
+  {c:"鼠",py:"shǔ",w:["老鼠","松鼠","袋鼠","鼠小"],d:"小小的老鼠"},
+  {c:"蛙",py:"wā",w:["青蛙","小蛙","牛蛙","蛙跳"],d:"呱呱叫的青蛙"},
+  {c:"燕",py:"yàn",w:["燕子","飞燕","海燕","春燕"],d:"剪刀尾巴的燕子"},
+  {c:"熊",py:"xióng",w:["小熊","熊熊","狗熊","熊猫"],d:"胖胖的大熊"},
+  {c:"蜂",py:"fēng",w:["蜜蜂","马蜂","蜂窝","蜂王"],d:"嗡嗡飞的蜜蜂"},
+  {c:"蝶",py:"dié",w:["蝴蝶","粉蝶","蝶舞","蝶翅"],d:"花间飞的蝴蝶"},
+  {c:"虾",py:"xiā",w:["小虾","大虾","虾米","龙虾"],d:"水里游的虾"},
+  {c:"蟹",py:"xiè",w:["螃蟹","小蟹","蟹脚","蟹壳"],d:"横着走的螃蟹"},
+  {c:"龟",py:"guī",w:["乌龟","小龟","龟壳","海龟"],d:"慢吞吞的乌龟"},
+  /* --- 食物（14） --- */
+  {c:"肉",py:"ròu",w:["猪肉","羊肉","牛肉","吃肉"],d:"香香的肉"},
+  {c:"蛋",py:"dàn",w:["鸡蛋","鸭蛋","鸟蛋","蛋糕"],d:"圆圆的蛋"},
+  {c:"奶",py:"nǎi",w:["牛奶","奶奶","奶糖","奶茶"],d:"白白的牛奶"},
+  {c:"茶",py:"chá",w:["喝茶","茶叶","茶园","茶杯"],d:"香香的热茶"},
+  {c:"糖",py:"táng",w:["糖果","白糖","红糖","糖块"],d:"甜甜的糖"},
+  {c:"盐",py:"yán",w:["盐巴","食盐","咸盐","盐水"],d:"咸咸的盐"},
+  {c:"菜",py:"cài",w:["青菜","白菜","饭菜","菜园"],d:"绿绿的菜"},
+  {c:"瓜",py:"guā",w:["西瓜","南瓜","黄瓜","瓜果"],d:"圆圆的大瓜"},
+  {c:"桃",py:"táo",w:["桃子","桃树","水蜜桃","桃花"],d:"毛茸茸的桃"},
+  {c:"梨",py:"lí",w:["梨子","鸭梨","雪梨","梨树"],d:"脆脆的梨"},
+  {c:"橙",py:"chéng",w:["橙子","橙汁","甜橙","橙黄"],d:"酸酸甜的橙"},
+  {c:"豆",py:"dòu",w:["豆子","黄豆","红豆","绿豆"],d:"圆圆的小豆"},
+  {c:"饼",py:"bǐng",w:["饼干","大饼","月饼","烧饼"],d:"脆脆的饼"},
+  {c:"饭",py:"fàn",w:["米饭","吃饭","午饭","晚饭"],d:"香喷喷的饭"},
+  /* --- 家人朋友（11） --- */
+  {c:"爷",py:"yé",w:["爷爷","老爷","大爷","爷孙"],d:"爸爸的爸爸"},
+  {c:"哥",py:"gē",w:["哥哥","大哥","哥们","表哥"],d:"大一点的男孩"},
+  {c:"弟",py:"dì",w:["弟弟","小弟","兄弟","表弟"],d:"小一点的男孩"},
+  {c:"姐",py:"jiě",w:["姐姐","大姐","姐妹","表姐"],d:"大一点的女孩"},
+  {c:"妹",py:"mèi",w:["妹妹","小妹","姐妹","表妹"],d:"小一点的女孩"},
+  {c:"朋",py:"péng",w:["朋友","小伙伴","朋辈","亲朋"],d:"一起玩的朋友"},
+  {c:"友",py:"yǒu",w:["友好","好友","友情","亲友"],d:"好朋友"},
+  {c:"师",py:"shī",w:["老师","师父","师长","法师"],d:"教我们的老师"},
+  {c:"生",py:"shēng",w:["学生","生字","生活","花生"],d:"上学的学生"},
+  {c:"兵",py:"bīng",w:["士兵","当兵","兵器","骑兵"],d:"保护我们的兵"},
+  {c:"工",py:"gōng",w:["工人","做工","工具","手工"],d:"做工的工人"},
+  /* --- 动作（15） --- */
+  {c:"跑",py:"pǎo",w:["跑步","快跑","奔跑","跑开"],d:"迈开腿快跑"},
+  {c:"跳",py:"tiào",w:["跳高","跳绳","跳跳","跳起"],d:"双脚离地跳"},
+  {c:"爬",py:"pá",w:["爬山","爬行","爬树","爬坡"],d:"手脚并用爬"},
+  {c:"游",py:"yóu",w:["游泳","游水","游玩","旅游"],d:"在水里游"},
+  {c:"唱",py:"chàng",w:["唱歌","合唱","唱戏","欢唱"],d:"张开嘴唱歌"},
+  {c:"哭",py:"kū",w:["哭哭","大哭","哭脸","啼哭"],d:"掉眼泪地哭"},
+  {c:"笑",py:"xiào",w:["笑笑","大笑","笑脸","微笑"],d:"开心地笑"},
+  {c:"睡",py:"shuì",w:["睡觉","午睡","睡着","入睡"],d:"闭上眼睡觉"},
+  {c:"醒",py:"xǐng",w:["醒来","清醒","睡醒","惊醒"],d:"睁开眼醒来"},
+  {c:"拿",py:"ná",w:["拿来","拿住","拿走","手拿"],d:"用手拿起来"},
+  {c:"给",py:"gěi",w:["给我","送给","交给","给钱"],d:"把东西给别人"},
+  {c:"想",py:"xiǎng",w:["想想","想法","想象","心想"],d:"在脑子里想"},
+  {c:"问",py:"wèn",w:["问问","问题","问好","提问"],d:"开口问问题"},
+  {c:"答",py:"dá",w:["回答","答对","答案","报答"],d:"回答出问题"},
+  {c:"学",py:"xué",w:["学习","上学","同学","学会"],d:"学新的本领"}
 ];
 /* 象形图 / 示意图 SVG（简化手绘风） */
 function picSVG(ch){
@@ -1789,13 +1896,13 @@ function buildDefaultChestPool(rewards){
   return pool;
 }
 function recalcZones(s){
-  var z=[0,0,0,0], maxCleared=0, n, L;
-  for(n=1;n<=20;n++){
+  var z=new Array(NUM_ZONES).fill(0), maxCleared=0, n, L;
+  for(n=1;n<=NUM_LEVELS;n++){
     L = s.game.levels["L"+n];
     if(L && L.cleared){ z[Math.floor((n-1)/5)]++; if(n>maxCleared) maxCleared=n; }
   }
   s.game.zones = z;
-  s.game.unlockedThrough = Math.min(20, maxCleared+1);
+  s.game.unlockedThrough = Math.min(NUM_LEVELS, maxCleared+1);
 }
 /* 幂等补齐：任何字段缺失都补默认值，可重复调用 */
 function normalizeV2(s){
@@ -1803,7 +1910,7 @@ function normalizeV2(s){
   for(k in d){ if(!d.hasOwnProperty(k)) continue; if(!(k in s) || s[k]===null || s[k]===undefined) s[k]=d[k]; }
   if(!s.game) s.game = d.game;
   if(!s.game.levels) s.game.levels = {};
-  if(!Array.isArray(s.game.zones) || s.game.zones.length!==4) s.game.zones=[0,0,0,0];
+  if(!Array.isArray(s.game.zones) || s.game.zones.length!==NUM_ZONES) s.game.zones=new Array(NUM_ZONES).fill(0);
   if(!s.pet) s.pet = d.pet;
   if(!s.pet.wears) s.pet.wears = {hat:null,scarf:null,wing:null,bg:null};
   if(!Array.isArray(s.pet.owned)) s.pet.owned = [];
@@ -2104,7 +2211,10 @@ function syncSave(){
 
 /* ===== JS-BLOCK: SVG-GENERATORS ===== */
 /* 美术 §16.6（地图，逐行搬运）+ §18.2（货币图标）。坐标全部由公式生成，不写死。 */
-var MAP_W = 400, MAP_H = 2520;   /* ⚠️ 2520 不是 2400：L20 y=2436 + Boss r44 + 留白 40 */
+var MAP_W = 400, MAP_H = 4920;   /* 8 区：L40 y=4836 + Boss r44 + 留白 40 */
+var NUM_ZONES = 8;            /* 区域数：每区 5 关 */
+var NUM_LEVELS = NUM_ZONES*5; /* 40 关，每关 5 字 → 200 字库 */
+var DAILY_IDX = NUM_LEVELS;   /* 每日挑战节点下标 = 40 */
 
 var ZONE_CFG = [
   {name:"青草岛", y0:120,  sky:["#BFE9FF","#E8F7D4"], land:"#7CC576", accent:"#FFB86B",
@@ -2118,22 +2228,34 @@ var ZONE_CFG = [
    starOut:"#3B2A1E", haloOut:"#3B2A1E", haloIn:"#FFFFFF"},
   {name:"星星堡", y0:1920, sky:["#2E2A5E","#5B4B9E"], land:"#6C5CE7", accent:"#FFD86B",
    deco:"star",  dark:true,  numBg:"#E8E3FF", numFg:"#2E2A5E", line:"#E8E3FF",
+   starOut:"#FFFFFF", haloOut:"#FFFFFF", haloIn:"#FFE9A8"},
+  {name:"沙滩湾", y0:2520, sky:["#BFE9FF","#FFF3C4"], land:"#F2C879", accent:"#FF9F68",
+   deco:"cloud", dark:false, numBg:"#FFFFFF", numFg:"#3B2A1E", line:"#3B2A1E",
+   starOut:"#3B2A1E", haloOut:"#3B2A1E", haloIn:"#FFFFFF"},
+  {name:"雪山峰", y0:3120, sky:["#EAF4FF","#FFFFFF"], land:"#BFD8EC", accent:"#7FC8F8",
+   deco:"tree",  dark:false, numBg:"#FFFFFF", numFg:"#3B2A1E", line:"#3B2A1E",
+   starOut:"#3B2A1E", haloOut:"#3B2A1E", haloIn:"#FFFFFF"},
+  {name:"火山口", y0:3720, sky:["#FFD9C2","#FFB199"], land:"#E06B4B", accent:"#FFC93C",
+   deco:"fruit", dark:false, numBg:"#FFFFFF", numFg:"#3B2A1E", line:"#3B2A1E",
+   starOut:"#3B2A1E", haloOut:"#3B2A1E", haloIn:"#FFFFFF"},
+  {name:"海底宫", y0:4320, sky:["#0E3A5C","#1E6FA8"], land:"#1E88E5", accent:"#7DF2E0",
+   deco:"star",  dark:true,  numBg:"#E8F3FF", numFg:"#0E3A5C", line:"#E8F3FF",
    starOut:"#FFFFFF", haloOut:"#FFFFFF", haloIn:"#FFE9A8"}
 ];
 
-function nodePos(i){                       /* i: 0..19，20 = 每日挑战 */
-  if(i===20) return { x:200, y:2560, zone:3, cfg:ZONE_CFG[3], k:5, daily:true };   /* P5 对齐：与 L20 Boss(y=2436) 中心间距 124px，避免两节点重叠 */
+function nodePos(i){                       /* i: 0..NUM_LEVELS-1，DAILY_IDX = 每日挑战 */
+  if(i===DAILY_IDX) return { x:200, y:ZONE_CFG[NUM_ZONES-1].y0+640, zone:NUM_ZONES-1, cfg:ZONE_CFG[NUM_ZONES-1], k:5, daily:true };   /* 落在最后一区下方：y0+600+40，避免与末关 Boss 重叠 */
   var z = Math.floor(i/5), k = i%5, cfg = ZONE_CFG[z];
   return { x:(k%2===0?110:290), y:cfg.y0+100+k*104, zone:z, cfg:cfg, k:k };
 }
-function isBoss(i){ return (i%5)===4; }    /* L5/L10/L15/L20 */
+function isBoss(i){ return (i%5)===4; }    /* 每区第 5 关：L5/L10/.../L40 */
 
-/* P5 · 每日字灵挑战（GDD §2.7.2）。20 关全部 cleared 才解锁。
-   注意：不能用 unlockedThrough===20 判断 —— recalcZones 用 min(20,maxCleared+1)，L19 通关时已经是 20。 */
+/* P5 · 每日字灵挑战（GDD §2.7.2）。全部 NUM_LEVELS 关 cleared 才解锁。
+   注意：不能用 unlockedThrough===NUM_LEVELS 判断 —— recalcZones 用 min(NUM_LEVELS,maxCleared+1)，最后一区通关时已经是 NUM_LEVELS。 */
 function dailyUnlocked(s){
   s = s || state;
   if(!s.game || !s.game.levels) return false;
-  for(var n=1;n<=20;n++){ var L = s.game.levels["L"+n]; if(!(L && L.cleared)) return false; }
+  for(var n=1;n<=NUM_LEVELS;n++){ var L = s.game.levels["L"+n]; if(!(L && L.cleared)) return false; }
   return true;
 }
 function dailyDone(s){
@@ -2224,7 +2346,7 @@ function zonePlateSVG(z){
 /* 关卡节点 5 态（美术 §17）。st = {state, stars, sub, total} */
 function nodeSVG(i, st){
   st = st || {state:'locked', stars:0};
-  var p = nodePos(i), c = p.cfg, isB = isBoss(i), daily = (i===20), boss = isB || daily;
+  var p = nodePos(i), c = p.cfg, isB = isBoss(i), daily = (i===DAILY_IDX), boss = isB || daily;
   var R = boss ? 44 : 34;
   var g = '<g class="node n-'+st.state+(boss?' n-boss':'')+(daily?' n-daily':'')+(st.next?' n-next':'')+'" transform="translate('+p.x+','+p.y+')" style="--i:'+i+'" '+
           'data-lv="'+(i+1)+'" data-page-node-id="'+nid(daily?'map.node.DAILY':('map.node.L'+(i+1)))+'" tabindex="0" role="button" '+
@@ -2319,13 +2441,13 @@ function nodeSVG(i, st){
 }
 /* 整张地图 */
 function mapSVG(states, daily){
-  var H = (daily && daily.show) ? 2640 : MAP_H;   /* 每日节点 y=2560 + r44 + 留白 → 2640 */
+  var H = (daily && daily.show) ? (ZONE_CFG[NUM_ZONES-1].y0+720) : MAP_H;   /* 每日节点 y = y0+640，+80 留白 */
   var o = '<svg class="map" viewBox="0 0 '+MAP_W+' '+H+'" preserveAspectRatio="xMidYMin meet" '+
           'xmlns="http://www.w3.org/2000/svg" data-page-node-id="'+nid('map.root')+'" role="img" '+
-          'aria-label="'+((daily && daily.show) ? '字灵群岛地图，共 4 个区域 20 个关卡，另有每日字灵挑战' : '字灵群岛地图，共 4 个区域 20 个关卡')+'">';
+          'aria-label="'+((daily && daily.show) ? ('字灵群岛地图，共 '+NUM_ZONES+' 个区域 '+NUM_LEVELS+' 个关卡，另有每日字灵挑战') : ('字灵群岛地图，共 '+NUM_ZONES+' 个区域 '+NUM_LEVELS+' 个关卡'))+'">';
   o += '<defs>';
   var z, c;
-  for(z=0;z<4;z++){
+  for(z=0;z<NUM_ZONES;z++){
     c = ZONE_CFG[z];
     o += '<linearGradient id="sky'+z+'" x1="0" y1="0" x2="0" y2="1">'+
          '<stop offset="0" stop-color="'+c.sky[0]+'"/><stop offset="1" stop-color="'+c.sky[1]+'"/></linearGradient>';
@@ -2338,10 +2460,10 @@ function mapSVG(states, daily){
          '<stop offset="1" stop-color="#3DA5E0"/></radialGradient>';
   }
   o += '</defs>';
-  for(z=0;z<4;z++){
-    o += '<rect x="0" y="'+ZONE_CFG[z].y0+'" width="'+MAP_W+'" height="'+((z===3 && daily && daily.show)?700:600)+'" fill="url(#sky'+z+')"/>';
+  for(z=0;z<NUM_ZONES;z++){
+    o += '<rect x="0" y="'+ZONE_CFG[z].y0+'" width="'+MAP_W+'" height="'+((z===NUM_ZONES-1 && daily && daily.show)?720:600)+'" fill="url(#sky'+z+')"/>';
   }
-  for(z=0;z<4;z++){
+  for(z=0;z<NUM_ZONES;z++){
     c = ZONE_CFG[z];
     o += zonePlateSVG(z);
     o += '<path class="road" d="'+zonePath(z)+'" fill="none" stroke="'+c.line+'" stroke-width="13" '+
@@ -2359,17 +2481,15 @@ function mapSVG(states, daily){
          '<text y="6" text-anchor="middle" font-size="17" font-weight="800" '+
          'font-family="-apple-system,PingFang SC,sans-serif" fill="'+(c.dark?'#E8E3FF':'#3B2A1E')+'">'+c.name+'</text></g>';
   }
-  o += bridgeSVG('wood', 700);
-  o += bridgeSVG('vine', 1300);
-  o += bridgeSVG('star', 1900);
-  /* REQ-102：高亮当前该闯的节点（红色光环）；20 关全清后高亮未完成的每日挑战 */
-  var nextIdx = (daily && daily.show) ? (daily.done ? -1 : 20) : (currentLevel()-1);
-  for(var i=0;i<20;i++){
+  for(z=1; z<NUM_ZONES; z++) o += bridgeSVG(['wood','vine','star'][(z-1)%3], ZONE_CFG[z].y0-20);
+  /* REQ-102：高亮当前该闯的节点（红色光环）；全部通关后高亮未完成的每日挑战 */
+  var nextIdx = (daily && daily.show) ? (daily.done ? -1 : DAILY_IDX) : (currentLevel()-1);
+  for(var i=0;i<NUM_LEVELS;i++){
     var nst = (states&&states[i]) || {state:'locked', stars:0};
     if(i === nextIdx) nst.next = true;
     o += nodeSVG(i, nst);
   }
-  if(daily && daily.show) o += nodeSVG(20, {state: daily.done ? 'cleared' : 'available', stars:0, total:0, sub:0, next: nextIdx===20});
+  if(daily && daily.show) o += nodeSVG(DAILY_IDX, {state: daily.done ? 'cleared' : 'available', stars:0, total:0, sub:0, next: nextIdx===DAILY_IDX});
   return o+'</svg>';
 }
 /* 货币 / 反馈图标（美术 §18.2，viewBox 0 0 32 32） */
@@ -2423,12 +2543,12 @@ ICON.cross = function(size){
 /* 节点状态由 state 派生（美术 §17.4）：全屏同时只有 1 个 available */
 function currentLevel(){
   var n, L;
-  for(n=1;n<=20;n++){ L = state.game.levels["L"+n]; if(!(L && L.cleared)) return n; }
-  return 20;
+  for(n=1;n<=NUM_LEVELS;n++){ L = state.game.levels["L"+n]; if(!(L && L.cleared)) return n; }
+  return NUM_LEVELS;
 }
 function levelStates(){
   var out=[], i, n, L, cur = currentLevel();
-  for(i=0;i<20;i++){
+  for(i=0;i<NUM_LEVELS;i++){
     n = i+1; L = state.game.levels["L"+n] || {};
     out.push({
       state: (L.cleared && L.stars>=3) ? 'perfect'
@@ -2477,7 +2597,7 @@ function scrollToCurrent(){
 function tapNode(n){
   if(n === 21){
     SFX.tap();
-    if(!dailyUnlocked(state)){ toast('把 20 关全部闯完，就能解锁每日挑战啦！'); return; }
+    if(!dailyUnlocked(state)){ toast('把 '+NUM_LEVELS+' 关全部闯完，就能解锁每日挑战啦！'); return; }
     if(dailyDone(state)){ toast('今天的字灵挑战已经完成啦，明天再来！'); return; }
     startDaily();
     return;
@@ -2899,7 +3019,7 @@ function petBgSVG(id){
 /* 取孩子已掌握的前 n 个字（供 Lv5 环绕小字灵显示），无则回退默认字 */
 function learnedCharsTop(n){
   n = n||5; var out=[], z, k, L, chs, j;
-  for(z=0; z<4 && out.length<n; z++){
+  for(z=0; z<NUM_ZONES && out.length<n; z++){
     for(k=0;k<5 && out.length<n;k++){
       L = state.game.levels["L"+(z*5+k+1)];
       if(L && L.cleared){ chs = levelChars(z*5+k); for(j=0;j<chs.length && out.length<n;j++) out.push(chs[j].c); }
@@ -3144,7 +3264,7 @@ function onCostume(e){
 function codexGroups(s){
   s = s || state;
   var groups = [], z, k, n, L, cleared, locked, chs, ch, cells, lv0;
-  for(z=0; z<4; z++){
+  for(z=0; z<NUM_ZONES; z++){
     var zone = { name: ZONE_CFG[z].name, levels:[] };
     for(k=0; k<5; k++){
       lv0 = z*5 + k; n = lv0+1;
@@ -4003,7 +4123,7 @@ function currentLevelIdx(){ return Math.max(0, currentLevel()-1); }
 function learnedPool(s){
   s = s || state;
   var out = [], n, i, L, chs;
-  for(n=1;n<=20;n++){
+  for(n=1;n<=NUM_LEVELS;n++){
     L = (s.game && s.game.levels && s.game.levels["L"+n]) || {};
     if(!L.cleared) continue;
     chs = levelChars(n-1);
