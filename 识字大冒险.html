@@ -2539,6 +2539,23 @@ function nodeSVG(i, st){
   g += '<circle class="hit" r="48" fill="transparent"/>';
   return g+'</g>';
 }
+/* 地图上的宠物标记：站在当前进度节点，显示当前装扮 + 等级 */
+function mapPetSVG(x, y){
+  var st = petStage(state.pet.bond || 0);
+  var lv = st + 1;
+  var S = PET_STAGES[st];
+  var wears = state.pet.wears || {};
+  var petInner = petSVG({level: lv, mood: 'happy', wears: wears, t: Date.now(), chars: learnedCharsTop(5), idPrefix: 'mp-'});
+  return '<g class="map-pet" transform="translate('+x+','+y+')" pointer-events="none" '+
+         'aria-label="墨墨在这里，等级 '+lv+'">'+
+    '<svg x="-24" y="-56" width="48" height="56" viewBox="0 0 120 140" overflow="visible">'+petInner+'</svg>'+
+    '<g transform="translate(12, 12)">'+
+      '<circle r="9" fill="#FFFFFF" stroke="'+S.theme+'" stroke-width="2"/>'+
+      '<text y="3" text-anchor="middle" font-size="9" font-weight="800" '+
+            'font-family="-apple-system,PingFang SC,sans-serif" fill="'+S.theme+'">Lv'+lv+'</text>'+
+    '</g>'+
+  '</g>';
+}
 /* 整张地图 */
 function mapSVG(states, daily){
   var H = (daily && daily.show) ? (ZONE_CFG[NUM_ZONES-1].y0+720) : MAP_H;   /* 每日节点 y = y0+640，+80 留白 */
@@ -2590,6 +2607,9 @@ function mapSVG(states, daily){
     o += nodeSVG(i, nst);
   }
   if(daily && daily.show) o += nodeSVG(DAILY_IDX, {state: daily.done ? 'cleared' : 'available', stars:0, total:0, sub:0, next: nextIdx===DAILY_IDX});
+  /* 在当前进度节点盖上宠物形象（带等级），放在节点上层 */
+  var curPos = nodePos(currentLevel()-1);
+  o += mapPetSVG(curPos.x, curPos.y);
   return o+'</svg>';
 }
 /* 货币 / 反馈图标（美术 §18.2，viewBox 0 0 32 32） */
@@ -2951,9 +2971,11 @@ var PET_SCARFS = {
     return '<g class="pk-scarf" transform="translate(60,104)"><path d="M-30 0 q30 14 60 0" fill="none" stroke="#9B6DFF" stroke-width="8" stroke-linecap="round"/>'+o+'</g>'; }
 };
 var PET_WINGS = {
-  small: function(){ return '<g class="pk-wing">'+
-      '<ellipse cx="26" cy="80" rx="15" ry="22" fill="url(#pkWing)" stroke="#9B6DFF" stroke-width="2.2" transform="rotate(-18 26 80)"/>'+
-      '<ellipse cx="94" cy="80" rx="15" ry="22" fill="url(#pkWing)" stroke="#9B6DFF" stroke-width="2.2" transform="rotate(18 94 80)"/></g>'; }
+  small: function(lineC, pref){
+    pref = pref || '';
+    return '<g class="pk-wing">'+
+      '<ellipse cx="26" cy="80" rx="15" ry="22" fill="url(#'+pref+'pkWing)" stroke="#9B6DFF" stroke-width="2.2" transform="rotate(-18 26 80)"/>'+
+      '<ellipse cx="94" cy="80" rx="15" ry="22" fill="url(#'+pref+'pkWing)" stroke="#9B6DFF" stroke-width="2.2" transform="rotate(18 94 80)"/></g>'; }
 };
 /* 相位：用负 delay 让重绘后动画不跳帧 */
 function ph(t, period){ return t ? -(t % period) : 0; }
@@ -2966,6 +2988,7 @@ function petSVG(opt){
   var wears = opt.wears || {};
   var t     = opt.t || 0;
   var chars = opt.chars || ['日','月','山','水','火'];
+  var pref  = opt.idPrefix || '';   /* 支持同一页多个宠物（如地图 + 宠物页）避免 gradient id 冲突 */
   var S = PET_STAGES[lv-1];
   var lineW = (lv === 5) ? 3 : 2.6;
   var lineC = (lv === 5) ? '#FFC93C' : S.line;
@@ -2974,11 +2997,11 @@ function petSVG(opt){
   out += '<svg class="pet pet-lv'+lv+'" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" '+
          'data-level="'+lv+'" data-mood="'+mood+'" aria-hidden="true">';
   out += '<defs>'+
-    '<radialGradient id="pkBody'+lv+'" cx="36%" cy="26%" r="82%">'+
+    '<radialGradient id="'+pref+'pkBody'+lv+'" cx="36%" cy="26%" r="82%">'+
       '<stop offset="0" stop-color="'+S.hi+'"/><stop offset="1" stop-color="'+S.theme+'"/></radialGradient>'+
-    '<linearGradient id="pkWing" x1="0" y1="0" x2="0" y2="1">'+
+    '<linearGradient id="'+pref+'pkWing" x1="0" y1="0" x2="0" y2="1">'+
       '<stop offset="0" stop-color="rgba(255,255,255,.9)"/><stop offset="1" stop-color="rgba(155,109,255,.6)"/></linearGradient>'+
-    '<radialGradient id="pkGlow" cx="50%" cy="50%" r="50%">'+
+    '<radialGradient id="'+pref+'pkGlow" cx="50%" cy="50%" r="50%">'+
       '<stop offset="0" stop-color="#FFE9A8" stop-opacity=".55"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient>'+
   '</defs>';
   out += '<g class="pk-all" transform="translate(60,120) scale('+S.scale+') translate(-60,-120)">';
@@ -2987,11 +3010,11 @@ function petSVG(opt){
   if(lv >= 4){
     out += '<g class="pk-halo" style="animation-delay:'+phHalo+'ms">'+
       '<ellipse cx="60" cy="30" rx="24" ry="7.5" fill="none" stroke="#FFD86B" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="34 18"/></g>';
-    out += '<circle cx="60" cy="86" r="52" fill="url(#pkGlow)" class="pk-aura"/>';
+    out += '<circle cx="60" cy="86" r="52" fill="url(#'+pref+'pkGlow)" class="pk-aura"/>';
   }
   if(lv === 1){
     out += '<g class="pk-egg" style="animation-delay:'+phBreath+'ms">'+
-      '<ellipse cx="60" cy="82" rx="31" ry="39" fill="url(#pkBody1)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>'+
+      '<ellipse cx="60" cy="82" rx="31" ry="39" fill="url(#'+pref+'pkBody1)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>'+
       '<path d="M42 60 l9 8 -7 7 10 7" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
       '<path d="M72 58 l-8 9 8 6 -7 8" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
       '<path d="M36 92 l10 -6 8 8" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
@@ -3002,7 +3025,7 @@ function petSVG(opt){
   }
   if(lv === 2){
     out += '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
-    out += '<ellipse cx="60" cy="76" rx="28" ry="27" fill="url(#pkBody2)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+    out += '<ellipse cx="60" cy="76" rx="28" ry="27" fill="url(#'+pref+'pkBody2)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
     out += '<ellipse cx="42" cy="66" rx="7" ry="13" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-22 42 66)"/>';
     out += '<ellipse cx="78" cy="66" rx="7" ry="13" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(22 78 66)"/>';
     out += '<ellipse cx="26" cy="86" rx="9" ry="6" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.2" transform="rotate(-20 26 86)"/>';
@@ -3011,7 +3034,7 @@ function petSVG(opt){
     out += '<path d="M26 96 Q60 108 94 96 L92 106 Q84 118 60 119 Q36 118 28 106 Z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
   }
   if(lv >= 3){
-    if(wears.wing && PET_WINGS[wears.wing]) out += PET_WINGS[wears.wing](lineC);
+    if(wears.wing && PET_WINGS[wears.wing]) out += PET_WINGS[wears.wing](lineC, pref);
     out += '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
     out += '<path d="M88 104 C 106 112 116 98 108 82" fill="none" stroke="'+lineC+'" stroke-width="15" stroke-linecap="round"/>';
     out += '<path d="M88 104 C 106 112 116 98 108 82" fill="none" stroke="'+S.theme+'" stroke-width="10.5" stroke-linecap="round"/>';
@@ -3019,7 +3042,7 @@ function petSVG(opt){
     out += '<ellipse cx="79" cy="48" rx="8.5" ry="17" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(24 79 48)"/>';
     out += '<ellipse cx="41" cy="50" rx="4" ry="9" fill="'+S.belly+'" transform="rotate(-24 41 50)"/>';
     out += '<ellipse cx="79" cy="50" rx="4" ry="9" fill="'+S.belly+'" transform="rotate(24 79 50)"/>';
-    out += '<ellipse cx="60" cy="84" rx="32" ry="33" fill="url(#pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+    out += '<ellipse cx="60" cy="84" rx="32" ry="33" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
     out += '<ellipse cx="60" cy="94" rx="19" ry="17" fill="'+S.belly+'" opacity=".9"/>';
     out += '</g>';
   }
