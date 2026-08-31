@@ -4184,35 +4184,26 @@ function nextGameOrS3(){
 }
 
 /* ============ S3 小考 ============ */
-function qQuiz(t, type){
-  if(type === 'py'){
-    var others = shuffle(LV.chars.filter(function(c){ return c.c !== t.c; })).slice(0,3).map(function(c){ return c.py; });
-    var allpy = shuffle([t.py].concat(others));
-    return {
-      stimHTML: '<div class="lv-hero">'+t.c+'</div><button class="lv-small-play" data-act="speak">🔊</button><div class="lv-listen-lab">这个字的拼音是哪个？</div>',
-      stimSpeak: t.c,
-      choices: allpy.map(function(p){ return {html:'<span class="lv-py-lg">'+p+'</span>', correct: (p === t.py)}; }),
-      hint: function(){ speak(t.c); }
-    };
-  } else {
-    var opts = makeChoices(t, LV.pool, LV.distract, 4);
-    return {
-      stimHTML: '<div class="lv-pic">'+picSVG(t.c)+'</div><button class="lv-small-play" data-act="speak">🔊</button><div class="lv-listen-lab">这个图说的是哪个字？</div>',
-      stimSpeak: t.c,
-      choices: opts.map(function(o){ return {html: lvCharHTML(o.ch), correct: o.correct}; }),
-      hint: function(){ speak(t.c); }
-    };
-  }
+/* S3 小考：全程字图辨识，不含拼音题（5 岁未学拼音，不考核拼音认读）。
+   每题显示插图 + 听音，让孩子从 4 个汉字里选出正确字，无需读拼音。 */
+function qQuiz(t){
+  var opts = makeChoices(t, LV.pool, LV.distract, 4);
+  return {
+    stimHTML: '<div class="lv-pic">'+picSVG(t.c)+'</div><button class="lv-small-play" data-act="speak">🔊</button><div class="lv-listen-lab">这个图说的是哪个字？</div>',
+    stimSpeak: t.c,
+    choices: opts.map(function(o){ return {html: lvCharHTML(o.ch), correct: o.correct}; }),
+    hint: function(){ speak(t.c); }
+  };
 }
 function startS3(){
   LV.stage = 'S3';
   LV.quizIdx = 0;
-  LV.quizPlan = LV.chars.map(function(c, i){ return {target:c, type: (i<3 ? 'py' : 'pic')}; });
+  LV.quizPlan = LV.chars.map(function(c){ return {target:c, type:'pic'}; });
   renderQuizQuestion();
 }
 function renderQuizQuestion(){
   var plan = LV.quizPlan[LV.quizIdx];
-  var q = qQuiz(plan.target, plan.type);
+  var q = qQuiz(plan.target);
   q.title = '小考 · 第 '+(LV.quizIdx+1)+' / 5 题';
   lvAsk(q, 'retry', function(correct, firstAttempt){
     if(correct){
