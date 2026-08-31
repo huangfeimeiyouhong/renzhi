@@ -2991,8 +2991,10 @@ var _petMood = "happy", _petPraise = "";
 var _petShopOpen = false, _costumeConfirm = null;
 
 /* ---- UI：渲染宠物页 ---- */
-function renderPet(){
+function renderPet(keepScroll){
   var host = $("page-pet"); if(!host) return;
+  /* 装扮交互需保留滚动位置：先在旧 .pet-page 上记录 scrollTop，重渲染后还原 */
+  var _prevScroll = (keepScroll && host.querySelector('.pet-page')) ? host.querySelector('.pet-page').scrollTop : 0;
   var bond = state.pet.bond||0, st = petStage(bond), lv = st+1, S = PET_STAGES[st];
   var lo = PET_BOND_THRESH[st], hi = (st<4 ? PET_BOND_THRESH[st+1] : PET_BOND_THRESH[4]);
   var pct = st>=4 ? 100 : Math.max(0, Math.min(100, Math.round((bond-lo)/(hi-lo)*100)));
@@ -3026,6 +3028,7 @@ function renderPet(){
       (_petShopOpen ? costumeSectionHTML() : '')+
     '</div>';
   setHTML(host, html);
+  if(keepScroll){ var _np = host.querySelector('.pet-page'); if(_np) _np.scrollTop = _prevScroll; }
   var fb = $("petFeed");   if(fb) fb.addEventListener('click', feedPet);
   var fs = $("petStroke"); if(fs) fs.addEventListener('click', petPet);
   var pd = $("petDress");  if(pd) pd.addEventListener('click', function(){ _petShopOpen=!_petShopOpen; _costumeConfirm=null; renderPet(); });
@@ -3097,7 +3100,7 @@ function costumeSectionHTML(){
 }
 function onCostume(e){
   var cancel = e.target.closest && e.target.closest('[data-act="costume-cancel"]');
-  if(cancel){ _costumeConfirm=null; renderPet(); return; }
+  if(cancel){ _costumeConfirm=null; renderPet(true); return; }
   var buyBtn = e.target.closest && e.target.closest('[data-act="costume-buy"]');
   if(buyBtn){
     var id = buyBtn.getAttribute('data-id'), r = buyCostume(state, id);
@@ -3106,10 +3109,11 @@ function onCostume(e){
       if(SFX){ if(SFX.coin) SFX.coin(); else if(SFX.tap) SFX.tap(); }
       if(typeof speak==='function') speak('买到啦，穿上'+r.name);
       toast('🎉 买到'+r.name+'，穿上啦！');
+      renderHUD();            /* 购买后立即刷新顶部星星计数 */
     } else if(r.reason==='nostar'){
       _costumeConfirm=null; toast('⭐ 星星不够，去学字赚星星吧～');
     } else { _costumeConfirm=null; }
-    renderPet(); return;
+    renderPet(true); return;
   }
   var card = e.target.closest && e.target.closest('.pc-card'); if(!card) return;
   var cid = card.getAttribute('data-id'), slot = card.getAttribute('data-slot');
@@ -3117,16 +3121,16 @@ function onCostume(e){
   if(lv < costumeUnlockLv(slot)){ toast('升到 Lv'+costumeUnlockLv(slot)+' 就能用'+card.querySelector('.pc-name').textContent+'啦'); return; }
   if(costumeEquipped(state,cid)){
     equipCostume(state,cid); syncSave();
-    if(typeof speak==='function') speak('脱下来啦'); toast('脱下来啦'); renderPet(); return;
+    if(typeof speak==='function') speak('脱下来啦'); toast('脱下来啦'); renderPet(true); return;
   }
   if(costumeOwned(state,cid)){
     var r3 = equipCostume(state,cid); syncSave();
     if(SFX && SFX.tap) SFX.tap();
-    if(typeof speak==='function') speak('穿上'+r3.name); toast('穿上'+r3.name+'！'); renderPet(); return;
+    if(typeof speak==='function') speak('穿上'+r3.name); toast('穿上'+r3.name+'！'); renderPet(true); return;
   }
   /* 未拥有 → 内联二次确认（不弹模态框，符合"排斥模态框"偏好） */
   _costumeConfirm = (_costumeConfirm===cid) ? null : cid;
-  renderPet();
+  renderPet(true);
 }
 /* ===== /JS-BLOCK: PET ===== */
 
