@@ -376,32 +376,40 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 }
 @keyframes bossspin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
-/* ===================== 底部 Tab（≥72px 高，含安全区） ===================== */
+/* ===================== 底部导航：游戏风悬浮胶囊按钮条 =====================
+   改成游戏 HUD 里常见的悬浮胶囊按钮组：每个按钮是带圆形图标徽章的离散 token，
+   不再是 App 式平铺的等分 tab。选中态整颗按钮填充浅主色，图标徽章填充主色。 */
 .tabbar{
   flex:0 0 auto; z-index:var(--z-dock);
-  display:flex; align-items:stretch;
-  min-height:var(--tab-h);
-  padding-bottom:var(--safe-bot);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  min-height:auto;
+  margin:0 auto calc(10px + var(--safe-bot));
+  padding:8px 14px;
+  width:fit-content; max-width:calc(100% - 20px);
   background:var(--c-surface);
-  border-top:var(--bw-ui) solid var(--c-line);
-  box-shadow:0 -4px 16px rgba(var(--c-shadow-rgb),.10);
+  border:2px solid var(--c-line);
+  border-radius:999px;
+  box-shadow:0 8px 24px rgba(var(--c-shadow-rgb),.14);
 }
 .tab{
-  flex:1 1 0; min-width:0; min-height:var(--tab-h);
+  flex:0 0 auto; width:auto; min-width:58px; min-height:58px;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-  background:transparent; border:0; padding:6px 2px; cursor:pointer;
+  background:transparent; border:0; border-radius:16px;
+  padding:4px 8px; cursor:pointer;
   color:var(--c-ink-2); font-size:var(--fs-mini); font-weight:800;
-  transition:transform var(--dur-tap) var(--ease-tap), color var(--dur-tap) linear;
+  transition:transform var(--dur-tap) var(--ease-tap), color var(--dur-tap) linear, background var(--dur-tap) linear;
 }
-.tab:active{ transform:scale(.94); }
+.tab:active{ transform:scale(.92); }
 .tab svg{ display:block; }
-.tab.on{ color:var(--c-pri-d); }
-.tab.on .tab-ic{ background:var(--c-pri-l); }
+.tab.on{ color:var(--c-pri-d); background:var(--c-pri-l); }
 .tab-ic{
-  width:34px; height:34px; border-radius:50%;
+  width:40px; height:40px; border-radius:50%;
   display:grid; place-items:center;
-  background:transparent; transition:background var(--dur-tap) linear;
+  background:var(--c-surface-2); border:2px solid var(--c-line);
+  color:var(--c-ink-2);
+  transition:background var(--dur-tap) linear, border-color var(--dur-tap) linear, color var(--dur-tap) linear;
 }
+.tab.on .tab-ic{ background:var(--c-pri); border-color:var(--c-pri-d); color:#fff; }
 
 /* ===================== 通用页内占位 / 区块 ===================== */
 .pane{ padding:var(--sp-4); }
@@ -484,7 +492,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 
 /* ===================== Toast ===================== */
 .toast{
-  position:fixed; left:50%; bottom:calc(var(--tab-h) + var(--safe-bot) + 16px);
+  position:fixed; left:50%; bottom:calc(var(--tab-h) + var(--safe-bot) + 24px);
   transform:translate(-50%, 12px);
   z-index:var(--z-toast);
   max-width:min(88vw, 420px);
@@ -539,34 +547,6 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   .map-wrap{ padding-bottom: 8px; }
 }
 
-/* ===================== REQ-302 · 横屏/平板：底部 tab → 左侧"按钮式"导航栏 =====================
-   手机横屏或平板访问时，自动切换为横版布局：底部整条 tab 不再铺满，
-   改为左侧一列带圆角背景的"按钮"（图标+文字），主区占满剩余宽度，适配性更强。
-   竖屏（默认手机）保持原底部 tab 不变，不影响既有体验。 */
-@media (orientation: landscape){
-  /* 主区让出左侧导航宽度 */
-  #pages{ margin-left: var(--rail-w); }
-  .tabbar{
-    position:fixed; left:0; top:var(--hud-h); bottom:0;
-    width:var(--rail-w);
-    flex-direction:column; align-items:stretch;
-    border-top:0; border-right:2px solid var(--c-line);
-    box-shadow:4px 0 16px rgba(var(--c-shadow-rgb),.08);
-    padding: calc(var(--safe-top, 0px) + 4px) max(0px, env(safe-area-inset-left)) 0 0;
-    z-index:calc(var(--z-dock) + 1);
-  }
-  .tab{
-    flex:0 0 auto; width:auto; min-height:58px;
-    margin:6px 8px; border-radius:14px;
-    flex-direction:column; gap:3px;
-  }
-  .tab.on{ background:var(--c-pri-l); }
-  .tab-ic{ background:transparent; }
-  .tab.on .tab-ic{ background:transparent; }
-  .map-wrap{ padding-bottom:8px; }
-  /* Toast 居中需避开左侧导航栏 */
-  .toast{ left:calc(50% + (var(--rail-w) / 2)); }
-}
 @media (min-width: 1024px){
   .map{ max-width: 640px; margin: 0 auto; }
   .panel{ left:50%; right:auto; transform:translate(-50%,102%); width:min(640px,92vw); border-radius:var(--r-xl); }
@@ -617,6 +597,34 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   .dex{ padding: var(--sp-4) max(var(--sp-5), env(safe-area-inset-left)) var(--sp-4) max(var(--sp-5), env(safe-area-inset-right)); }
   .dex-grid{ grid-template-columns: repeat(8, 1fr); }
   .chest-page{ max-width: 760px; margin: 0 auto; }
+}
+
+/* ===================== REQ-302 · 横屏/平板：底部胶囊按钮条 → 左侧游戏风导航栏 =====================
+   手机横屏或平板访问时，自动切横版：底部悬浮胶囊按钮条移到左侧，
+   改为左侧一列带圆形图标徽章的游戏风"按钮"（图标+文字），主区占满剩余宽度。
+   竖屏（默认手机）仍用底部悬浮胶囊按钮条。放在 768 块之后，确保覆盖其 .tabbar 内边距。 */
+@media (orientation: landscape){
+  /* 主区让出左侧导航宽度 */
+  #pages{ margin-left: var(--rail-w); }
+  .tabbar{
+    position:fixed; left:0; top:var(--hud-h); bottom:0;
+    width:var(--rail-w);
+    flex-direction:column; align-items:stretch; justify-content:flex-start;
+    margin:0;
+    border-radius:0 24px 24px 0;
+    border:2px solid var(--c-line); border-left:0;
+    box-shadow:6px 0 24px rgba(var(--c-shadow-rgb),.12);
+    padding: calc(var(--safe-top, 0px) + 12px) 8px 8px max(0px, env(safe-area-inset-left));
+    z-index:calc(var(--z-dock) + 1);
+  }
+  .tab{
+    flex:0 0 auto; width:auto; min-height:58px;
+    margin:6px 6px; border-radius:14px;
+    flex-direction:column; gap:3px;
+  }
+  .map-wrap{ padding-bottom:8px; }
+  /* Toast 居中需避开左侧导航栏 */
+  .toast{ left:calc(50% + (var(--rail-w) / 2)); }
 }
 /* ===== /BLOCK: CSS-TOKENS ===== */
 
