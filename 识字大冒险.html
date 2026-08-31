@@ -483,6 +483,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 }
 .row{ display:flex; align-items:center; gap:var(--sp-3); margin-bottom:var(--sp-3); }
 .row-lb{ flex:1 1 auto; font-size:var(--fs-body); font-weight:700; }
+.vol-slider{ flex:0 0 150px; max-width:150px; accent-color:#10B981; height:28px; cursor:pointer; }
 .hint{ font-size:var(--fs-mini); color:var(--c-ink-2); margin:0 0 var(--sp-3); }
 .todo{
   font-size:var(--fs-mini); font-weight:800; color:var(--c-ink-2);
@@ -1156,6 +1157,10 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
       <span class="row-lb" data-nid="panel.row.sound.lb">音效</span>
       <button class="btn btn-sec" id="soundBtn" type="button" aria-pressed="true" data-nid="panel.sound">开</button>
     </div>
+    <div class="row" data-nid="panel.row.vol">
+      <span class="row-lb" data-nid="panel.row.vol.lb">音量</span>
+      <input type="range" id="volSlider" class="vol-slider" min="0" max="100" value="100" data-nid="panel.vol" aria-label="音量">
+    </div>
   </div>
 
   <div class="panel-sec" data-nid="panel.sec.tickets">
@@ -1715,12 +1720,26 @@ function picSVG(ch){
 
 /* ============ 拼音发音（浏览器内置 TTS，零外链/离线可用） ============ */
 var _zhVoice=null;
+/* 选声：优先更自然的中文嗓音，避免机械感。评分越高越优先：
+   +3 命中「高质量/神经嗓音」名单（Apple Ting-Ting/Yu-Shu/Mei-Jia/Sin-Ji、微软 Xiaoxiao/Yunyang 神经嗓、Google 普通话、常见中文名）
+   +2 本地嗓音（localService，延迟低、通常更顺）
+   +1 普通话（zh-CN 优先于 zh-TW/zh-HK） */
 function _initVoices(){
   if(!('speechSynthesis' in window)) return;
   var vs=window.speechSynthesis.getVoices();
+  if(!vs || !vs.length) return;
+  var PREMIUM = /Ting-Ting|Yu-Shu|Mei-Jia|Sin-Ji|Ya-Chu|Xiaoxiao|XiaoxiaoNeural|Yunyang|YunyangNeural|Google\s*普通话|Google\s*中文|Microsoft\s*Xiaoxiao|Microsoft\s*Yunyang|婷婷|雨桐|美佳|小云|小萍|普通话\s*\(.*神经/i;
+  var best=null, bestScore=-1;
   for(var i=0;i<vs.length;i++){
-    if(/zh|Chinese|普通话|Mandarin|Yue/i.test(vs[i].lang+" "+vs[i].name)){ _zhVoice=vs[i]; break; }
+    var v=vs[i], name=(v.name||''), lang=(v.lang||'');
+    if(!/zh|Chinese|普通话|Mandarin|Yue|漢語|国语/i.test(lang+" "+name)) continue;
+    var score=0;
+    if(PREMIUM.test(name)) score+=3;
+    if(v.localService) score+=2;
+    if(/^zh-CN/i.test(lang)) score+=1;
+    if(score>bestScore){ bestScore=score; best=v; }
   }
+  if(best) _zhVoice=best;
 }
 function ttsOK(){ return ('speechSynthesis' in window); }
 /* GDD §9.5 第 6 条：TTS 不可用时，听音类 G1 自动替换为 G2 字图配对（视觉），其余游戏照常。
@@ -1742,12 +1761,18 @@ if(typeof window !== "undefined" && 'speechSynthesis' in window){ window.speechS
 function spkSVG(){
   return '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
 }
+/* TTS 音量（0–1），随「音量」滑块变化；默认 1 */
+function ttsVol(){
+  var v = (typeof state!=="undefined" && state && state.settingsNew) ? state.settingsNew.soundVol : null;
+  v = (v==null ? 1 : v);
+  return Math.max(0, Math.min(1, v));
+}
 function speak(text){
   if(!ttsOK()||!text) return;
   try{
     window.speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);
-    u.lang="zh-CN"; u.rate=(text.length>1?0.62:0.85); u.pitch=1.05;
+    u.lang="zh-CN"; u.rate=(text.length>1?0.62:0.85); u.pitch=1.05; u.volume=ttsVol();
     if(_zhVoice) u.voice=_zhVoice;
     window.speechSynthesis.speak(u);
   }catch(e){}
@@ -1761,7 +1786,7 @@ function speakQueue(text){
   if(!ttsOK()||!text) return;
   try{
     var u=new SpeechSynthesisUtterance(text);
-    u.lang="zh-CN"; u.rate=(text.length>1?0.62:0.85); u.pitch=1.05;
+    u.lang="zh-CN"; u.rate=(text.length>1?0.62:0.85); u.pitch=1.05; u.volume=ttsVol();
     if(_zhVoice) u.voice=_zhVoice;
     window.speechSynthesis.speak(u);
   }catch(e){}
@@ -1787,15 +1812,16 @@ function guideNext(el, sayText, delayMs){
 /* ===== JS-BLOCK: AUDIO ===== */
 /* 美术 §9：Web Audio 合成音效（零外链，护耳参数：sine/triangle、≤1600Hz、attack≥10ms） */
 var SFX = (function(){
-  var AC=null, MASTER=null, LP=null, enabled=true;
+  var AC=null, MASTER=null, LP=null, enabled=true, vol=1;
+  var BASE_MASTER=.32;   /* 护耳基准音量，再乘 vol 滑块 */
 
   function ctx(){
     if(!AC){
       var C = (typeof window !== "undefined") && (window.AudioContext || window.webkitAudioContext);
       if(!C) return null;
       AC = new C();
-      LP = AC.createBiquadFilter(); LP.type='lowpass'; LP.frequency.value=5200; LP.Q.value=.7;
-      MASTER = AC.createGain(); MASTER.gain.value=.5;
+      LP = AC.createBiquadFilter(); LP.type='lowpass'; LP.frequency.value=3400; LP.Q.value=.7;  /* 更暖，削减高频金属感 */
+      MASTER = AC.createGain(); MASTER.gain.value=BASE_MASTER*vol;
       LP.connect(MASTER); MASTER.connect(AC.destination);
     }
     if(AC.state === 'suspended' && AC.resume) AC.resume();   /* iOS 需用户手势解锁 */
@@ -1827,6 +1853,7 @@ var SFX = (function(){
   }
   return {
     setEnabled: function(v){ enabled = !!v; },
+    setVolume: function(v){ vol = Math.max(0, Math.min(1, (v==null?1:v))); if(MASTER) MASTER.gain.value = BASE_MASTER*vol; },
     unlock: function(){ ctx(); },
     tap:    function(){ tone({freq:880, dur:.07, type:'sine', gain:.10, attack:.006}); },
     right:  function(){ [523.25,659.25,783.99].forEach(function(f,i){
@@ -1904,7 +1931,7 @@ function defaultStateV2(){
     stats:{ totalRight:0, totalWrong:0, playSeconds:0, sessions:0, wrongByChar:{} },
     /* fsScale 是本阶段工程追加项（对应美术 §11 的 --fs-scale 大字号模式），
        其余字段与 GDD §12.2 完全一致。 */
-    settingsNew:{ dailyMinutes:20, restReminder:true, soundOn:true, fsScale:1, chestPool:{} }
+    settingsNew:{ dailyMinutes:20, restReminder:true, soundOn:true, fsScale:1, soundVol:1, chestPool:{} }
   };
 }
 
@@ -1981,7 +2008,7 @@ function migrate(s){
   s.daily = {};
   s.streak = { cur: streakV1(s), best: streakV1(s), lastDate: todayStr() };
   s.stats = { totalRight: s.quizRight || 0, totalWrong: 0, playSeconds:0, sessions:0, wrongByChar:{} };
-  s.settingsNew = { dailyMinutes:20, restReminder:true, soundOn:true, fsScale:1,
+  s.settingsNew = { dailyMinutes:20, restReminder:true, soundOn:true, fsScale:1, soundVol:1,
                     chestPool: buildDefaultChestPool(s.rewards) };
 
   /* 步骤 7：v1 的 cursor / dayStart / startDate 原样保留 */
@@ -2025,6 +2052,7 @@ function normalizeV2(s){
   if(!s.settingsNew) s.settingsNew = d.settingsNew;
   if(!s.settingsNew.chestPool) s.settingsNew.chestPool = {};
   if(typeof s.settingsNew.fsScale !== "number") s.settingsNew.fsScale = 1;
+  if(typeof s.settingsNew.soundVol !== "number") s.settingsNew.soundVol = 1;
   if(!s.codex) s.codex = {};
   s.pet.level = bondToLevel(s.pet.bond || 0);
   recalcZones(s);
@@ -3045,6 +3073,16 @@ function bindParent(){
     SFX.setEnabled(on);
     syncSave();
   });
+  var vs = $("volSlider");
+  if(vs){
+    vs.value = Math.round((state.settingsNew.soundVol==null?1:state.settingsNew.soundVol)*100);
+    vs.addEventListener('input', function(){
+      var v = parseInt(this.value,10)/100;
+      state.settingsNew.soundVol = v;
+      SFX.setVolume(v);
+      syncSave();
+    });
+  }
   if(typeof document !== "undefined" && document.addEventListener){
     document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeParent(); });
   }
@@ -4977,6 +5015,7 @@ function bindFirstInteractionFullscreen(){
 function boot(){
   load();
   SFX.setEnabled(state.settingsNew.soundOn !== false);
+  SFX.setVolume(state.settingsNew.soundVol==null?1:state.settingsNew.soundVol);
   applyFsScale(state.settingsNew.fsScale);
   var sb = $("soundBtn");
   if(sb){ sb.setAttribute('aria-pressed', state.settingsNew.soundOn !== false ? 'true' : 'false');
