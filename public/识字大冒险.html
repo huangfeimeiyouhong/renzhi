@@ -800,12 +800,13 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 
 .g4-grid{ display:grid; gap:10px; margin:14px auto; max-width:440px; }
 .g4-cell{ aspect-ratio:1; min-height:64px; border-radius:16px; border:3px solid var(--c-line); background:var(--c-surface-2);
-  display:flex; align-items:center; justify-content:center; font-family:var(--font-hanzi); font-size:40px; color:var(--c-hanzi); cursor:pointer; }
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-hanzi); font-size:40px; color:var(--c-hanzi); cursor:pointer; position:relative; }
 .g4-cell.path{ background:var(--c-cream); border-color:var(--c-road); }
 .g4-cell.cur{ box-shadow:0 0 0 4px var(--c-ok); animation:g4pulse 1.2s infinite; }
 .g4-cell.hint{ box-shadow:0 0 0 6px var(--c-gold); animation:g4hint 1s infinite; }
 .g4-cell.g4-shake{ animation:lvshake .42s ease; }
-.g4-cell.start, .g4-cell.end{ font-size:30px; }
+/* 起点/终点用小徽章，不再遮挡汉字（否则孩子看不到目标字） */
+.g4-badge{ position:absolute; top:-8px; right:-8px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:var(--c-surface); border:2px solid var(--c-road); border-radius:50%; font-size:14px; box-shadow:var(--sh-1); pointer-events:none; }
 .g4-lab{ text-align:center; font-size:var(--fs-h3); font-weight:800; color:var(--c-ink); }
 .g4-tgt{ color:var(--c-pri-d); }
 @keyframes g4pulse{ 0%,100%{box-shadow:0 0 0 4px var(--c-ok)} 50%{box-shadow:0 0 0 9px var(--c-ok-l)} }
@@ -3328,8 +3329,9 @@ function mgG4(g, done){
       if(c===path[0]) cls+=' start';
       if(c===path[path.length-1]) cls+=' end';
       if(c===cur) cls+=' cur';
-      var mark = (c===path[0])?'🏁':(c===path[path.length-1])?'🎯':(ch?ch.c:'');
-      cellHTML += '<button class="'+cls+'" data-cell="'+c+'">'+mark+'</button>';
+      var mark = ch ? ch.c : '';
+      var badge = (c===path[0]) ? '<span class="g4-badge">🏁</span>' : (c===path[path.length-1]) ? '<span class="g4-badge">🎯</span>' : '';
+      cellHTML += '<button class="'+cls+'" data-cell="'+c+'">'+badge+mark+'</button>';
     }
     var html =
       '<header class="lv-hd"><button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
