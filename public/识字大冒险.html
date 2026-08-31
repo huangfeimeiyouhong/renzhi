@@ -1413,6 +1413,21 @@ function _initVoices(){
   }
 }
 function ttsOK(){ return ('speechSynthesis' in window); }
+/* GDD §9.5 第 6 条：TTS 不可用时，听音类 G1 自动替换为 G2 字图配对（视觉），其余游戏照常。
+   返回去重后最多 2 个不重复的小游戏类型；若替换后不足 2 个，从 G2/G3/G4/G5 补齐，避免卡死。 */
+function ttsSafeGames(pair){
+  if(ttsOK()) return pair.slice(0,2);
+  var out = [];
+  pair.forEach(function(t){
+    var g = (t === 'G1') ? 'G2' : t;
+    if(out.indexOf(g) < 0) out.push(g);
+  });
+  if(out.length < 2){
+    var fb = ['G2','G3','G4','G5'];
+    for(var i=0; i<fb.length && out.length<2; i++){ if(out.indexOf(fb[i]) < 0) out.push(fb[i]); }
+  }
+  return out.slice(0,2);
+}
 if(typeof window !== "undefined" && 'speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged=_initVoices; _initVoices(); }
 function spkSVG(){
   return '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -1973,7 +1988,7 @@ var ZONE_CFG = [
 ];
 
 function nodePos(i){                       /* i: 0..19，20 = 每日挑战 */
-  if(i===20) return { x:200, y:2480, zone:3, cfg:ZONE_CFG[3], k:5, daily:true };
+  if(i===20) return { x:200, y:2560, zone:3, cfg:ZONE_CFG[3], k:5, daily:true };   /* P5 对齐：与 L20 Boss(y=2436) 中心间距 124px，避免两节点重叠 */
   var z = Math.floor(i/5), k = i%5, cfg = ZONE_CFG[z];
   return { x:(k%2===0?110:290), y:cfg.y0+100+k*104, zone:z, cfg:cfg, k:k };
 }
@@ -2170,7 +2185,7 @@ function nodeSVG(i, st){
 }
 /* 整张地图 */
 function mapSVG(states, daily){
-  var H = (daily && daily.show) ? 2620 : MAP_H;
+  var H = (daily && daily.show) ? 2640 : MAP_H;   /* 每日节点 y=2560 + r44 + 留白 → 2640 */
   var o = '<svg class="map" viewBox="0 0 '+MAP_W+' '+H+'" preserveAspectRatio="xMidYMin meet" '+
           'xmlns="http://www.w3.org/2000/svg" data-page-node-id="'+nid('map.root')+'" role="img" '+
           'aria-label="'+((daily && daily.show) ? '字灵群岛地图，共 4 个区域 20 个关卡，另有每日字灵挑战' : '字灵群岛地图，共 4 个区域 20 个关卡')+'">';
@@ -3107,11 +3122,13 @@ function runMinigame(g, done){
   if(g.type==='g5') return mgG5(g, done);
 }
 
+var DAILY_DIFF = 10;   /* P5 对齐 GDD §2.7.2：每日字灵挑战固定中档难度（≈第三区），不随 currentLevelIdx 递增（daily 时各 minigame 取此值而非 19 最难关） */
+
 /* ---------- G3 拍字地鼠 ---------- */
 /* ---------- G3 拍字地鼠（真·地鼠洞：洞固定，字从洞里冒出/缩回） ---------- */
 function mgG3(g, done){
   var host = $('levelHost');
-  var idx = currentLevelIdx();
+  var idx = (LV && LV.daily) ? DAILY_DIFF : currentLevelIdx();
   var maxHoles = 6;
   /* 6 个固定洞，早期冒出 3 只、中期 4 只、后期 5 只，营造"地鼠突然冒出来"的惊喜感 */
   var numMoles = idx<6 ? 3 : (idx<12 ? 4 : 5);
@@ -3257,7 +3274,7 @@ function mgG3(g, done){
 /* ---------- G4 认字小路 ---------- */
 function mgG4(g, done){
   var host = $('levelHost');
-  var idx = currentLevelIdx();
+  var idx = (LV && LV.daily) ? DAILY_DIFF : currentLevelIdx();
   var cols = idx<8 ? 3 : (idx<14 ? 4 : 5);
   var rows = idx<8 ? 4 : (idx<14 ? 5 : 5);
   var steps = idx<8 ? 5 : (idx<14 ? 7 : 9);
@@ -3368,7 +3385,7 @@ function mgG4(g, done){
 /* ---------- G5 连线成词 ---------- */
 function mgG5(g, done){
   var host = $('levelHost');
-  var idx = currentLevelIdx();
+  var idx = (LV && LV.daily) ? DAILY_DIFF : currentLevelIdx();
   var qCount = idx<8 ? 4 : (idx<14 ? 5 : 6);
   var COMBO = buildCombo();
   var valid = LV.chars.filter(function(c){
@@ -3459,10 +3476,10 @@ function mgG5(g, done){
 /* GDD §7.2：N 组卡牌背面朝上，点两张 → 图卡与字卡匹配则定格(绿框)+消除计分，
    不匹配则翻回（600ms 记忆窗口，纯靠运气也能看清楚，5 岁记忆窗口短）。全部消完过关。
    防挫败：无倒计时、不匹配不惩罚只翻回（与 G3/G4/G5 一致，GDD §9.1）。
-   难度：按 currentLevelIdx 取 4/6/8 组，但受本关可用字数(= min(LV.chars, LV.pool 去重))上限约束。 */
+   难度：按 (LV.daily ? DAILY_DIFF : currentLevelIdx) 取 4/6/8 组，但受本关可用字数(= min(LV.chars, LV.pool 去重))上限约束。 */
 function mgG2(g, done){
   var host = $('levelHost');
-  var idx = currentLevelIdx();
+  var idx = (LV && LV.daily) ? DAILY_DIFF : currentLevelIdx();
   var wantPairs = idx<8 ? 4 : (idx<14 ? 6 : 8);
   /* 候选字：本关 5 字优先，不足从已学字池补，去重后取 wantPairs 个 */
   var cand = [], seenC = {};
@@ -3981,10 +3998,14 @@ function startDaily(){
   var allLearned = learnedPool(state).map(function(it){ return it.ch; });
   var seen = {}; chars.forEach(function(c){ seen[c.c]=1; });
   var distract = shuffle(allLearned.filter(function(c){ return !seen[c.c]; }));
-  /* 2 个不同小游戏，承载 3 题（2+1）。TTS 不可用时按 GDD §9.5 第 6 条过滤 G1 */
-  var cand = ['G1','G2','G3','G4','G5'];
-  if(!ttsOK()) cand = cand.filter(function(g){ return g !== 'G1'; });
-  var games = shuffle(cand).slice(0,2).map(function(t){ return t.toLowerCase(); });
+  /* 2 个不同小游戏，承载 3 题（2+1）。TTS 不可用时按 GDD §9.5 第 6 条：G1 听音类自动替换为 G2 字图配对（保证在场），另一游戏从 G3/G4/G5 随机 */
+  var games;
+  if(!ttsOK()){
+    var rest = shuffle(['G3','G4','G5']).slice(0,1);
+    games = shuffle(['G2'].concat(rest)).map(function(t){ return t.toLowerCase(); });
+  } else {
+    games = shuffle(['G1','G2','G3','G4','G5']).slice(0,2).map(function(t){ return t.toLowerCase(); });
+  }
   LV = {
     idx: -1, daily: true,
     chars: chars,
@@ -4113,7 +4134,7 @@ function startS2(){
   LV.gameNo = 0; LV.qInGame = 0;
   /* P3：按 GDD §7.7 轮换表选本关两个小游戏（G1–G5 轮换），默认 G1/G2 兜底。
      用本关真实下标 LV.idx（而非全局 currentLevel），避免回放已通关关卡时选错轮换 */
-  var rot = GAME_ROTATION[LV.idx] || ['G1','G2'];
+  var rot = ttsSafeGames(GAME_ROTATION[LV.idx] || ['G1','G2']);   /* GDD §9.5 第 6 条：TTS 不可用时 G1→G2 */
   LV.games = rot.map(function(t){ return {type: t.toLowerCase(), targets: shuffle(LV.chars).slice(0,4)}; });
   renderGameIntro(0);
 }
