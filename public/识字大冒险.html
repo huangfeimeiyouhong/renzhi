@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <!-- 可访问性：移除 maximum-scale=1.0 与 user-scalable=no，改为允许缩放（美术 §10.4） -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#FFF6EC">
 <meta name="description" content="识字大冒险 · 5 岁儿童识字启蒙游戏：地图闯关 + 字灵宠物收集">
 <title>识字大冒险</title>
@@ -279,7 +281,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   -webkit-overflow-scrolling:touch;
   overscroll-behavior-y:contain;
   scroll-snap-type:y proximity;
-  background:#0E0B1F;                 /* 滚出边界时的兜底底色 */
+  background:linear-gradient(180deg, #BFE9FF 0%, #E8F7D4 100%); /* 与青草岛天空渐变一致，避免顶部透明/滚出边界时露黑底 */
 }
 .map{ display:block; width:100%; height:auto; }
 .node{ cursor:pointer; outline:none; }
@@ -1437,7 +1439,7 @@ function speak(text){
   try{
     window.speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);
-    u.lang="zh-CN"; u.rate=0.85; u.pitch=1.05;
+    u.lang="zh-CN"; u.rate=(text.length>1?0.62:0.85); u.pitch=1.05;
     if(_zhVoice) u.voice=_zhVoice;
     window.speechSynthesis.speak(u);
   }catch(e){}
@@ -4344,6 +4346,28 @@ function render(){
   renderHUD();
   renderMap();
 }
+/* 手机端：用户首次触摸/点击时尝试进入全屏并锁定竖屏。
+   真正的 Fullscreen API 必须由用户手势触发，无法自动触发。 */
+function tryFullscreen(){
+  if(document.fullscreenElement || document.webkitFullscreenElement) return;
+  var el = document.documentElement;
+  var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+  if(fn){
+    try{ fn.call(el).catch(function(){}); }catch(e){}
+  }
+}
+function tryLockPortrait(){
+  if(window.screen && screen.orientation && screen.orientation.lock){
+    try{ screen.orientation.lock('portrait').catch(function(){}); }catch(e){}
+  }
+}
+function bindFirstInteractionFullscreen(){
+  function once(){
+    tryFullscreen();
+    tryLockPortrait();
+  }
+  document.addEventListener('click', once, {once:true});
+}
 function boot(){
   load();
   SFX.setEnabled(state.settingsNew.soundOn !== false);
@@ -4358,6 +4382,7 @@ function boot(){
   bindMap();
   bindParent();
   scrollToCurrent();
+  bindFirstInteractionFullscreen();
 }
 if(typeof document !== "undefined" && document.getElementById){
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
