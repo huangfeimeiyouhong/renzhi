@@ -511,6 +511,10 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   /* 长按进度改用描边提示，不依赖动画传达（美术 §10.3「不依赖动画单独传达信息」） */
   .pbtn.pressing .pbtn-face{ outline:3px solid var(--c-sky); outline-offset:2px; }
   *{ transition-duration:.01ms !important; }
+  /* P5：每日挑战弹层 / 能量果飞行 / HUD 弹跳 降级（循环/强动效一律 animation:none） */
+  .lv-ask-card{ animation:none !important; }
+  .fly-fruit{ animation:none !important; opacity:0 !important; }
+  .cur-bump{ animation:none !important; }
 }
 
 /* ===================== 横屏 / 平板（美术 §10.6） ===================== */
@@ -581,7 +585,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .lv-s1card,.lv-s4{ display:flex; flex-direction:column; align-items:center; gap:var(--sp-4);
   padding:var(--sp-5) var(--sp-4); background:var(--c-surface-2); border-radius:var(--r-xl); box-shadow:var(--sh-2); }
 .lv-words{ display:flex; flex-wrap:wrap; gap:var(--sp-2); justify-content:center; }
-.lv-word{ padding:6px 12px; border-radius:var(--r-pill); background:var(--c-surface); border:2px solid var(--c-line); font-size:var(--fs-body); color:var(--c-ink); }
+.lv-word{ padding:6px 12px; border-radius:var(--r-pill); background:var(--c-surface); border:2px solid var(--c-line); font-size:var(--fs-body); color:var(--c-ink); cursor:pointer; touch-action:manipulation; }
 .lv-stars{ display:flex; gap:var(--sp-3); justify-content:center; }
 .lv-star{ display:inline-block; }
 .lv-star.pop{ animation:lvstarpop .5s var(--ease-emp) both; }
@@ -596,6 +600,35 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   font-family:var(--font-hanzi); font-size:34px; color:var(--c-hanzi); cursor:pointer; }
 .lv-chip:active{ transform:scale(.94); }
 @keyframes lvshake{ 0%,100%{transform:translateX(0);} 20%{transform:translateX(-8px);} 40%{transform:translateX(7px);} 60%{transform:translateX(-5px);} 80%{transform:translateX(4px);} }
+
+/* ===================== P5 · 离开关卡二次确认弹层（GDD §9.5 第 2 条） ===================== */
+.lv-ask{ position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center;
+  background:rgba(60,40,25,.5); padding:var(--sp-4); }
+.lv-ask-card{ background:var(--c-surface); border-radius:var(--r-xl); border:var(--bw-ui) solid var(--c-line);
+  box-shadow:var(--sh-modal); padding:var(--sp-5); text-align:center; max-width:min(90vw,420px);
+  animation:askIn .26s var(--ease-emp) both; }
+@keyframes askIn{ from{ transform:scale(.86); opacity:0 } to{ transform:scale(1); opacity:1 } }
+.lv-ask-face{ font-size:56px; line-height:1; margin-bottom:var(--sp-2); }
+.lv-ask-t{ font-size:var(--fs-h1); font-weight:800; color:var(--c-ink); }
+.lv-ask-sub{ font-size:var(--fs-cap); color:var(--c-ink-2); margin-top:var(--sp-2); }
+.lv-ask-btns{ display:flex; gap:var(--sp-3); margin-top:var(--sp-5); }
+.lv-ask-stay, .lv-ask-go{ min-height:88px; min-width:88px; flex:1; font-size:var(--fs-btn); font-weight:800;
+  border-radius:var(--r-pill); cursor:pointer; border:var(--bw-btn-2) solid var(--c-line); }
+.lv-ask-stay{ background:var(--c-pri); color:#fff; border-color:var(--btn-edge); }   /* 主按钮：实底白字 */
+.lv-ask-go{ background:var(--c-surface); color:var(--c-ink); }                       /* 次级：浅底描边 */
+
+/* ===================== P5 · 能量果微反馈飞行动画（GDD §8 / §7.5） ===================== */
+.fly-fruit{ position:fixed; z-index:var(--z-toast); font-size:26px; line-height:1;
+  transform:translate(-50%,-50%); pointer-events:none;
+  animation:flyFruit .68s var(--ease-emp) forwards; }
+@keyframes flyFruit{
+  0%{   transform:translate(-50%,-50%) scale(.6); opacity:0; }
+  18%{  transform:translate(-50%,-50%) scale(1.25); opacity:1; }
+  100%{ transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.55); opacity:0; }
+}
+.cur-bump{ animation:curBump .34s var(--ease-emp); }
+@keyframes curBump{ 0%,100%{transform:scale(1)} 45%{transform:scale(1.22)} }
+
 /* ===== /BLOCK: LEVEL-FLOW ===== */
 
 /* ===================== P2 · 宠物页（字灵「墨墨」） ===================== */
@@ -639,6 +672,47 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .pet-stroke{ flex:0 0 auto; background:var(--c-surface); color:var(--c-ink); border-color:var(--c-line); box-shadow:var(--sh-1); }
 .pet-feed:active, .pet-stroke:active{ transform:translateY(3px); box-shadow:var(--sh-btn-down); }
 .pet-hint{ font-size:var(--fs-mini); color:var(--c-ink-3); }
+
+/* ---- P4 · 装扮商店 ---- */
+.pet-dress{
+  flex:0 0 auto; min-height:var(--tap-comfort); padding:0 var(--sp-4); border-radius:var(--r-pill);
+  font-size:var(--fs-btn); font-weight:800; cursor:pointer; border:var(--bw-btn-2) solid var(--btn-edge);
+  background:var(--c-lav); color:#fff; box-shadow:var(--sh-btn); transition:transform var(--dur-tap) var(--ease-tap);
+}
+.pet-dress:active{ transform:translateY(3px); box-shadow:var(--sh-btn-down); }
+.pet-costume{
+  max-width:340px; margin:var(--sp-5) auto 0; padding:var(--sp-4);
+  background:var(--c-surface-2); border-radius:var(--r-xl); box-shadow:var(--sh-2);
+  display:flex; flex-direction:column; gap:var(--sp-4);
+}
+.pc-head{ display:flex; align-items:center; justify-content:space-between; }
+.pc-title{ font-size:var(--fs-h3); font-weight:800; color:var(--c-ink); }
+.pc-star{ font-size:var(--fs-body); font-weight:800; color:var(--c-pri-d); background:var(--c-cream); padding:4px 12px; border-radius:var(--r-pill); border:2px solid var(--c-line); }
+.pc-row{ display:flex; flex-direction:column; gap:8px; }
+.pc-label{ font-size:var(--fs-cap); font-weight:800; color:var(--c-ink-2); }
+.pc-grid{ display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch; }
+.pc-card{
+  flex:0 0 auto; width:92px; padding:8px 6px; border-radius:var(--r-lg); border:2px solid var(--c-line);
+  background:var(--c-surface); display:flex; flex-direction:column; align-items:center; gap:6px;
+  cursor:pointer; box-shadow:var(--sh-1); transition:transform var(--dur-tap) var(--ease-tap); font-family:inherit;
+}
+.pc-card:active{ transform:translateY(2px); }
+.pc-card.pc-on{ border-color:var(--c-pri); background:var(--c-lav-l); box-shadow:0 0 0 3px rgba(124,92,255,.25), var(--sh-1); }
+.pc-card.pc-locked{ opacity:.6; cursor:default; }
+.pc-prev{ position:relative; width:84px; height:84px; border-radius:var(--r-md); overflow:hidden; background:var(--c-cream); }
+.pc-prev .pet{ width:100%; height:100%; }
+.pc-prev .pet-bg{ width:100%; height:100%; }
+.pc-lockmask{ position:absolute; inset:0; display:grid; place-items:center; font-size:30px; background:rgba(255,255,255,.35); }
+.pc-name{ font-size:var(--fs-mini); font-weight:800; color:var(--c-ink); }
+.pc-badge{ font-size:var(--fs-mini); font-weight:800; padding:3px 10px; border-radius:var(--r-pill); }
+.pc-badge.pc-on{ color:#fff; background:var(--c-pri); }
+.pc-badge.pc-wear{ color:var(--c-pri-d); background:var(--c-lav-l); border:2px solid var(--c-pri); }
+.pc-badge.pc-buy{ color:var(--c-pri-d); background:var(--c-cream); border:2px solid var(--c-line); }
+.pc-badge.pc-lock{ color:var(--c-ink-3); background:var(--c-track); }
+.pc-confirm{ display:flex; gap:6px; }
+.pc-no, .pc-yes{ flex:1; min-height:30px; border-radius:var(--r-pill); font-size:var(--fs-mini); font-weight:800; cursor:pointer; border:2px solid var(--c-line); }
+.pc-no{ background:var(--c-surface); color:var(--c-ink-2); }
+.pc-yes{ background:var(--c-pri); color:#fff; border-color:var(--btn-edge); }
 
 /* ---- 宠物动效（美术 §15.6；循环动画全部可被 prefers-reduced-motion 关掉）---- */
 .pk-body, .pk-egg{ transform-box:view-box; transform-origin:60px 120px; animation:pk-breathe 2600ms cubic-bezier(.45,0,.55,1) infinite; }
@@ -705,13 +779,18 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .g3-pic{ cursor:pointer; }
 .g3-tchar{ font-family:var(--font-hanzi); font-size:72px; line-height:1; color:var(--c-hanzi); cursor:pointer; }
 .g3-lab{ font-size:var(--fs-cap); font-weight:700; color:var(--c-ink-2); }
-.g3-holes{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin:18px 0; }
-.g3-hole{ width:96px; height:96px; border-radius:24px; border:3px solid var(--c-line); background:var(--c-surface);
-  box-shadow:var(--sh-1); display:flex; align-items:center; justify-content:center; cursor:pointer;
-  font-family:var(--font-hanzi); font-size:52px; color:var(--c-hanzi); }
-.g3-hole.g3-hit{ animation:g3hit .3s ease forwards; }
-.g3-hole.g3-shake{ animation:lvshake .42s ease; }
-@keyframes g3hit{ 0%{transform:scale(1)} 45%{transform:scale(1.25) rotate(8deg)} 100%{transform:scale(0); opacity:0} }
+/* 真·地鼠洞：6 个洞固定，字以"地鼠"形式从洞里冒出/缩回 */
+.g3-holes{ display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; justify-items:center; margin:22px auto; max-width:340px; }
+.g3-hole{ position:relative; width:92px; height:92px; border:none; background:transparent; padding:0; cursor:pointer; outline:none; }
+.g3-hole .g3-mound{ position:absolute; left:50%; bottom:4px; transform:translateX(-50%); width:70px; height:22px; border-radius:50%; background:#CDBEA6; box-shadow:inset 0 3px 6px rgba(0,0,0,.18); pointer-events:none; }
+.g3-hole .g3-mole{ position:absolute; left:50%; bottom:8px; transform:translateX(-50%) translateY(44px) scale(.25); width:72px; height:72px; border-radius:22px; background:var(--c-surface); border:3px solid var(--c-line); box-shadow:var(--sh-1); display:flex; align-items:center; justify-content:center; font-family:var(--font-hanzi); font-size:42px; color:var(--c-hanzi); opacity:0; pointer-events:none; }
+.g3-hole.g3-up .g3-mole{ animation:g3pop .34s cubic-bezier(.175,.885,.32,1.275) forwards; }
+.g3-hole.g3-down .g3-mole{ animation:g3down .22s ease-in forwards; }
+.g3-hole.g3-hit .g3-mole{ animation:g3hit .32s ease forwards; }
+.g3-hole.g3-wrong .g3-mole{ animation:lvshake .42s ease; }
+@keyframes g3pop{ 0%{ transform:translateX(-50%) translateY(44px) scale(.25); opacity:0; } 70%{ transform:translateX(-50%) translateY(-10px) scale(1.08); opacity:1; } 100%{ transform:translateX(-50%) translateY(0) scale(1); opacity:1; } }
+@keyframes g3down{ to{ transform:translateX(-50%) translateY(44px) scale(.25); opacity:0; } }
+@keyframes g3hit{ 0%{ transform:translateX(-50%) translateY(0) scale(1); opacity:1; } 50%{ transform:translateX(-50%) translateY(-20px) scale(1.2); opacity:1; } 100%{ transform:translateX(-50%) translateY(44px) scale(.25); opacity:0; } }
 .g3-bar{ height:14px; background:var(--c-track); border-radius:99px; overflow:hidden; margin:6px 8px 0; }
 .g3-fill{ height:100%; width:100%; background:var(--c-ok); transition:width .12s linear; }
 .g3-fill.g3-warn{ background:var(--c-warn); }
@@ -744,6 +823,30 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .g5-cand.gone{ opacity:.4; background:var(--c-disabled-bg); cursor:default; }
 .g5-lab, .g5-fb{ text-align:center; }
 .g5-fb{ min-height:24px; font-weight:800; color:var(--c-pri-d); }
+
+/* ===================== P6 · G2 字图配对（记忆翻牌） ===================== */
+.g2-lab{ text-align:center; font-size:var(--fs-h3); font-weight:800; color:var(--c-ink); margin:4px 10px 2px; }
+.g2-grid{ display:grid; gap:10px; margin:14px auto; max-width:440px; justify-items:stretch; }
+.g2-card{ width:100%; aspect-ratio:1; perspective:620px; border:none; background:transparent; padding:0; cursor:pointer; outline:none; }
+.g2-inner{ position:relative; width:100%; height:100%; transition:transform .28s ease-out; transform-style:preserve-3d; }
+.g2-card.flipped .g2-inner{ transform:rotateY(180deg); }
+.g2-face{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:16px; display:flex; align-items:center; justify-content:center; }
+.g2-back{ background:linear-gradient(135deg,#9B6DFF,#6C8EF5); border:3px solid #FFFFFF; box-shadow:var(--sh-1); }
+.g2-back .g2-q{ font-size:34px; font-weight:800; color:#FFFFFF; }
+.g2-front{ background:var(--c-surface); border:3px solid var(--c-line); transform:rotateY(180deg); }
+.g2-front.g2-char{ font-family:var(--font-hanzi); font-size:40px; font-weight:800; color:var(--c-hanzi); }
+.g2-front.g2-pic svg{ width:72%; height:72%; }
+.g2-card.matched .g2-inner{ transform:rotateY(180deg); animation:g2pop .45s ease; }
+.g2-card.matched .g2-front{ border-color:var(--c-ok); background:var(--c-ok-l); }
+.g2-card.matched{ cursor:default; }
+.g2-card.mismatch .g2-front{ border-color:var(--c-err); }
+.g2-card.mismatch{ animation:lvshake .3s ease; }
+@keyframes g2pop{ 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+@media (prefers-reduced-motion: reduce){
+  .g2-inner{ transition:none; }
+  .g2-card.matched{ animation:none; }
+  .g2-card.mismatch{ animation:none; }
+}
 
 /* ===================== P3 · 宝箱小屋 + 金色奖券 ===================== */
 .chest-page{ padding:18px; }
@@ -1619,7 +1722,7 @@ function migrateCursor(){
 function ensureDaily(){
   var t = todayStr();
   if(!state.daily[t]){
-    state.daily[t] = {login:true, firstClear:false, learnCount:0, playCount:0, petLines:[], energyEarned:0};
+    state.daily[t] = {login:true, firstClear:false, learnCount:0, playCount:0, petLines:[], energyEarned:0, dailyDone:false};
     if(state.streak.lastDate !== t){
       var y = new Date(); y.setDate(y.getDate()-1); var ys = todayStr(y);
       state.streak.cur = (state.streak.lastDate === ys) ? (state.streak.cur + 1) : 1;
@@ -1869,11 +1972,26 @@ var ZONE_CFG = [
    starOut:"#FFFFFF", haloOut:"#FFFFFF", haloIn:"#FFE9A8"}
 ];
 
-function nodePos(i){                       /* i: 0..19 */
+function nodePos(i){                       /* i: 0..19，20 = 每日挑战 */
+  if(i===20) return { x:200, y:2480, zone:3, cfg:ZONE_CFG[3], k:5, daily:true };
   var z = Math.floor(i/5), k = i%5, cfg = ZONE_CFG[z];
   return { x:(k%2===0?110:290), y:cfg.y0+100+k*104, zone:z, cfg:cfg, k:k };
 }
 function isBoss(i){ return (i%5)===4; }    /* L5/L10/L15/L20 */
+
+/* P5 · 每日字灵挑战（GDD §2.7.2）。20 关全部 cleared 才解锁。
+   注意：不能用 unlockedThrough===20 判断 —— recalcZones 用 min(20,maxCleared+1)，L19 通关时已经是 20。 */
+function dailyUnlocked(s){
+  s = s || state;
+  if(!s.game || !s.game.levels) return false;
+  for(var n=1;n<=20;n++){ var L = s.game.levels["L"+n]; if(!(L && L.cleared)) return false; }
+  return true;
+}
+function dailyDone(s){
+  s = s || state;
+  var t = todayStr();
+  return !!(s.daily && s.daily[t] && s.daily[t].dailyDone);
+}
 
 /* 路径：相邻节点间的 S 形曲线 */
 function zonePath(z){
@@ -1957,11 +2075,11 @@ function zonePlateSVG(z){
 /* 关卡节点 5 态（美术 §17）。st = {state, stars, sub, total} */
 function nodeSVG(i, st){
   st = st || {state:'locked', stars:0};
-  var p = nodePos(i), c = p.cfg, boss = isBoss(i);
+  var p = nodePos(i), c = p.cfg, isB = isBoss(i), daily = (i===20), boss = isB || daily;
   var R = boss ? 44 : 34;
-  var g = '<g class="node n-'+st.state+(boss?' n-boss':'')+'" transform="translate('+p.x+','+p.y+')" style="--i:'+i+'" '+
-          'data-lv="'+(i+1)+'" data-page-node-id="'+nid('map.node.L'+(i+1))+'" tabindex="0" role="button" '+
-          'aria-label="'+nodeAria(i, st)+'">';
+  var g = '<g class="node n-'+st.state+(boss?' n-boss':'')+(daily?' n-daily':'')+'" transform="translate('+p.x+','+p.y+')" style="--i:'+i+'" '+
+          'data-lv="'+(i+1)+'" data-page-node-id="'+nid(daily?'map.node.DAILY':('map.node.L'+(i+1)))+'" tabindex="0" role="button" '+
+          'aria-label="'+(daily?dailyAria(st):nodeAria(i, st))+'">';
   /* 光环：双层描边，任何底色上都看得见 */
   if(st.state==='available' || st.state==='inProgress')
     g += '<circle class="halo" r="'+R+'" fill="none" stroke="'+c.haloOut+'" stroke-width="9" opacity=".55"/>'+
@@ -1971,14 +2089,20 @@ function nodeSVG(i, st){
     g += '<path class="bossframe-bg" d="'+starPts(0,0,R+13,R+4,8)+'" fill="none" stroke="'+c.starOut+'" stroke-width="8" stroke-linejoin="round" opacity=".85"/>'+
          '<path class="bossframe" d="'+starPts(0,0,R+13,R+4,8)+'" fill="none" stroke="#FFC93C" stroke-width="3.5" stroke-linejoin="round"/>';
   /* 主体 */
-  g += '<circle class="disc" r="'+R+'" fill="url(#ng'+p.zone+')" stroke="'+c.line+'" stroke-width="3"/>';
+  g += '<circle class="disc" r="'+R+'" fill="'+(daily?'url(#ngD)':('url(#ng'+p.zone+')'))+'" stroke="'+c.line+'" stroke-width="3"/>';
   /* perfect：双层同心描边替代 drop-shadow（外圈宽而淡 + 内圈窄而实，静态无 perf 损耗，美术 §17.7） */
   if(st.state==='perfect') g += '<circle class="perfectring perfectring--out" r="'+(R-4)+'" fill="none" stroke="#FFC93C" stroke-width="7" opacity=".32"/>'+
                                 '<circle class="perfectring perfectring--in" r="'+(R-1)+'" fill="none" stroke="#FFC93C" stroke-width="2.4"/>';
   /* 关卡号 */
-  g += '<circle class="numbg" r="15" fill="'+c.numBg+'" stroke="'+c.line+'" stroke-width="2.5"/>'+
-       '<text class="num" y="6" text-anchor="middle" font-size="19" font-weight="800" '+
-       'font-family="-apple-system,PingFang SC,sans-serif" fill="'+c.numFg+'">'+(i+1)+'</text>';
+  if(daily){
+    g += '<rect class="numbg" x="-27" y="-14" width="54" height="28" rx="14" fill="'+c.numBg+'" stroke="'+c.line+'" stroke-width="2.5"/>'+
+         '<text class="num" y="7" text-anchor="middle" font-size="19" font-weight="800" '+
+         'font-family="-apple-system,PingFang SC,sans-serif" fill="'+c.numFg+'">每日</text>';
+  } else {
+    g += '<circle class="numbg" r="15" fill="'+c.numBg+'" stroke="'+c.line+'" stroke-width="2.5"/>'+
+         '<text class="num" y="6" text-anchor="middle" font-size="19" font-weight="800" '+
+         'font-family="-apple-system,PingFang SC,sans-serif" fill="'+c.numFg+'">'+(i+1)+'</text>';
+  }
   /* 进行中的小节进度 */
   if(st.state==='inProgress'){
     var d='', k;
@@ -2006,7 +2130,7 @@ function nodeSVG(i, st){
       '<path d="M-6 -2 v-6 a6 6 0 0 1 12 0 v6" fill="none" stroke="#6B6455" stroke-width="3" stroke-linecap="round"/></g>';
   }
   /* 星星：两遍绘制（贴纸外描边 + 本体） */
-  if(st.state==='cleared' || st.state==='perfect'){
+  if((st.state==='cleared' || st.state==='perfect') && !daily){
     var s='', k2, sx, SD='M0 -11 l2.7 5.5 6 .9 -4.4 4.2 1 6L0 3.1l-5.3 2.5 1-6L-8.7 -4.6 l6-.9z';
     for(k2=0;k2<3;k2++){
       sx = (k2-1)*26;
@@ -2019,11 +2143,19 @@ function nodeSVG(i, st){
     g += '<g class="stars">'+s+'</g>';
   }
   /* 三星皇冠 */
-  if(st.state==='perfect'){
+  if(st.state==='perfect' && !daily){
     g += '<g class="crown" transform="translate(0,'+(-R-38)+')">'+
       '<path d="M-11 3 L-7.5 -7 L-4 0 L0 -9 L4 0 L7.5 -7 L11 3 Z" fill="none" stroke="'+c.starOut+'" stroke-width="7.5" stroke-linejoin="round"/>'+
       '<path d="M-11 3 L-7.5 -7 L-4 0 L0 -9 L4 0 L7.5 -7 L11 3 Z" fill="#FFC93C" stroke="#B87400" stroke-width="2" stroke-linejoin="round"/>'+
       '<rect x="-12" y="3" width="24" height="5" rx="2.5" fill="#FFD86B" stroke="#B87400" stroke-width="2"/></g>';
+  }
+  /* 每日挑战：今天已完成 → 绿色对勾徽章（替代星星，让孩子看懂今日已做）。
+     沿用「两遍绘制：贴纸外描边 + 本体」画法，第一层用 c.starOut 宽描边 */
+  if(daily && st.state === 'cleared'){
+    g += '<g class="dailytick" transform="translate(0,'+(-R-20)+')">'+
+      '<circle r="13" fill="#7CC576" stroke="'+c.starOut+'" stroke-width="5"/>'+
+      '<circle r="13" fill="#7CC576" stroke="#3F7D3A" stroke-width="2"/>'+
+      '<path d="M-6 0 L-1.5 5 L6.5 -4.5" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></g>';
   }
   /* 小旗 */
   if(st.state==='available' || st.state==='inProgress'){
@@ -2037,10 +2169,11 @@ function nodeSVG(i, st){
   return g+'</g>';
 }
 /* 整张地图 */
-function mapSVG(states){
-  var o = '<svg class="map" viewBox="0 0 '+MAP_W+' '+MAP_H+'" preserveAspectRatio="xMidYMin meet" '+
+function mapSVG(states, daily){
+  var H = (daily && daily.show) ? 2620 : MAP_H;
+  var o = '<svg class="map" viewBox="0 0 '+MAP_W+' '+H+'" preserveAspectRatio="xMidYMin meet" '+
           'xmlns="http://www.w3.org/2000/svg" data-page-node-id="'+nid('map.root')+'" role="img" '+
-          'aria-label="字灵群岛地图，共 4 个区域 20 个关卡">';
+          'aria-label="'+((daily && daily.show) ? '字灵群岛地图，共 4 个区域 20 个关卡，另有每日字灵挑战' : '字灵群岛地图，共 4 个区域 20 个关卡')+'">';
   o += '<defs>';
   var z, c;
   for(z=0;z<4;z++){
@@ -2050,9 +2183,14 @@ function mapSVG(states){
     o += '<radialGradient id="ng'+z+'" cx="36%" cy="28%" r="80%">'+
          '<stop offset="0" stop-color="'+c.accent+'"/><stop offset="1" stop-color="'+c.land+'"/></radialGradient>';
   }
+  if(daily && daily.show){
+    o += '<radialGradient id="ngD" cx="36%" cy="28%" r="80%">'+
+         '<stop offset="0" stop-color="#FF6B9D"/><stop offset=".55" stop-color="#FFC93C"/>'+
+         '<stop offset="1" stop-color="#3DA5E0"/></radialGradient>';
+  }
   o += '</defs>';
   for(z=0;z<4;z++){
-    o += '<rect x="0" y="'+ZONE_CFG[z].y0+'" width="'+MAP_W+'" height="600" fill="url(#sky'+z+')"/>';
+    o += '<rect x="0" y="'+ZONE_CFG[z].y0+'" width="'+MAP_W+'" height="'+((z===3 && daily && daily.show)?700:600)+'" fill="url(#sky'+z+')"/>';
   }
   for(z=0;z<4;z++){
     c = ZONE_CFG[z];
@@ -2076,6 +2214,7 @@ function mapSVG(states){
   o += bridgeSVG('vine', 1300);
   o += bridgeSVG('star', 1900);
   for(var i=0;i<20;i++) o += nodeSVG(i, (states&&states[i]) || {state:'locked', stars:0});
+  if(daily && daily.show) o += nodeSVG(20, {state: daily.done ? 'cleared' : 'available', stars:0, total:0, sub:0});
   return o+'</svg>';
 }
 /* 货币 / 反馈图标（美术 §18.2，viewBox 0 0 32 32） */
@@ -2157,14 +2296,21 @@ function nodeAria(i, st){
   if(isBoss(i)) txt += '，Boss 关';
   return txt;
 }
+function dailyAria(st){
+  return '每日字灵挑战，' + (st.state==='cleared' ? '今天已完成，明天再来' : '可挑战，3 题复习已学过的字');
+}
 function setHTML(el, html){
   if(!el) return;
   el.innerHTML = html;
   assignNodeIds(el);        /* 动态内容重建后立刻补 data-page-node-id，ID 稳定 */
 }
+function dailyMapState(){
+  var show = dailyUnlocked(state);
+  return { show:show, done: show && dailyDone(state) };
+}
 function renderMap(){
   var host = $("mapHost"); if(!host) return;
-  setHTML(host, mapSVG(levelStates()));
+  setHTML(host, mapSVG(levelStates(), dailyMapState()));
 }
 /* 首次进入自动滚到当前关（美术 §16.7 要点 2） */
 function scrollToCurrent(){
@@ -2174,6 +2320,13 @@ function scrollToCurrent(){
   wrap.scrollTop = Math.max(0, p.y*scale - wrap.clientHeight/2);
 }
 function tapNode(n){
+  if(n === 21){
+    SFX.tap();
+    if(!dailyUnlocked(state)){ toast('把 20 关全部闯完，就能解锁每日挑战啦！'); return; }
+    if(dailyDone(state)){ toast('今天的字灵挑战已经完成啦，明天再来！'); return; }
+    startDaily();
+    return;
+  }
   var sts = levelStates(), st = sts[n-1], el;
   if(!st) return;
   SFX.tap();
@@ -2248,6 +2401,40 @@ function renderHUD(){
   /* 第 3 槽：有完整钥匙显示钥匙数，否则显示碎片 n/3 */
   if(icK) setHTML(icK, state.keys > 0 ? ICON.key(24) : ICON.shard(24));
   if(nK) nK.textContent = state.keys > 0 ? state.keys : (state.shards + '/3');
+}
+
+/* P5 · GDD §8：得到能量果时，🍎 从触发点飞向顶部 HUD 计数器，落点弹一下 */
+function flyFruit(fromEl){
+  if(typeof document === "undefined" || !document.body) return;
+  var target = $("curEnergy"); if(!target) return;
+  var a = fromEl && fromEl.getBoundingClientRect ? fromEl.getBoundingClientRect() : null;
+  var b = target.getBoundingClientRect();
+  var x0 = a ? (a.left + a.width/2) : (b.left + b.width/2);
+  var y0 = a ? (a.top  + a.height/2) : (window.innerHeight*0.6);
+  var f = document.createElement('div');
+  f.className = 'fly-fruit';
+  f.textContent = '🍎';
+  f.style.left = x0 + 'px';
+  f.style.top  = y0 + 'px';
+  f.style.setProperty('--dx', (b.left + b.width/2 - x0) + 'px');
+  f.style.setProperty('--dy', (b.top  + b.height/2 - y0) + 'px');
+  document.body.appendChild(f);
+  target.classList.remove('cur-bump'); void target.offsetWidth; target.classList.add('cur-bump');
+  MG_TIMERS.push(setTimeout(function(){
+    if(f.parentNode) f.parentNode.removeChild(f);
+    target.classList.remove('cur-bump');
+  }, 720));
+}
+/* 发能量果：写 state + 刷 HUD + 飞行反馈。上限 999 与 applyLevelResult 一致 */
+function gainEnergy(n, fromEl){
+  n = n|0; if(n<=0) return 0;
+  var before = state.energy||0;
+  state.energy = Math.min(999, before + n);
+  var t = todayStr();
+  if(state.daily && state.daily[t]) state.daily[t].energyEarned = (state.daily[t].energyEarned||0) + (state.energy - before);
+  renderHUD();
+  flyFruit(fromEl);
+  return state.energy - before;
 }
 function applyFsScale(v){
   v = (v === 1.15 || v === 1.3) ? v : 1;
@@ -2565,6 +2752,57 @@ function learnedCharsTop(n){
   return out;
 }
 
+/* ===== 装扮系统（P4）：8 件装扮目录 + 购买/装备纯逻辑（美术 §15.4，经济 §4.4/§5.4）===== */
+/* 8 件合计 8+8+25+15+15+25+15+25 = 136⭐，与 GDD §4.3.1 经济闭环上限一致，不可上调。 */
+var PET_COSTUME_LIST = [
+  {id:'flower',  name:'小花帽',   slot:'hat',   price:8,  rarity:'normal'},
+  {id:'leaf',    name:'树叶帽',   slot:'hat',   price:8,  rarity:'normal'},
+  {id:'crown',   name:'小王冠',   slot:'hat',   price:25, rarity:'legend'},
+  {id:'rainbow', name:'彩虹围巾', slot:'scarf', price:15, rarity:'rare'},
+  {id:'star',    name:'星星围巾', slot:'scarf', price:15, rarity:'rare'},
+  {id:'small',   name:'小翅膀',   slot:'wing',  price:25, rarity:'legend'},
+  {id:'forest',  name:'森林背景', slot:'bg',    price:15, rarity:'rare'},
+  {id:'space',   name:'星空背景', slot:'bg',    price:25, rarity:'legend'}  /* §5.5 逐项价=25（§4.4 的"背景=15"为稀有档归类笔误） */
+];
+var PET_COSTUME_SLOTS = [
+  {slot:'hat',   label:'帽子'}, {slot:'scarf', label:'围巾'},
+  {slot:'wing',  label:'翅膀'}, {slot:'bg',    label:'背景'}
+];
+function costumeMeta(id){ for(var i=0;i<PET_COSTUME_LIST.length;i++) if(PET_COSTUME_LIST[i].id===id) return PET_COSTUME_LIST[i]; return null; }
+/* 等级门禁与 petSVG 渲染口径一致（帽/围巾 Lv2、翅膀 Lv3、背景任意），避免"买了戴不上" */
+function costumeUnlockLv(slot){ return slot==='wing'?3:(slot==='hat'||slot==='scarf'?2:1); }
+function costumeOwned(s,id){ return Array.isArray(s.pet.owned) && s.pet.owned.indexOf(id)>=0; }
+function costumeEquipped(s,id){ var m=costumeMeta(id); return !!(m && s.pet.wears[m.slot]===id); }
+function costumePreviewSVG(item, lv){
+  if(item.slot==='bg') return petBgSVG(item.id);
+  var wears={}; wears[item.slot]=item.id;
+  var prevLv = Math.max(lv, costumeUnlockLv(item.slot));
+  return petSVG({level:prevLv, mood:'happy', wears:wears, t:0, chars:learnedCharsTop(5)});
+}
+/* 纯逻辑：购买并自动装备（GDD §5.4 #3：未拥有→花⭐→二次确认→购入后自动装备） */
+function buyCostume(s,id){
+  var m=costumeMeta(id); if(!m) return {ok:false,reason:'noid'};
+  if(costumeOwned(s,id)) return {ok:false,reason:'owned'};
+  var lv=petStage(s.pet.bond)+1;
+  if(lv < costumeUnlockLv(m.slot)) return {ok:false,reason:'locked'};
+  if((s.stars||0) < m.price) return {ok:false,reason:'nostar'};
+  s.stars -= m.price;
+  if(!Array.isArray(s.pet.owned)) s.pet.owned=[];
+  s.pet.owned.push(id);
+  s.pet.wears[m.slot]=id;
+  return {ok:true, id:id, slot:m.slot, name:m.name, price:m.price, stars:s.stars};
+}
+/* 纯逻辑：装备/脱下（点已装备→脱下；点已拥有→穿上；同槽自动替换） */
+function equipCostume(s,id){
+  var m=costumeMeta(id); if(!m) return {ok:false,reason:'noid'};
+  var lv=petStage(s.pet.bond)+1;
+  if(lv < costumeUnlockLv(m.slot)) return {ok:false,reason:'locked'};
+  if(!costumeOwned(s,id)) return {ok:false,reason:'unowned'};
+  var on = s.pet.wears[m.slot]===id;
+  s.pet.wears[m.slot] = on ? null : id;
+  return {ok:true, equipped:!on, slot:m.slot, name:m.name};
+}
+
 /* ---- 纯逻辑：喂食一次（不碰 DOM，便于单测）。用户 P2：每次消耗 1 🍎、+10 亲密度；GDD §5.4 每日上限 5 次 ---- */
 function applyFeed(s){
   if(!s || !s.pet) return {ok:false, reason:"nopet"};
@@ -2592,6 +2830,7 @@ function applyPetStroke(s){
 
 var PET_LINES_HAPPY = ["你真棒！","我好喜欢和你一起学！","这个字好有趣呀～","哇，你好厉害！","我们继续吧！"];
 var _petMood = "happy", _petPraise = "";
+var _petShopOpen = false, _costumeConfirm = null;
 
 /* ---- UI：渲染宠物页 ---- */
 function renderPet(){
@@ -2622,13 +2861,17 @@ function renderPet(){
           '<button class="pet-feed" id="petFeed" type="button" data-page-node-id="'+nid('pet.feed')+'">'+
             '🍎 喂能量果<small> (剩 '+(state.energy||0)+' 个)</small></button>'+
           '<button class="pet-stroke" id="petStroke" type="button" data-page-node-id="'+nid('pet.stroke')+'">✋ 摸摸它</button>'+
+          '<button class="pet-dress" id="petDress" type="button" data-page-node-id="'+nid('pet.dress')+'">🎀 装扮</button>'+
         '</div>'+
         '<div class="pet-hint" data-page-node-id="'+nid('pet.hint')+'">今天还能喂 '+(5-(state.pet.fedToday||0))+' 次 · 摸 '+(10-(state.pet.petToday||0))+' 次</div>'+
       '</div>'+
+      (_petShopOpen ? costumeSectionHTML() : '')+
     '</div>';
   setHTML(host, html);
   var fb = $("petFeed");   if(fb) fb.addEventListener('click', feedPet);
   var fs = $("petStroke"); if(fs) fs.addEventListener('click', petPet);
+  var pd = $("petDress");  if(pd) pd.addEventListener('click', function(){ _petShopOpen=!_petShopOpen; _costumeConfirm=null; renderPet(); });
+  var pc = $("petCostume"); if(pc) pc.addEventListener('click', onCostume);
 }
 function feedPet(){
   var r = applyFeed(state);
@@ -2654,6 +2897,78 @@ function petPet(){
   syncSave();
   renderPet();
   if(r.leveledUp){ setTimeout(function(){ _petMood="happy"; _petPraise=""; renderPet(); }, 2600); }
+}
+
+/* ---- 装扮商店 UI（P4）---- */
+function costumeSectionHTML(){
+  var lv = petStage(state.pet.bond)+1, html = '';
+  html += '<section class="pet-costume" id="petCostume" data-page-node-id="'+nid('pet.costume')+'">'+
+    '<div class="pc-head"><span class="pc-title">🎀 给墨墨换装</span>'+
+      '<span class="pc-star">⭐ '+state.stars+'</span></div>';
+  for(var s=0;s<PET_COSTUME_SLOTS.length;s++){
+    var slot=PET_COSTUME_SLOTS[s].slot, label=PET_COSTUME_SLOTS[s].label;
+    html += '<div class="pc-row"><div class="pc-label">'+label+'</div><div class="pc-grid">';
+    for(var i=0;i<PET_COSTUME_LIST.length;i++){
+      var it=PET_COSTUME_LIST[i]; if(it.slot!==slot) continue;
+      var locked = lv < costumeUnlockLv(slot);
+      var owned = costumeOwned(state,it.id);
+      var on = costumeEquipped(state,it.id);
+      var cls = 'pc-card'+(on?' pc-on':'')+(locked?' pc-locked':'');
+      var prev = costumePreviewSVG(it, lv);
+      var badge;
+      if(_costumeConfirm===it.id){
+        badge = '<div class="pc-confirm"><button class="pc-no" data-act="costume-cancel" type="button">取消</button>'+
+                '<button class="pc-yes" data-act="costume-buy" data-id="'+it.id+'" type="button">用 '+it.price+'⭐买</button></div>';
+      } else if(locked){
+        badge = '<div class="pc-badge pc-lock">Lv'+costumeUnlockLv(slot)+' 解锁</div>';
+      } else if(on){
+        badge = '<div class="pc-badge pc-on">✓ 穿着</div>';
+      } else if(owned){
+        badge = '<div class="pc-badge pc-wear">穿上</div>';
+      } else {
+        badge = '<div class="pc-badge pc-buy">⭐ '+it.price+'</div>';
+      }
+      html += '<button class="'+cls+'" data-id="'+it.id+'" data-slot="'+slot+'" type="button" '+(locked?'disabled':'')+'>'+
+        '<div class="pc-prev">'+prev+(locked?'<div class="pc-lockmask">🔒</div>':'')+'</div>'+
+        '<div class="pc-name">'+it.name+'</div>'+badge+'</button>';
+    }
+    html += '</div></div>';
+  }
+  html += '</section>';
+  return html;
+}
+function onCostume(e){
+  var cancel = e.target.closest && e.target.closest('[data-act="costume-cancel"]');
+  if(cancel){ _costumeConfirm=null; renderPet(); return; }
+  var buyBtn = e.target.closest && e.target.closest('[data-act="costume-buy"]');
+  if(buyBtn){
+    var id = buyBtn.getAttribute('data-id'), r = buyCostume(state, id);
+    if(r.ok){
+      _costumeConfirm=null; syncSave();
+      if(SFX){ if(SFX.coin) SFX.coin(); else if(SFX.tap) SFX.tap(); }
+      if(typeof speak==='function') speak('买到啦，穿上'+r.name);
+      toast('🎉 买到'+r.name+'，穿上啦！');
+    } else if(r.reason==='nostar'){
+      _costumeConfirm=null; toast('⭐ 星星不够，去学字赚星星吧～');
+    } else { _costumeConfirm=null; }
+    renderPet(); return;
+  }
+  var card = e.target.closest && e.target.closest('.pc-card'); if(!card) return;
+  var cid = card.getAttribute('data-id'), slot = card.getAttribute('data-slot');
+  var lv = petStage(state.pet.bond)+1;
+  if(lv < costumeUnlockLv(slot)){ toast('升到 Lv'+costumeUnlockLv(slot)+' 就能用'+card.querySelector('.pc-name').textContent+'啦'); return; }
+  if(costumeEquipped(state,cid)){
+    equipCostume(state,cid); syncSave();
+    if(typeof speak==='function') speak('脱下来啦'); toast('脱下来啦'); renderPet(); return;
+  }
+  if(costumeOwned(state,cid)){
+    var r3 = equipCostume(state,cid); syncSave();
+    if(SFX && SFX.tap) SFX.tap();
+    if(typeof speak==='function') speak('穿上'+r3.name); toast('穿上'+r3.name+'！'); renderPet(); return;
+  }
+  /* 未拥有 → 内联二次确认（不弹模态框，符合"排斥模态框"偏好） */
+  _costumeConfirm = (_costumeConfirm===cid) ? null : cid;
+  renderPet();
 }
 /* ===== /JS-BLOCK: PET ===== */
 
@@ -2757,7 +3072,7 @@ function mgClearHost(){
   if(MG_ROUTER){ var h=$('levelHost'); if(h) h.removeEventListener('click', MG_ROUTER); }
   MG_ROUTER = null;
 }
-function mgCorrect(){ LV.combo++; if(LV.combo>LV.maxCombo) LV.maxCombo=LV.combo; }
+function mgCorrect(){ LV.combo++; if(LV.combo>LV.maxCombo) LV.maxCombo=LV.combo; gainEnergy(1, null); }
 function mgWrong(){ LV.combo = 0; }
 /* 纯函数：给定对错序列，返回最大连击（与 mgCorrect/mgWrong 等价，供单测验证逻辑） */
 function simCombo(seq){
@@ -2786,41 +3101,96 @@ function buildCombo(){
 
 function runMinigame(g, done){
   mgClearTimers(); mgClearHost();
+  if(g.type==='g2') return mgG2(g, done);   /* G2 字图配对（记忆翻牌，自管循环） */
   if(g.type==='g3') return mgG3(g, done);
   if(g.type==='g4') return mgG4(g, done);
   if(g.type==='g5') return mgG5(g, done);
 }
 
 /* ---------- G3 拍字地鼠 ---------- */
+/* ---------- G3 拍字地鼠（真·地鼠洞：洞固定，字从洞里冒出/缩回） ---------- */
 function mgG3(g, done){
   var host = $('levelHost');
   var idx = currentLevelIdx();
-  var maxMoles = idx<8 ? 1 : (idx<14 ? 2 : 3);
-  var stayMs   = idx<8 ? 2000 : (idx<14 ? 1500 : 1100);
+  var maxHoles = 6;
+  /* 6 个固定洞，早期冒出 3 只、中期 4 只、后期 5 只，营造"地鼠突然冒出来"的惊喜感 */
+  var numMoles = idx<6 ? 3 : (idx<12 ? 4 : 5);
+  var showMs   = idx<6 ? 2500 : (idx<12 ? 2200 : 1800); /* 地鼠停留时间 */
+  var roundGap = 450;                                   /* 两波地鼠间隔 */
   var TOTAL = 30000;
   var queue = shuffle(LV.chars).concat(shuffle(LV.chars)).concat(shuffle(LV.chars));
   var qPos = 0, hits = 0;
   var distractorPool = LV.pool.concat(LV.distract);
-  var endTime = 0, holesEl, fillEl, tcharEl, tpicEl, router;
+  var endTime = 0, fillEl, tcharEl, tpicEl, router;
+  var holes = [];
+  var spawnTimer = null;
+  var hideTimers = [];
 
   function curTarget(){ return queue[qPos % queue.length]; }
   function updateTarget(){
     var t = curTarget();
     if(tcharEl) tcharEl.textContent = t.c;
-    if(tpicEl)  tpicEl.innerHTML = picSVG(t.c);
+    if(tpicEl) tpicEl.innerHTML = picSVG(t.c);
     speak(t.c);
   }
-  function spawnRound(){
-    if(!holesEl) return;
-    var t = curTarget();
-    var others = shuffle(distractorPool.filter(function(c){ return c.c !== t.c; })).slice(0, maxMoles-1);
-    var moles = shuffle([t].concat(others)).slice(0, maxMoles);
-    var html = '';
-    for(var i=0;i<maxMoles;i++){
-      var m = moles[i];
-      html += '<button class="g3-hole" data-ch="'+(m?m.c:'')+'">'+(m?('<span class="lv-ch">'+m.c+'</span>'):'')+'</button>';
+  function clearRoundTimers(){
+    for(var i=0;i<hideTimers.length;i++) clearTimeout(hideTimers[i]);
+    hideTimers.length = 0;
+    if(spawnTimer){ clearInterval(spawnTimer); spawnTimer = null; }
+  }
+  function clearMoles(){
+    for(var i=0;i<holes.length;i++){
+      var h = holes[i];
+      h.classList.remove('g3-up','g3-hit','g3-wrong');
+      if(!h.classList.contains('g3-down')) h.classList.add('g3-down');
+      h.removeAttribute('data-ch');
     }
-    holesEl.innerHTML = html;
+  }
+  function spawnRound(){
+    if(!holes.length) return;
+    clearRoundTimers();
+    clearMoles();
+    var order = shuffle([0,1,2,3,4,5]);
+    var chosen = order.slice(0, numMoles);
+    var t = curTarget();
+    var assigns = [t];
+    var others = shuffle(distractorPool.filter(function(c){ return c.c !== t.c; })).slice(0, numMoles-1);
+    assigns = shuffle(assigns.concat(others));
+    for(var i=0;i<chosen.length;i++){
+      var h = holes[chosen[i]];
+      var a = assigns[i];
+      var mole = h.querySelector('.g3-mole');
+      h.setAttribute('data-ch', a.c);
+      if(mole) mole.textContent = a.c;
+      h.classList.remove('g3-down','g3-hit','g3-wrong');
+      h.classList.add('g3-up');
+      (function(hh){
+        hideTimers.push(setTimeout(function(){
+          if(hh.classList.contains('g3-up') && !hh.classList.contains('g3-hit')){
+            hh.classList.remove('g3-up'); hh.classList.add('g3-down');
+          }
+        }, showMs));
+      })(h);
+    }
+  }
+  function nextRound(){
+    updateTarget();
+    spawnRound();
+    spawnTimer = setInterval(spawnRound, showMs + roundGap);
+  }
+  function onHole(btn){
+    if(!btn.classList.contains('g3-up') || btn.classList.contains('g3-hit')) return;
+    var ch = btn.getAttribute('data-ch');
+    if(ch === curTarget().c){
+      btn.classList.add('g3-hit');
+      SFX.right(); hits++; mgCorrect(); qPos++;
+      clearRoundTimers();
+      setTimeout(nextRound, 480);
+    } else {
+      btn.classList.add('g3-wrong');
+      SFX.wrong(); mgWrong();
+      setTimeout(function(){ btn.classList.remove('g3-wrong','g3-up'); btn.classList.add('g3-down'); }, 420);
+    }
   }
   function tick(){
     var rem = endTime - Date.now();
@@ -2831,18 +3201,8 @@ function mgG3(g, done){
       fillEl.className = 'g3-fill' + (rem<=10000?' g3-warn':'') + (rem<=5000?' g3-danger':'');
     }
   }
-  function onHole(btn){
-    var ch = btn.getAttribute('data-ch');
-    if(ch === curTarget().c){
-      btn.classList.add('g3-hit'); SFX.right(); hits++; mgCorrect(); qPos++;
-      setTimeout(spawnRound, 260); setTimeout(updateTarget, 120);
-    } else {
-      btn.classList.add('g3-shake'); SFX.wrong(); mgWrong();
-      setTimeout(function(){ if(btn) btn.classList.remove('g3-shake'); }, 420);
-    }
-  }
   function endGame(){
-    mgClearTimers(); mgClearHost();
+    clearRoundTimers(); mgClearTimers(); mgClearHost();
     var html = '<div class="lv-s4">'+
       '<div class="lv-hero" style="font-size:48px">🎉</div>'+
       '<div class="lv-hd-t" style="font-size:var(--fs-h2)">拍中 '+hits+' 个！</div>'+
@@ -2855,6 +3215,11 @@ function mgG3(g, done){
   }
   function init(){
     var t0 = curTarget();
+    var holesHtml = '';
+    for(var i=0;i<maxHoles;i++){
+      holesHtml += '<button class="g3-hole" data-idx="'+i+'" aria-label="地鼠洞">'+
+                    '<div class="g3-mound"></div><div class="g3-mole"></div></button>';
+    }
     var html =
       '<header class="lv-hd"><button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
         '<div class="lv-hd-t">拍字地鼠</div>'+
@@ -2865,24 +3230,25 @@ function mgG3(g, done){
           '<div class="g3-tchar" data-act="speak">'+t0.c+'</div>'+
           '<div class="g3-lab">拍一拍这个字！</div>'+
         '</div>'+
-        '<div class="g3-holes"></div>'+
+        '<div class="g3-holes">'+holesHtml+'</div>'+
         '<div class="g3-bar"><div class="g3-fill"></div></div>'+
       '</div>';
     host.innerHTML = lvWrap(html);
     bindExit(host);
     tcharEl = host.querySelector('.g3-tchar'); tpicEl = host.querySelector('.g3-pic');
-    holesEl = host.querySelector('.g3-holes'); fillEl = host.querySelector('.g3-fill');
+    fillEl = host.querySelector('.g3-fill');
+    holes = [].slice.call(host.querySelectorAll('.g3-hole'));
     router = function(e){
       var sp = e.target.closest && e.target.closest('[data-act="speak"]');
       if(sp){ speak(curTarget().c); return; }
       var btn = e.target.closest && e.target.closest('.g3-hole');
-      if(btn && !btn.disabled) onHole(btn);
+      if(btn) onHole(btn);
     };
     host.addEventListener('click', router); MG_ROUTER = router;
     spawnRound();
+    spawnTimer = setInterval(spawnRound, showMs + roundGap);
     endTime = Date.now() + TOTAL;
     MG_TIMERS.push(setInterval(tick, 120));
-    MG_TIMERS.push(setInterval(spawnRound, stayMs));
     setTimeout(function(){ speak(curTarget().c); }, 260);
   }
   init();
@@ -3089,6 +3455,110 @@ function mgG5(g, done){
   buildQuestion();
 }
 
+/* ---------- G2 字图配对（记忆翻牌） ---------- */
+/* GDD §7.2：N 组卡牌背面朝上，点两张 → 图卡与字卡匹配则定格(绿框)+消除计分，
+   不匹配则翻回（600ms 记忆窗口，纯靠运气也能看清楚，5 岁记忆窗口短）。全部消完过关。
+   防挫败：无倒计时、不匹配不惩罚只翻回（与 G3/G4/G5 一致，GDD §9.1）。
+   难度：按 currentLevelIdx 取 4/6/8 组，但受本关可用字数(= min(LV.chars, LV.pool 去重))上限约束。 */
+function mgG2(g, done){
+  var host = $('levelHost');
+  var idx = currentLevelIdx();
+  var wantPairs = idx<8 ? 4 : (idx<14 ? 6 : 8);
+  /* 候选字：本关 5 字优先，不足从已学字池补，去重后取 wantPairs 个 */
+  var cand = [], seenC = {};
+  function pushChar(ch){ if(ch && ch.c && !seenC[ch.c]){ seenC[ch.c]=1; cand.push(ch); } }
+  (LV.chars||[]).forEach(pushChar);
+  (LV.pool||[]).forEach(pushChar);
+  cand = shuffle(cand).slice(0, wantPairs);
+  if(cand.length < 2){ done(); return; }   /* 极端兜底：字不够成不了对，优雅跳过 */
+  var pairs = cand.length;
+  /* 每组一张图卡 + 一张字卡，全部打乱铺到网格（真正的记忆翻牌） */
+  var cards = [];
+  cand.forEach(function(ch){
+    cards.push({kind:'pic',  ch:ch, matched:false});
+    cards.push({kind:'char', ch:ch, matched:false});
+  });
+  cards = shuffle(cards);
+  var cols = 4;   /* 2 行 / 3 行 / 4 行，均为 4 列 */
+  var flipped = [], matchedCount = 0, busy = false, router;
+  function cardHTML(c, i){
+    var cls = 'g2-card', front;
+    if(c.matched) cls += ' matched';
+    else if(flipped.indexOf(i) >= 0) cls += ' flipped';
+    if(c.kind==='pic') front = '<div class="g2-front g2-pic">'+picSVG(c.ch.c)+'</div>';
+    else front = '<div class="g2-front g2-char">'+c.ch.c+'</div>';
+    return '<button class="'+cls+'" data-ci="'+i+'" aria-label="卡片">'+
+      '<div class="g2-inner">'+front+'<div class="g2-face g2-back"><span class="g2-q">?</span></div></div></button>';
+  }
+  function render(){
+    var html =
+      '<header class="lv-hd"><button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
+        '<div class="lv-hd-t">字图配对</div><div style="width:64px"></div></header>'+
+      '<div class="g2">'+
+        '<div class="g2-lab">翻开两张，找出「图」和「字」是一对的好朋友！</div>'+
+        '<div class="g2-grid" style="grid-template-columns:repeat('+cols+',1fr)">'+
+          cards.map(cardHTML).join('')+
+        '</div>'+
+      '</div>';
+    host.innerHTML = lvWrap(html);
+    bindExit(host); attachRouter();
+  }
+  function onCard(i){
+    if(busy) return;
+    var c = cards[i];
+    if(!c || c.matched) return;
+    if(flipped.indexOf(i) >= 0) return;   /* 已翻开的不再翻 */
+    flipped.push(i);
+    var btn = host.querySelector('[data-ci="'+i+'"]');
+    if(btn) btn.classList.add('flipped');
+    if(flipped.length < 2) return;
+    busy = true;
+    var a = cards[flipped[0]], b = cards[flipped[1]];
+    var ba = host.querySelector('[data-ci="'+flipped[0]+'"]');
+    var bb = host.querySelector('[data-ci="'+flipped[1]+'"]');
+    if(a.ch.c === b.ch.c && a.kind !== b.kind){
+      a.matched = b.matched = true;
+      mgCorrect(); SFX.right(); speak(a.ch.c);
+      if(ba) ba.classList.add('matched');
+      if(bb) bb.classList.add('matched');
+      flipped = []; matchedCount++;
+      if(matchedCount >= pairs){ setTimeout(win, 480); }
+      else { busy = false; }
+    } else {
+      [ba,bb].forEach(function(el){ if(el) el.classList.add('mismatch'); });
+      SFX.wrong(); mgWrong();
+      setTimeout(function(){
+        flipped.forEach(function(fi){
+          var el = host.querySelector('[data-ci="'+fi+'"]');
+          if(el) el.classList.remove('flipped','mismatch');
+        });
+        flipped = []; busy = false;
+      }, 600);
+    }
+  }
+  function attachRouter(){
+    if(MG_ROUTER) host.removeEventListener('click', MG_ROUTER);
+    router = function(e){
+      var ex = e.target.closest && e.target.closest('[data-act="exit"]'); if(ex) return;
+      var ce = e.target.closest && e.target.closest('.g2-card');
+      if(ce) onCard(parseInt(ce.getAttribute('data-ci'),10));
+    };
+    host.addEventListener('click', router); MG_ROUTER = router;
+  }
+  function win(){
+    mgClearTimers(); mgClearHost();
+    gainEnergy(3, null);   /* GDD §7.2：全部完成追加 🍎+3 */
+    var html = '<div class="lv-s4"><div class="lv-hero" style="font-size:48px">🎴</div>'+
+      '<div class="lv-hd-t" style="font-size:var(--fs-h2)">全部配对成功！</div>'+
+      '<div class="lv-s4tip">你的记性真好！</div>'+
+      '<button class="lv-btn" id="mgNext">继续 ➜</button></div>';
+    host.innerHTML = lvWrap(html); SFX.clear();
+    host.querySelector('#mgNext').addEventListener('click', function(){ done(); });
+    speak('全部配对成功！');
+  }
+  render();
+}
+
 /* ===== /JS-BLOCK: MINIGAMES (P3) ===== */
 
 /* ===== JS-BLOCK: CHEST (P3) ===== */
@@ -3260,7 +3730,42 @@ function pick(arr){ return arr[rand(arr.length)]; }
 function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function lvCharHTML(ch){ return '<span class="lv-ch">'+ch.c+'</span><span class="lv-py">'+ch.py+'</span>'; }
 function lvWrap(inner){ return '<div class="lv-scroll"><div class="lv-stage">'+inner+'</div></div>'; }
-function bindExit(host){ var x=host.querySelector('[data-act="exit"]'); if(x) x.addEventListener('click', function(){ closeLevel(); }); }
+function bindExit(host){
+  var x = host.querySelector('[data-act="exit"]');
+  if(x) x.addEventListener('click', function(){ askLeave(); });
+}
+/* GDD §9.5 第 2 条：离开关卡二次确认。全屏弹层 + 两个 ≥88px 大按钮，默认焦点落在「继续玩」 */
+function askLeave(){
+  var host = $('levelHost'); if(!host) return;
+  if(host.querySelector('.lv-ask')) return;              /* 防重复弹 */
+  var d = document.createElement('div');
+  d.className = 'lv-ask';
+  d.setAttribute('role','dialog');
+  d.setAttribute('aria-modal','true');
+  d.setAttribute('aria-label','要离开吗');
+  d.innerHTML =
+    '<div class="lv-ask-card">'+
+      '<div class="lv-ask-face" aria-hidden="true">🥺</div>'+
+      '<div class="lv-ask-t">要离开吗？</div>'+
+      '<div class="lv-ask-sub">进度会帮你存好，下次可以接着玩</div>'+
+      '<div class="lv-ask-btns">'+
+        '<button class="lv-ask-stay" data-act="stay">继续玩</button>'+
+        '<button class="lv-ask-go" data-act="go">离开</button>'+
+      '</div>'+
+    '</div>';
+  host.appendChild(d);
+  assignNodeIds(d);
+  var stay = d.querySelector('[data-act="stay"]');
+  var go   = d.querySelector('[data-act="go"]');
+  stay.addEventListener('click', function(){ SFX.tap(); if(d.parentNode) d.parentNode.removeChild(d); });
+  go.addEventListener('click', function(){
+    SFX.tap();
+    if(LV && !LV.daily){ saveSectionProgress(state, LV); save(); }
+    if(d.parentNode) d.parentNode.removeChild(d);
+    closeLevel();
+  });
+  try{ stay.focus(); }catch(e){}
+}
 function bindSpeak(host, txt){
   [].forEach.call(host.querySelectorAll('[data-act="speak"]'), function(el){
     el.addEventListener('click', function(e){ if(e&&e.stopPropagation) e.stopPropagation(); if(txt) speak(txt); });
@@ -3271,6 +3776,92 @@ function bindSpeak(host, txt){
 function levelChars(i){ return CHAR_DICT.slice(i*5, i*5+5); }
 /* 当前应玩关卡的 0 基下标（= currentLevel() - 1）。 */
 function currentLevelIdx(){ return Math.max(0, currentLevel()-1); }
+
+/* ---- P5 · 每日挑战出题池：已学字 + 遗忘权重（GDD §7.6 / §2.7.2） ---- */
+/* 已通关关卡的字才算「已学」；带上所属关卡记录，供权重计算取星数/通关时间 */
+function learnedPool(s){
+  s = s || state;
+  var out = [], n, i, L, chs;
+  for(n=1;n<=20;n++){
+    L = (s.game && s.game.levels && s.game.levels["L"+n]) || {};
+    if(!L.cleared) continue;
+    chs = levelChars(n-1);
+    for(i=0;i<chs.length;i++) out.push({ ch:chs[i], lv:n, L:L });
+  }
+  return out;
+}
+/* 权重：星少 / 错得多 / 久未复习 → 权重高；已掌握（codex s=2）额外加权（GDD：间隔复习） */
+function charWeight(item, s, now){
+  s = s || state; now = now || Date.now();
+  var w = 1;
+  w += (3 - Math.min(3, item.L.stars||0)) * 1.5;
+  var wrong = (s.stats && s.stats.wrongByChar && s.stats.wrongByChar[item.ch.c]) || 0;
+  w += Math.min(6, wrong) * 1.2;
+  var days = item.L.clearedAt ? Math.floor((now - item.L.clearedAt)/86400000) : 0;
+  w += Math.min(7, days) * 0.5;
+  if(s.codex && s.codex[item.ch.c] && s.codex[item.ch.c].s === 2) w *= 1.4;
+  return w;
+}
+/* 加权不重复抽样 k 个 */
+function weightedPickN(items, k, s, now){
+  var pool = items.slice(), out = [], i, total, r, acc;
+  while(out.length < k && pool.length){
+    total = 0;
+    for(i=0;i<pool.length;i++) total += charWeight(pool[i], s, now);
+    r = Math.random()*total; acc = 0;
+    for(i=0;i<pool.length;i++){ acc += charWeight(pool[i], s, now); if(r <= acc) break; }
+    if(i >= pool.length) i = pool.length-1;
+    out.push(pool[i].ch);
+    pool.splice(i,1);
+  }
+  return out;
+}
+function dailyChars(s, now){
+  var items = learnedPool(s);
+  if(!items.length) return [];
+  return weightedPickN(items, Math.min(3, items.length), s, now);
+}
+/* P5：错题/对题按字累计（append-only），喂给遗忘权重 */
+function ensureStats(s){
+  if(!s.stats) s.stats = {totalRight:0,totalWrong:0,playSeconds:0,sessions:0,wrongByChar:{}};
+  if(!s.stats.wrongByChar) s.stats.wrongByChar = {};
+  return s.stats;
+}
+function noteWrong(s, c){
+  if(!s) return; var st = ensureStats(s);
+  st.totalWrong = (st.totalWrong||0)+1;
+  if(c) st.wrongByChar[c] = (st.wrongByChar[c]||0)+1;
+}
+function noteRight(s, c){
+  if(!s) return; var st = ensureStats(s);
+  st.totalRight = (st.totalRight||0)+1;
+  if(c && s.codex && s.codex[c]) s.codex[c].right = (s.codex[c].right||0)+1;
+}
+/* P5：退出关卡时把已完成小节数落盘，地图节点显示 inProgress，下次可续（GDD §9.5 第 2 条）。
+   小节口径与 levelStates() 的 total=3 对齐：S1 学完 5 字算 1，S2 两个小游戏各算 ~0.5，S3 进小考算 3。 */
+function stageProgress(lv){
+  if(!lv) return 0;
+  if(lv.stage === 'S4') return 4;
+  if(lv.stage === 'S3') return 3;
+  if(lv.stage === 'S2') return (lv.gameNo >= 1) ? 2 : 1;
+  return (lv.learned >= 5) ? 1 : 0;   /* S1 */
+}
+function saveSectionProgress(s, lv){
+  if(!s || !lv || lv.daily) return 0;          /* 每日挑战不写关卡进度 */
+  var key = "L"+(lv.idx+1);
+  if(!s.game) return 0;
+  if(!s.game.levels) s.game.levels = {};
+  var prev = s.game.levels[key] || {};
+  if(prev.cleared) return prev.sections || 4;  /* 已通关的不回退（GDD §9.5 第 3 条：永不降低） */
+  var n = Math.max(prev.sections||0, stageProgress(lv));   /* 只增不减 */
+  s.game.levels[key] = {
+    stars: prev.stars||0, cleared:false, clearedAt: prev.clearedAt||null,
+    hintsUsed: lv.hintsUsed||0, combo: lv.maxCombo||0,
+    quizCorrect: prev.quizCorrect||0, quizTotal: prev.quizTotal||0,
+    plays: prev.plays||0, sections: n
+  };
+  return n;
+}
 
 /* ---- 纯函数：三星判定（GDD §3.5） ---- */
 function computeStars(quizCorrect, quizTotal, hintsUsed, maxCombo){
@@ -3300,6 +3891,18 @@ function applyLevelResult(s, idx, stars, hintsUsed, maxCombo, quizCorrect, quizT
     quizCorrect: quizCorrect, quizTotal: quizTotal,
     plays: (prev.plays||0)+1, sections: 4
   };
+  /* P5：通关即把本关 5 字写进图鉴（append-only，s 只升不降）。
+     s=1 已学 / s=2 已掌握（≥2★ 视为掌握），供每日挑战遗忘权重取数（GDD §7.6） */
+  if(!s.codex) s.codex = {};
+  var lvChars = levelChars(idx), ci2, cc, ce;
+  for(ci2=0; ci2<lvChars.length; ci2++){
+    cc = lvChars[ci2].c;
+    ce = s.codex[cc] || { s:0, right:0, wrong:0, firstAt:Date.now(), masterAt:null };
+    ce.s = Math.max(ce.s||0, newStars>=2 ? 2 : 1);
+    if(ce.s===2 && !ce.masterAt) ce.masterAt = Date.now();
+    if(!ce.firstAt) ce.firstAt = Date.now();
+    s.codex[cc] = ce;
+  }
   recalcZones(s);   /* 顺带把 unlockedThrough 推进到「最高已通关 +1」 */
   /* 防刷（GDD §4.3）：星星/碎片按关卡取历史最大补差，不重复给；能量果每次都给。
      Boss 关奖励按 GDD §4.3 整体 ×2：把「本次提升的星数差」再乘 2（普通关 ×1）。 */
@@ -3368,12 +3971,100 @@ function closeLevel(){
   showPage('page-map');
 }
 
+/* ============ 每日字灵挑战（GDD §2.7.2） ============ */
+/* 复用关卡流水线，但跳过 S1 学字（复习不是学新字），走「2 个不同小游戏承载 3 题 → 结算」。
+   题量 3 题、玩法随机 2 个不同小游戏、固定难度、时长 ≈2min。 */
+function startDaily(){
+  var chars = dailyChars(state);
+  if(!chars || chars.length < 1){ toast('还没有学过的字，先去闯关吧！'); return; }
+  /* 干扰项：全部已学字（非相邻关），保证 4 选 1 成立 */
+  var allLearned = learnedPool(state).map(function(it){ return it.ch; });
+  var seen = {}; chars.forEach(function(c){ seen[c.c]=1; });
+  var distract = shuffle(allLearned.filter(function(c){ return !seen[c.c]; }));
+  /* 2 个不同小游戏，承载 3 题（2+1）。TTS 不可用时按 GDD §9.5 第 6 条过滤 G1 */
+  var cand = ['G1','G2','G3','G4','G5'];
+  if(!ttsOK()) cand = cand.filter(function(g){ return g !== 'G1'; });
+  var games = shuffle(cand).slice(0,2).map(function(t){ return t.toLowerCase(); });
+  LV = {
+    idx: -1, daily: true,
+    chars: chars,
+    boss: false,
+    stage: 0, hintsUsed: 0, combo: 0, maxCombo: 0,
+    gameCorrect: 0, gameTotal: 3, quizFirstCorrect: 0, quizTotal: 3,
+    learned: 5,            /* 跳过 S1 */
+    gameNo: 0, qInGame: 0,
+    pool: chars.slice(), distract: distract,
+    games: [
+      {type: games[0], targets: chars.slice(0,2)},
+      {type: games[1], targets: chars.slice(2,3)}
+    ],
+    quizIdx: 0, quizPlan: null
+  };
+  var host = $('levelHost');
+  if(host){ host.classList.add('on'); host.setAttribute('aria-hidden','false'); }
+  SFX.tap();
+  renderGameIntro(0);
+}
+/* P5 · 每日挑战产出（GDD §2.7.2）：⭐+1 / 🍎+15 / 亲密度+5。
+   关键裁决：每日挑战的 ⭐ 不受 §4.3 防刷补差规则限制 —— 它是新关卡 L21 不是重玩，
+   这是终局后唯一的星星来源，走补差就彻底断流。 */
+function applyDailyResult(s){
+  if(!s) return null;
+  var t = todayStr();
+  if(!s.daily) s.daily = {};
+  if(!s.daily[t]) s.daily[t] = {login:true, firstClear:false, learnCount:0, playCount:0, petLines:[], energyEarned:0, dailyDone:false};
+  if(s.daily[t].dailyDone) return {ok:false, reason:"done"};   /* 每日 1 次，幂等 */
+  s.daily[t].dailyDone = true;
+  s.stars      = (s.stars||0) + 1;
+  s.starsTotal = (s.starsTotal||0) + 1;
+  s.energy     = Math.min(999, (s.energy||0) + 15);
+  if(s.pet){
+    s.pet.bond = (s.pet.bond||0) + 5;
+    s.pet.level = bondToLevel(s.pet.bond);
+  }
+  return {ok:true, star:1, energy:15, bond:5, petLevel: s.pet ? s.pet.level : null};
+}
+function finishDaily(){
+  LV.stage = 'S4';
+  var res = applyDailyResult(state);
+  save();
+  renderDailyResult(res);
+}
+function renderDailyResult(res){
+  var host = $('levelHost');
+  var ok = res && res.ok;
+  var rewardHTML =
+    '<div class="lv-reward-c">⭐ +1</div>'+
+    '<div class="lv-reward-c">🍎 +15</div>'+
+    '<div class="lv-reward-c">💗 +5</div>';
+  var chips = (LV.chars||[]).map(function(c){ return '<button class="lv-chip" data-c="'+c.c+'">'+c.c+'</button>'; }).join('');
+  var html =
+    '<header class="lv-hd"><div class="lv-hd-t">每日字灵挑战</div><div style="width:64px"></div></header>'+
+    '<div class="lv-s4">'+
+      '<div class="lv-hero" style="font-size:48px">🌈</div>'+
+      '<div class="lv-hd-t" style="font-size:var(--fs-h2)">每日挑战完成！</div>'+
+      (ok ? '<div class="lv-reward">'+rewardHTML+'</div>'
+          : '<div class="lv-s4tip">今天已经完成啦，明天再来～</div>')+
+      '<div class="lv-learned">复习了：'+chips+'</div>'+
+      '<div class="lv-s4tip">本次答对 '+LV.gameCorrect+' / 3</div>'+
+      '<button class="lv-btn" id="lvBack">返回地图</button>'+
+    '</div>';
+  host.innerHTML = lvWrap(html);
+  SFX.clear();
+  [].forEach.call(host.querySelectorAll('.lv-chip'), function(b){
+    b.addEventListener('click', function(){ speak(b.getAttribute('data-c')); });
+  });
+  host.querySelector('#lvBack').addEventListener('click', function(){ closeLevel(); });
+}
+
 /* ============ S1 学字 ============ */
 function renderS1(){
   LV.stage = 'S1';
   var ch = LV.chars[LV.learned];
   var host = $('levelHost');
-  var words = (ch.w||[]).map(function(w){ return '<span class="lv-word">'+w+'</span>'; }).join('');
+  /* 词语改成可点读按钮，且进入页面时自动连读 */
+  var words = (ch.w||[]).map(function(w){ return '<button class="lv-word" data-act="speak-word" data-w="'+w.replace(/"/g,'&quot;')+'">'+w+'</button>'; }).join('');
+  var allWords = (ch.w||[]).join('、');
   var html =
     '<header class="lv-hd">'+
       '<button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
@@ -3390,12 +4081,18 @@ function renderS1(){
     '</div>';
   host.innerHTML = lvWrap(html);
   bindExit(host);
-  bindSpeak(host, ch.c);
+  /* 点大图/听一听：读字 + 连读词语 */
+  bindSpeak(host, ch.c + (allWords?'，'+allWords:''));
+  /* 点单个词语：只读该词 */
+  [].forEach.call(host.querySelectorAll('[data-act="speak-word"]'), function(el){
+    el.addEventListener('click', function(e){ if(e&&e.stopPropagation) e.stopPropagation(); var w=this.getAttribute('data-w'); if(w) speak(w); });
+  });
   host.querySelector('#lvLearn').addEventListener('click', function(){
-    SFX.right(); LV.learned++;
+    SFX.right(); LV.learned++; gainEnergy(1, this);
     if(LV.learned >= 5) startS2(); else renderS1();
   });
   speak(ch.c);
+  if(allWords) setTimeout(function(){ speak(allWords); }, 900);
 }
 
 /* ============ S2 小游戏 ×2 ============ */
@@ -3403,15 +4100,6 @@ function qG1(t){
   var opts = makeChoices(t, LV.pool, LV.distract, 4);
   return {
     stimHTML: '<button class="lv-big-play" data-act="speak">🔊</button><div class="lv-listen-lab">点上面的喇叭，听一听是哪个字？</div>',
-    stimSpeak: t.c,
-    choices: opts.map(function(o){ return {html: lvCharHTML(o.ch), correct: o.correct}; }),
-    hint: function(){ speak(t.c); }
-  };
-}
-function qG2(t){
-  var opts = makeChoices(t, LV.pool, LV.distract, 4);
-  return {
-    stimHTML: '<div class="lv-pic">'+picSVG(t.c)+'</div><div class="lv-listen-lab">这个图说的是哪个字？</div>',
     stimSpeak: t.c,
     choices: opts.map(function(o){ return {html: lvCharHTML(o.ch), correct: o.correct}; }),
     hint: function(){ speak(t.c); }
@@ -3435,12 +4123,12 @@ function renderGameIntro(no){
   var html =
     '<header class="lv-hd">'+
       '<button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
-      '<div class="lv-hd-t">小游戏 '+(no+1)+' / 2</div>'+
+      '<div class="lv-hd-t">'+(LV.daily?('每日挑战 · 第 '+(no+1)+' / 2 关游戏'):('小游戏 '+(no+1)+' / 2'))+'</div>'+
       '<div style="width:64px"></div>'+
     '</header>'+
     '<div class="lv-s4">'+
       '<div class="lv-hero" style="font-size:48px">🎮</div>'+
-      '<div class="lv-hd-t" style="font-size:var(--fs-h2)">第 '+(no+1)+' 个小游戏</div>'+
+      '<div class="lv-hd-t" style="font-size:var(--fs-h2)">'+(LV.daily?'每日字灵挑战':('第 '+(no+1)+' 个小游戏'))+'</div>'+
       '<div class="lv-s4tip">'+name+'！准备好了吗？</div>'+
       '<button class="lv-btn" id="lvGo">开始 ➜</button>'+
     '</div>';
@@ -3450,16 +4138,17 @@ function renderGameIntro(no){
 }
 function renderGameQuestion(){
   var g = LV.games[LV.gameNo];
-  /* P3：G3/G4/G5 是自管内部循环的小游戏，跑完回调 nextGameOrS3 */
-  if(g.type==='g3' || g.type==='g4' || g.type==='g5'){
+  /* P3/P6：G2–G5 是自管内部循环的小游戏（G2 字图配对记忆翻牌 / G3 拍字地鼠 / G4 认字小路 / G5 连线成词），
+     跑完回调 nextGameOrS3；G1 听音找字仍是 quiz 式（qG1 + lvAsk），逐题驱动 */
+  if(g.type==='g2' || g.type==='g3' || g.type==='g4' || g.type==='g5'){
     runMinigame(g, nextGameOrS3);
     return;
   }
   var t = g.targets[LV.qInGame];
-  var q = (g.type==='g1') ? qG1(t) : qG2(t);
-  q.title = gameName(g.type) + ' · 第 '+(LV.qInGame+1)+' / '+g.targets.length;
+  var q = qG1(t);   /* 到此分支只剩 G1（G2–G5 已在上方 runMinigame 路由） */
+  q.title = (LV.daily ? '每日挑战 · ' : '') + gameName(g.type) + ' · 第 '+(LV.qInGame+1)+' / '+g.targets.length;
   lvAsk(q, 'auto', function(correct){
-    if(correct){ LV.gameCorrect++; LV.combo++; }
+    if(correct){ LV.gameCorrect++; LV.combo++; gainEnergy(1, null); }
     else { LV.combo = 0; }
     LV.maxCombo = Math.max(LV.maxCombo, LV.combo);
     LV.qInGame++;
@@ -3469,6 +4158,7 @@ function renderGameQuestion(){
 }
 function nextGameOrS3(){
   if(LV.gameNo === 0){ LV.gameNo = 1; LV.qInGame = 0; renderGameIntro(1); }
+  else if(LV.daily) finishDaily();
   else startS3();
 }
 
@@ -3613,11 +4303,13 @@ function lvAsk(q, mode, onResolved){
       locked = true;
       btn.classList.add('correct');
       SFX.right();
+      noteRight(state, q.stimSpeak);
       var fb = host.querySelector('#lvFb'); if(fb) fb.textContent = pick(PRAISE);
       setTimeout(function(){ onResolved(true, firstAttempt); }, 650);
     } else {
       btn.classList.add('wrong'); btn.disabled = true;
       LV.combo = 0; SFX.wrong();
+      noteWrong(state, q.stimSpeak);
       var fb2 = host.querySelector('#lvFb'); if(fb2) fb2.textContent = pick(GENTLE);
       if(mode === 'auto'){
         /* S2 小游戏：零惩罚，高亮正确项后自动进入下一题（GDD §9.1） */
@@ -3672,6 +4364,13 @@ var __SZ__ = {
   levelChars:levelChars, currentLevelIdx:currentLevelIdx,
   computeStars:computeStars, levelReward:levelReward, applyLevelResult:applyLevelResult,
   openLevel:openLevel, closeLevel:closeLevel,
+  /* P5 导出：每日挑战 / 遗忘权重 / 进度落盘 / 能量果（供单测 vm 沙箱） */
+  dailyUnlocked:dailyUnlocked, dailyDone:dailyDone, dailyAria:dailyAria, dailyMapState:dailyMapState,
+  learnedPool:learnedPool, charWeight:charWeight, weightedPickN:weightedPickN, dailyChars:dailyChars,
+  noteWrong:noteWrong, noteRight:noteRight, ensureStats:ensureStats,
+  stageProgress:stageProgress, saveSectionProgress:saveSectionProgress,
+  applyDailyResult:applyDailyResult, gainEnergy:gainEnergy, startDaily:startDaily, finishDaily:finishDaily,
+  tapNode:tapNode, renderMap:renderMap,
   /* P3 导出：供单测 vm 沙箱使用的纯逻辑 */
   GAME_ROTATION:GAME_ROTATION, doOpenChest:doOpenChest, simCombo:simCombo,
   couponCode:couponCode, buildCombo:buildCombo, renderChest:renderChest,
@@ -3680,6 +4379,9 @@ var __SZ__ = {
   PET_BOND_THRESH:PET_BOND_THRESH, petStage:petStage, applyFeed:applyFeed, applyPetStroke:applyPetStroke,
   petSVG:petSVG, petBgSVG:petBgSVG, learnedCharsTop:learnedCharsTop,
   codexGroups:codexGroups, codexKnownCount:codexKnownCount, renderPet:renderPet, renderDex:renderDex, feedPet:feedPet,
+  PET_COSTUME_LIST:PET_COSTUME_LIST, PET_COSTUME_SLOTS:PET_COSTUME_SLOTS,
+  costumeMeta:costumeMeta, costumeUnlockLv:costumeUnlockLv, costumeOwned:costumeOwned, costumeEquipped:costumeEquipped,
+  costumePreviewSVG:costumePreviewSVG, buyCostume:buyCostume, equipCostume:equipCostume,
   getState:function(){ return state; }, setState:function(s){ state = s; },
   getHASV2:function(){ return HAS_V2_FIELDS; }, setHASV2:function(v){ HAS_V2_FIELDS = !!v; }
 };
