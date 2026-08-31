@@ -190,6 +190,7 @@
   /* 工程常量 */
   --hud-h: 56px;
   --tab-h: 72px;
+  --rail-w: 96px;   /* 横屏/平板：左侧按钮式导航栏宽度 */
 }
 /* ===== /BLOCK: CSS-TOKENS ===== */
 
@@ -496,6 +497,18 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 }
 .toast.on{ opacity:1; transform:translate(-50%, 0); }
 
+/* ===================== 下一步引导（语音 + 按键发光） ===================== */
+/* REQ-102：到达新一步时，需要点击的按钮用橙金色呼吸光圈反复闪烁，并配合语音提醒。
+   动画是信息冗余（颜色 + 形状已可辨识），减弱动效环境下降级为静态描边。 */
+.lv-glow{ animation: lvguidance 1.2s ease-in-out 4; }
+@keyframes lvguidance{
+  0%,100%{ box-shadow: var(--sh-btn), 0 0 0 0 rgba(255,201,60,.95); }
+  50%{ box-shadow: var(--sh-btn), 0 0 0 14px rgba(255,201,60,0); }
+}
+.node.n-next .disc{ stroke:#FF5A4E; stroke-width:6; }
+.node.n-next .halo{ stroke:#FF5A4E; opacity:.95; }
+.node.n-next .halo--in{ stroke:#FFC93C; opacity:.95; }
+
 /* ===================== 动效降级（美术 §20.6 / §10.3） =====================
    循环动画一律 animation:none，绝不用「把时长压到接近 0」的替代写法
    —— 后者会让 infinite 循环高频重绘，是光敏性风险。 */
@@ -517,16 +530,93 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   .lv-ask-card{ animation:none !important; }
   .fly-fruit{ animation:none !important; opacity:0 !important; }
   .cur-bump{ animation:none !important; }
+  /* 引导发光降级为静态描边，不依赖动画单独传达信息 */
+  .lv-glow{ animation:none !important; outline:4px solid #FFC93C; outline-offset:3px; }
 }
 
 /* ===================== 横屏 / 平板（美术 §10.6） ===================== */
 @media (orientation: landscape) and (min-height: 420px){
   .map-wrap{ padding-bottom: 8px; }
 }
+
+/* ===================== REQ-302 · 横屏/平板：底部 tab → 左侧"按钮式"导航栏 =====================
+   手机横屏或平板访问时，自动切换为横版布局：底部整条 tab 不再铺满，
+   改为左侧一列带圆角背景的"按钮"（图标+文字），主区占满剩余宽度，适配性更强。
+   竖屏（默认手机）保持原底部 tab 不变，不影响既有体验。 */
+@media (orientation: landscape){
+  /* 主区让出左侧导航宽度 */
+  #pages{ margin-left: var(--rail-w); }
+  .tabbar{
+    position:fixed; left:0; top:var(--hud-h); bottom:0;
+    width:var(--rail-w);
+    flex-direction:column; align-items:stretch;
+    border-top:0; border-right:2px solid var(--c-line);
+    box-shadow:4px 0 16px rgba(var(--c-shadow-rgb),.08);
+    padding: calc(var(--safe-top, 0px) + 4px) max(0px, env(safe-area-inset-left)) 0 0;
+    z-index:calc(var(--z-dock) + 1);
+  }
+  .tab{
+    flex:0 0 auto; width:auto; min-height:58px;
+    margin:6px 8px; border-radius:14px;
+    flex-direction:column; gap:3px;
+  }
+  .tab.on{ background:var(--c-pri-l); }
+  .tab-ic{ background:transparent; }
+  .tab.on .tab-ic{ background:transparent; }
+  .map-wrap{ padding-bottom:8px; }
+  /* Toast 居中需避开左侧导航栏 */
+  .toast{ left:calc(50% + (var(--rail-w) / 2)); }
+}
 @media (min-width: 1024px){
   .map{ max-width: 640px; margin: 0 auto; }
   .panel{ left:50%; right:auto; transform:translate(-50%,102%); width:min(640px,92vw); border-radius:var(--r-xl); }
   .panel.on{ transform:translate(-50%,0); }
+}
+
+/* ===================== REQ-201 · 平板横屏自动适配 =====================
+   屏幕横过来（landscape 且短边≥600px 的平板）时：
+   - 地图限宽居中，避免节点被拉得过大
+   - 关卡舞台加宽、上下留白收窄，内容尽量一屏呈现
+   - 大字令牌按视口高度收敛（横屏下 34vw 会把主字顶得过大）
+   - 顶部/底部栏避让左右安全区（带刘海的 iPad 横握时缺口在侧边） */
+@media (orientation: landscape) and (min-width: 768px){
+  :root{
+    --fs-hanzi-hero: clamp(96px, 24vh, 172px);
+    --fs-hanzi-card: clamp(56px, 12vh, 84px);
+    --fs-hanzi-opt: clamp(30px, 6.5vh, 40px);
+    --tap-hanzi-opt: min(88px, 11vh);
+  }
+  .hud{
+    padding-left: max(var(--sp-3), env(safe-area-inset-left));
+    padding-right: max(var(--sp-3), env(safe-area-inset-right));
+  }
+  .tabbar{
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+  .map{ max-width: min(620px, 58vw); margin: 0 auto; }
+  /* 关卡流水线：加宽舞台、收窄纵向间距，减少滚动 */
+  .lv-stage{
+    max-width: 800px; gap: var(--sp-3);
+    padding: calc(var(--sp-3) + var(--safe-top)) calc(var(--sp-5) + max(0px, env(safe-area-inset-left))) calc(var(--sp-4) + var(--safe-bot));
+  }
+  .lv-s1card, .lv-s4{ gap: var(--sp-3); padding: var(--sp-4) var(--sp-5); }
+  .lv-pic{ width: min(26vh, 200px); }
+  .lv-listen{ min-height: 60px; }
+  .lv-btn{ min-height: 60px; }
+  .lv-grid{ grid-template-columns: repeat(2, minmax(180px, 250px)); justify-content:center; gap: var(--sp-3); }
+  /* 小游戏：网格适度加宽，卡片不至于过小 */
+  .g2-grid{ max-width: 560px; }
+  .g4-grid{ max-width: 520px; }
+  .g3-holes{ max-width: 440px; margin-top:14px; margin-bottom:14px; }
+  .g5-cand{ width: 92px; height: 92px; }
+  .g5-top{ margin: 8px 0; }
+  /* 宠物 / 图鉴 / 宝箱：限宽居中，左右留白 */
+  .pet-page{ padding: var(--sp-4) max(var(--sp-5), env(safe-area-inset-left)) var(--sp-4) max(var(--sp-5), env(safe-area-inset-right)); }
+  .pet-stage{ max-width: 560px; margin: 0 auto; }
+  .dex{ padding: var(--sp-4) max(var(--sp-5), env(safe-area-inset-left)) var(--sp-4) max(var(--sp-5), env(safe-area-inset-right)); }
+  .dex-grid{ grid-template-columns: repeat(8, 1fr); }
+  .chest-page{ max-width: 760px; margin: 0 auto; }
 }
 /* ===== /BLOCK: CSS-TOKENS ===== */
 
@@ -1447,6 +1537,37 @@ function speak(text){
     window.speechSynthesis.speak(u);
   }catch(e){}
 }
+/* 朗读前过滤 emoji 等符号，避免 TTS 读出怪音 */
+function cleanSpeakText(t){
+  return String(t||'').replace(/[^\u4e00-\u9fff\u3400-\u4dbfA-Za-z0-9，。！？、：；· \-]/g, '').replace(/\s+/g, ' ').trim();
+}
+/* 排队播报：不打断正在朗读的字词，接在其后播放（用于步骤引导语） */
+function speakQueue(text){
+  if(!ttsOK()||!text) return;
+  try{
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang="zh-CN"; u.rate=(text.length>1?0.62:0.85); u.pitch=1.05;
+    if(_zhVoice) u.voice=_zhVoice;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+/* REQ-102 下一步引导：到达新一步时，给目标按钮加发光颜色提醒，并语音提示点哪里。
+   el 为 null 时仅语音引导（如地图节点）；delayMs 内若页面已切换则自动放弃。 */
+function guideNext(el, sayText, delayMs){
+  delayMs = delayMs || 0;
+  var host = $('levelHost');
+  var hostNow = host ? host.innerHTML : null;
+  setTimeout(function(){
+    /* 页面已换（innerHTML 变了）就放弃，避免高亮落到旧按钮 */
+    var h2 = host ? host.innerHTML : null;
+    if(hostNow !== null && h2 !== hostNow) return;
+    if(el && el.isConnected !== false && el.parentNode){
+      try{ el.classList.add('lv-glow'); }catch(e){}
+    }
+    var txt = cleanSpeakText(sayText);
+    if(txt) speakQueue(txt);
+  }, delayMs);
+}
 
 /* ===== JS-BLOCK: AUDIO ===== */
 /* 美术 §9：Web Audio 合成音效（零外链，护耳参数：sine/triangle、≤1600Hz、attack≥10ms） */
@@ -2097,7 +2218,7 @@ function nodeSVG(i, st){
   st = st || {state:'locked', stars:0};
   var p = nodePos(i), c = p.cfg, isB = isBoss(i), daily = (i===20), boss = isB || daily;
   var R = boss ? 44 : 34;
-  var g = '<g class="node n-'+st.state+(boss?' n-boss':'')+(daily?' n-daily':'')+'" transform="translate('+p.x+','+p.y+')" style="--i:'+i+'" '+
+  var g = '<g class="node n-'+st.state+(boss?' n-boss':'')+(daily?' n-daily':'')+(st.next?' n-next':'')+'" transform="translate('+p.x+','+p.y+')" style="--i:'+i+'" '+
           'data-lv="'+(i+1)+'" data-page-node-id="'+nid(daily?'map.node.DAILY':('map.node.L'+(i+1)))+'" tabindex="0" role="button" '+
           'aria-label="'+(daily?dailyAria(st):nodeAria(i, st))+'">';
   /* 光环：双层描边，任何底色上都看得见 */
@@ -2233,8 +2354,14 @@ function mapSVG(states, daily){
   o += bridgeSVG('wood', 700);
   o += bridgeSVG('vine', 1300);
   o += bridgeSVG('star', 1900);
-  for(var i=0;i<20;i++) o += nodeSVG(i, (states&&states[i]) || {state:'locked', stars:0});
-  if(daily && daily.show) o += nodeSVG(20, {state: daily.done ? 'cleared' : 'available', stars:0, total:0, sub:0});
+  /* REQ-102：高亮当前该闯的节点（红色光环）；20 关全清后高亮未完成的每日挑战 */
+  var nextIdx = (daily && daily.show) ? (daily.done ? -1 : 20) : (currentLevel()-1);
+  for(var i=0;i<20;i++){
+    var nst = (states&&states[i]) || {state:'locked', stars:0};
+    if(i === nextIdx) nst.next = true;
+    o += nodeSVG(i, nst);
+  }
+  if(daily && daily.show) o += nodeSVG(20, {state: daily.done ? 'cleared' : 'available', stars:0, total:0, sub:0, next: nextIdx===20});
   return o+'</svg>';
 }
 /* 货币 / 反馈图标（美术 §18.2，viewBox 0 0 32 32） */
@@ -2472,6 +2599,9 @@ function toast(msg){
   t.classList.add('on');
   if(_toastT) clearTimeout(_toastT);
   _toastT = setTimeout(function(){ t.classList.remove('on'); }, 2200);
+  /* REQ-101：文字提示同时语音播报（朗读过滤 emoji） */
+  var txt = cleanSpeakText(msg);
+  if(txt) speak(txt);
 }
 function openParent(){
   var p = $("parentPanel"), s = $("scrim");
@@ -3234,6 +3364,7 @@ function mgG3(g, done){
     SFX.clear();
     host.querySelector('#mgNext').addEventListener('click', function(){ done(); });
     speak('拍中 '+hits+' 个！');
+    guideNext(host.querySelector('#mgNext'), '你真棒！点发光的继续按钮，我们接着玩', 1300);
   }
   function init(){
     var t0 = curTarget();
@@ -3272,6 +3403,9 @@ function mgG3(g, done){
     endTime = Date.now() + TOTAL;
     MG_TIMERS.push(setInterval(tick, 120));
     setTimeout(function(){ speak(curTarget().c); }, 260);
+    /* REQ-101/102：开局报玩法指令，并高亮地鼠洞区域 */
+    var g3holes = host.querySelector('.g3-holes');
+    if(g3holes) guideNext(g3holes, '等这个字冒出来，拍它！', 1500);
   }
   init();
 }
@@ -3335,6 +3469,7 @@ function mgG4(g, done){
     gridCh[cell] = cand[0] || LV.pool[0];
   }
   var cur = path[0], step = 0, hintTimer = null, router;
+  var g4Opened = false;
   /* 返回"下一步要走的相邻格子"对应的字；已到终点时返回 null（不再调用 .c 以免崩溃）。 */
   function targetCh(){ var ni = path[step+1]; return (ni==null) ? null : pathCh[ni]; }
   function render(){
@@ -3362,6 +3497,12 @@ function mgG4(g, done){
       '</div>';
     host.innerHTML = lvWrap(html);
     bindExit(host); attachRouter(); resetHint();
+    /* REQ-101/102：只在开局报一次玩法指令并高亮格子区 */
+    if(!g4Opened && tgt){
+      g4Opened = true;
+      var g4grid = host.querySelector('.g4-grid');
+      if(g4grid) guideNext(g4grid, '走到「'+tgt.c+'」，点你旁边发光的格子', 600);
+    }
     if(step>=path.length-1) win();
   }
   function onTap(cell){
@@ -3402,6 +3543,7 @@ function mgG4(g, done){
     host.innerHTML = lvWrap(html); SFX.clear();
     host.querySelector('#mgNext').addEventListener('click', function(){ done(); });
     speak('到达终点！');
+    guideNext(host.querySelector('#mgNext'), '你走得真稳！点发光的继续按钮', 1300);
   }
   render();
 }
@@ -3427,6 +3569,7 @@ function mgG5(g, done){
   if(qCount===0){ done(); return; }
   valid = shuffle(valid).slice(0, qCount);
   var qi = 0, router, curTargetChar=null, curCorrect=null, curCands=null;
+  var g5Opened = false;
   function buildQuestion(){
     curTargetChar = valid[qi];
     var partners = (COMBO[curTargetChar.c]||[]).filter(function(p){ return chObj(p); });
@@ -3454,6 +3597,12 @@ function mgG5(g, done){
     host.innerHTML = lvWrap(html);
     bindExit(host); attachRouter(); bindSpeak(host, curTargetChar.c);
     speak(curTargetChar.c);
+    /* REQ-101/102：只在开局报一次玩法指令并高亮选项区 */
+    if(!g5Opened){
+      g5Opened = true;
+      var g5cands = host.querySelector('.g5-cands');
+      if(g5cands) guideNext(g5cands, '哪个字能和它组成词？点下面的字', 1400);
+    }
   }
   function onCand(ci){
     var c = curCands[ci];
@@ -3492,6 +3641,7 @@ function mgG5(g, done){
     host.innerHTML = lvWrap(html); SFX.clear();
     host.querySelector('#mgNext').addEventListener('click', function(){ done(); });
     speak('连成 '+qCount+' 个词！');
+    guideNext(host.querySelector('#mgNext'), '你认识好多词啦！点发光的继续按钮', 1300);
   }
   buildQuestion();
 }
@@ -3513,6 +3663,7 @@ function mgG2(g, done){
   cand = shuffle(cand).slice(0, wantPairs);
   if(cand.length < 2){ done(); return; }   /* 极端兜底：字不够成不了对，优雅跳过 */
   var pairs = cand.length;
+  var mg2Opened = false;
   /* 每组一张图卡 + 一张字卡，全部打乱铺到网格（真正的记忆翻牌） */
   var cards = [];
   cand.forEach(function(ch){
@@ -3543,6 +3694,12 @@ function mgG2(g, done){
       '</div>';
     host.innerHTML = lvWrap(html);
     bindExit(host); attachRouter();
+    /* REQ-101/102：只在开局报一次玩法指令并高亮卡牌区 */
+    if(!mg2Opened){
+      mg2Opened = true;
+      var g2grid = host.querySelector('.g2-grid');
+      if(g2grid) guideNext(g2grid, '翻开两张卡片，找出图和字一对的好朋友，点卡片吧', 800);
+    }
   }
   function onCard(i){
     if(busy) return;
@@ -3596,6 +3753,7 @@ function mgG2(g, done){
     host.innerHTML = lvWrap(html); SFX.clear();
     host.querySelector('#mgNext').addEventListener('click', function(){ done(); });
     speak('全部配对成功！');
+    guideNext(host.querySelector('#mgNext'), '你的记性真好！点发光的继续按钮', 1300);
   }
   render();
 }
@@ -3707,6 +3865,9 @@ function renderChest(){
   setHTML(host, html);
   var ob = host.querySelector('#chestOpen');
   if(ob) ob.addEventListener('click', function(){ openChest(); });
+  /* REQ-101/102：说明状态；有钥匙时提醒点开宝箱 */
+  if(canOpen){ speak('宝箱在发光，点开宝箱看看吧'); guideNext(ob, null, 1600); }
+  else { speak('还差一把钥匙，先去闯关赚钥匙吧'); }
 }
 function openChest(){
   if(state.keys < 1){ toast('还差一把钥匙哦～'); return; }
@@ -3726,6 +3887,8 @@ function showTicketReveal(ticket){
   SFX.levelup(); speak('恭喜你获得一张金色奖券！');
   var ok = stage.querySelector('#ticketOk');
   if(ok) ok.addEventListener('click', function(){ renderChest(); });
+  /* REQ-102：提醒点「收下啦」 */
+  guideNext(ok, '把券拿给爸爸妈妈，再点收下啦', 2400);
 }
 function renderParentTickets(){
   var list = $('parentTicketsList'); if(!list) return;
@@ -3806,6 +3969,9 @@ function askLeave(){
     closeLevel();
   });
   try{ stay.focus(); }catch(e){}
+  /* REQ-101/102：语音播报 + 颜色提醒默认选项「继续玩」 */
+  speakQueue('要离开吗？想继续玩就点发光的继续玩按钮');
+  try{ stay.classList.add('lv-glow'); }catch(e){}
 }
 function bindSpeak(host, txt){
   [].forEach.call(host.querySelectorAll('[data-act="speak"]'), function(el){
@@ -4010,6 +4176,11 @@ function closeLevel(){
   LV = null;
   renderMap(); renderHUD(); save();
   showPage('page-map');
+  /* REQ-101/102：回到地图后，提醒去点当前该闯的关卡节点（红色光环） */
+  var nxt = document.querySelector('.node.n-next');
+  if(nxt){
+    guideNext(null, '看到红色光环的那一关了吗？点它继续闯关吧', 1200);
+  }
 }
 
 /* ============ 每日字灵挑战（GDD §2.7.2） ============ */
@@ -4100,6 +4271,9 @@ function renderDailyResult(res){
     b.addEventListener('click', function(){ speak(b.getAttribute('data-c')); });
   });
   host.querySelector('#lvBack').addEventListener('click', function(){ closeLevel(); });
+  /* REQ-101/102：播报完成 + 提醒点「返回地图」 */
+  speak('每日挑战完成！点发光的返回地图');
+  guideNext(host.querySelector('#lvBack'), null, 2200);
 }
 
 /* ============ S1 学字 ============ */
@@ -4138,6 +4312,8 @@ function renderS1(){
   });
   speak(ch.c);
   if(allWords) setTimeout(function(){ speak(allWords); }, 900);
+  /* REQ-102：学完读完后，提醒点「我学会了」 */
+  guideNext(host.querySelector('#lvLearn'), '学会了就点亮下面的按钮，点「我学会了」', 2600);
 }
 
 /* ============ S2 小游戏 ×2 ============ */
@@ -4146,6 +4322,7 @@ function qG1(t){
   return {
     stimHTML: '<button class="lv-big-play" data-act="speak">🔊</button><div class="lv-listen-lab">点上面的喇叭，听一听是哪个字？</div>',
     stimSpeak: t.c,
+    instruct: '点小喇叭听一听，是哪个字？找到它点一点',
     choices: opts.map(function(o){ return {html: lvCharHTML(o.ch), correct: o.correct}; }),
     hint: function(){ speak(t.c); }
   };
@@ -4180,6 +4357,9 @@ function renderGameIntro(no){
   host.innerHTML = lvWrap(html);
   bindExit(host);
   host.querySelector('#lvGo').addEventListener('click', function(){ renderGameQuestion(); });
+  /* REQ-101/102：报游戏名 + 提醒点「开始」 */
+  speak(name+'！准备好了吗？');
+  guideNext(host.querySelector('#lvGo'), '点发光的开始按钮，出发', 1400);
 }
 function renderGameQuestion(){
   var g = LV.games[LV.gameNo];
@@ -4215,6 +4395,7 @@ function qQuiz(t){
   return {
     stimHTML: '<div class="lv-pic">'+picSVG(t.c)+'</div><button class="lv-small-play" data-act="speak">🔊</button><div class="lv-listen-lab">这个图说的是哪个字？</div>',
     stimSpeak: t.c,
+    instruct: '看一看图，点小喇叭听一听，是哪个字？',
     choices: opts.map(function(o){ return {html: lvCharHTML(o.ch), correct: o.correct}; }),
     hint: function(){ speak(t.c); }
   };
@@ -4285,6 +4466,9 @@ function renderS4(res){
   });
   host.querySelector('#lvBack').addEventListener('click', function(){ closeLevel(); });
   host.querySelector('#lvReplay').addEventListener('click', function(){ openLevel(LV.idx); });
+  /* REQ-101/102：播报奖励 + 提醒点「返回地图」 */
+  speak('第'+(LV.idx+1)+'关通关啦！点发光的返回地图，去下一关吧');
+  guideNext(host.querySelector('#lvBack'), null, 2400);
 }
 
 /* ---- 通用答题渲染 + 防挫败处理 ---- */
@@ -4302,6 +4486,7 @@ function revealCorrect(q, host, onResolved, firstAttempt){
   highlightCorrect(q, host);
   var fb = host.querySelector('#lvFb');
   if(fb) fb.innerHTML = '是这个字呀～ <button class="lv-btn lv-btn-sm" id="lvGot">我记住啦</button>';
+  speakQueue('是这个字呀，我们记住啦');   /* REQ-101：揭晓正确答案时语音说明 */
   var got = host.querySelector('#lvGot');
   if(got) got.addEventListener('click', function(){ onResolved(false, firstAttempt); });
 }
@@ -4329,6 +4514,8 @@ function lvAsk(q, mode, onResolved){
     var st = host.querySelector('.lv-stim'); if(st){ st.classList.add('lv-pulse'); setTimeout(function(){ st.classList.remove('lv-pulse'); }, 700); }
   });
   if(q.stimSpeak) setTimeout(function(){ speak(q.stimSpeak); }, 140);
+  /* REQ-101：题目指令同步语音播报（排在读字之后，不打断） */
+  if(q.instruct) setTimeout(function(){ speakQueue(q.instruct); }, 900);
 
   host.querySelector('.lv-grid').addEventListener('click', function(e){
     var btn = (e.target && e.target.closest) ? e.target.closest('.lv-opt') : null;
@@ -4341,12 +4528,14 @@ function lvAsk(q, mode, onResolved){
       SFX.right();
       noteRight(state, q.stimSpeak);
       var fb = host.querySelector('#lvFb'); if(fb) fb.textContent = pick(PRAISE);
+      speakQueue(cleanSpeakText(pick(PRAISE)));   /* REQ-101：表扬语同步语音 */
       setTimeout(function(){ onResolved(true, firstAttempt); }, 650);
     } else {
       btn.classList.add('wrong'); btn.disabled = true;
       LV.combo = 0; SFX.wrong();
       noteWrong(state, q.stimSpeak);
       var fb2 = host.querySelector('#lvFb'); if(fb2) fb2.textContent = pick(GENTLE);
+      speakQueue(cleanSpeakText(pick(GENTLE)));   /* REQ-101：鼓励语同步语音 */
       if(mode === 'auto'){
         /* S2 小游戏：零惩罚，高亮正确项后自动进入下一题（GDD §9.1） */
         locked = true; highlightCorrect(q, host);
@@ -4369,25 +4558,34 @@ function render(){
   renderMap();
 }
 /* 手机端：用户首次触摸/点击时尝试进入全屏并锁定竖屏。
-   真正的 Fullscreen API 必须由用户手势触发，无法自动触发。 */
+   真正的 Fullscreen API 必须由用户手势触发，无法自动触发。
+   REQ-201：平板（短边 ≥600px）不锁定竖屏，横过来由 CSS 自动适配横屏布局。 */
+function isTabletSize(){
+  var short = Math.min(window.innerWidth || 0, window.innerHeight || 0);
+  return short >= 600;
+}
 function tryFullscreen(){
   if(document.fullscreenElement || document.webkitFullscreenElement) return;
   var el = document.documentElement;
   var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
   if(fn){
-    try{ fn.call(el).catch(function(){}); }catch(e){}
+    try{
+      var p = fn.call(el);
+      /* 进入全屏后尽力锁定横屏（仅 Android Chrome 生效；iOS 不支持则静默忽略） */
+      if(p && p.then) p.then(tryBestLandscape).catch(function(){});
+    }catch(e){}
   }
 }
-function tryLockPortrait(){
+/* REQ-302：手机尽量锁定横屏实现"自动横版"；平板不强制，允许自由旋转，由布局自适应。
+   iOS Safari 无 screen.orientation.lock，静默忽略——用户在横屏持机时布局自动切横版。 */
+function tryBestLandscape(){
+  if(isTabletSize()) return;   /* 平板：允许自由旋转，横屏/竖屏布局各自适配 */
   if(window.screen && screen.orientation && screen.orientation.lock){
-    try{ screen.orientation.lock('portrait').catch(function(){}); }catch(e){}
+    try{ screen.orientation.lock('landscape').catch(function(){}); }catch(e){}
   }
 }
 function bindFirstInteractionFullscreen(){
-  function once(){
-    tryFullscreen();
-    tryLockPortrait();
-  }
+  function once(){ tryFullscreen(); }
   document.addEventListener('click', once, {once:true});
 }
 function boot(){
@@ -4405,6 +4603,8 @@ function boot(){
   bindParent();
   scrollToCurrent();
   bindFirstInteractionFullscreen();
+  /* REQ-201：横竖屏切换后重新居中当前关卡节点 */
+  window.addEventListener('orientationchange', function(){ setTimeout(scrollToCurrent, 320); });
 }
 if(typeof document !== "undefined" && document.getElementById){
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
