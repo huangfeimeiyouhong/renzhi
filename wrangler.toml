@@ -1,5 +1,0 @@
-name = "renzhi"
-compatibility_date = "2026-08-31"
-# 纯静态资源部署：以 public/ 作为静态资源目录（避免把 .workbuddy 等内部目录发布到 CDN）。
-# public/index.html 仅做跳转，真正的游戏是 public/识字大冒险.html（单一源，避免重复）。
-assets = { directory = "public", not_found_handling = "single-page-application" }
