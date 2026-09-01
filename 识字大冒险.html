@@ -970,6 +970,28 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   border-radius:14px; padding:8px 12px; }
 .pt-name{ font-weight:800; color:var(--c-ink); flex:1 1 auto; }
 .pt-code{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; color:var(--c-ink-2); letter-spacing:1px; }
+/* 已核销奖券：只做「用过」的弱化区分，沿用既有色板，不新增视觉语言 */
+.pticket--used{ background:var(--c-surface-sunken); }
+.pt-when{ flex:0 0 auto; font-size:var(--fs-mini); color:var(--c-ink-2); }
+
+/* --- 家长中心 · 已核销折叠区（手风琴） ---
+   不用模态框：家长只想快速回看，就地展开即可收回。
+   开合状态由 JS 模块级变量 _ticketsUsedOpen 持有（每次渲染都从它取），
+   CSS 只负责 .pacc.open 的显隐，不自己记状态。 */
+.pacc{ margin-top:var(--sp-3); background:var(--c-surface); border:2px solid var(--c-line); border-radius:14px; overflow:hidden; }
+.pacc-hd{ display:flex; align-items:center; gap:8px; width:100%; min-height:var(--tap-min);
+  padding:8px 12px; background:none; border:0; font:inherit; font-size:var(--fs-body); font-weight:800;
+  color:var(--c-ink); text-align:left; cursor:pointer; }
+.pacc-caret{ flex:0 0 auto; font-size:var(--fs-mini); color:var(--c-ink-2);
+  transition:transform var(--dur-std) var(--ease-std); }
+.pacc.open .pacc-caret{ transform:rotate(90deg); }
+.pacc-t{ flex:1 1 auto; }
+.pacc-n{ flex:0 0 auto; font-size:var(--fs-mini); font-weight:800; color:var(--c-ink-2); }
+.pacc-body{ display:none; padding:0 12px 12px; }
+.pacc.open .pacc-body{ display:block; }
+.pacc-body .pticket + .pticket{ margin-top:8px; }
+/* 动效降级（美术 §20.6 / §10.3）：只吃掉箭头旋转的过渡，显隐仍可用 */
+@media (prefers-reduced-motion: reduce){ .pacc-caret{ transition:none; } }
 
 /* --- §19 宝箱 3 档（HTML + CSS 3D，来自美术规格.md §19.5） --- */
 .chest3d{ position:relative; width:200px; height:190px; margin:0 auto; perspective:600px; perspective-origin:50% 34%;
@@ -1164,7 +1186,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   </div>
 
   <div class="panel-sec" data-nid="panel.sec.tickets">
-    <h3 data-nid="panel.sec.tickets.t">🎟️ 待核销奖券</h3>
+    <h3 data-nid="panel.sec.tickets.t">🎟️ 奖券</h3>
     <div id="parentTicketsList" data-nid="panel.tickets.list"></div>
   </div>
 
@@ -4252,13 +4274,16 @@ function chestHTML(tier){
   '</div>';
 }
 function ticketHTML(t){
+  /* t = {name, code, date, redeemed, usedAt}
+     redeemed 且给了 usedAt 时，日期行补一段「核销于 YYYY-MM-DD」，让家长和孩子看得到是什么时候领的。 */
+  var dateLine = t.date + (t.redeemed ? ' · 已兑现' + (t.usedAt ? ' · 核销于 ' + fmtDate(t.usedAt) : '') : '');
   return ''+
   '<div class="ticket'+(t.redeemed?' is-redeemed':'')+'" data-page-node-id="ticket-'+t.code+'">'+
     '<div class="t-notch t-notch--l"></div><div class="t-notch t-notch--r"></div>'+
     '<div class="t-head"><span class="t-ico">&#127915;</span>金色奖券</div>'+
     '<div class="t-name">'+t.name+'</div>'+
     '<div class="t-code">'+t.code+'</div>'+
-    '<div class="t-date">'+t.date+(t.redeemed?' · 已兑现':'')+'</div>'+
+    '<div class="t-date">'+dateLine+'</div>'+
     (t.redeemed?'<div class="t-stamp">已兑现</div>':'')+
   '</div>';
 }
@@ -4270,7 +4295,7 @@ function renderChest(){
   if(canOpen) chest = chest.replace('chest3d chest3d--'+tier, 'chest3d chest3d--'+tier+' is-ready');
   var tickets = (state.coupons||[]).slice().reverse();
   var tHTML = tickets.length ? tickets.map(function(t){
-    return ticketHTML({name:t.name, code:t.code, date:fmtDate(t.gotAt), redeemed:!!t.used});
+    return ticketHTML({name:t.name, code:t.code, date:fmtDate(t.gotAt), redeemed:!!t.used, usedAt:t.usedAt});
   }).join('') : '<div class="chest-empty">还没有奖券，去开宝箱吧！</div>';
   var html =
     '<div class="chest-page">'+
@@ -4314,20 +4339,60 @@ function showTicketReveal(ticket){
   /* REQ-102：提醒点「收下啦」 */
   guideNext(ok, '把券拿给爸爸妈妈，再点收下啦', 2400);
 }
+/* 「已核销」折叠区的开合状态存在模块级变量里，不放在 DOM 上：
+   redeemCoupon() 核销后会重新调用 renderParentTickets() 整块重渲染，
+   状态若只挂在 DOM 节点上，每核销一张就被抹回默认收起。 */
+var _ticketsUsedOpen = false;
 function renderParentTickets(){
   var list = $('parentTicketsList'); if(!list) return;
-  var pending = (state.coupons||[]).filter(function(c){ return !c.used; });
-  if(!pending.length){ list.innerHTML = '<div class="hint">暂无待核销奖券 🎉</div>'; return; }
-  list.innerHTML = pending.map(function(c){
+  var all = state.coupons || [];
+  var pending = all.filter(function(c){ return !c.used; });
+  /* 已核销按「最近核销的排最前」回溯；coupons 是 append-only，只读展示，不提供取消核销 */
+  var used = all.filter(function(c){ return !!c.used; }).reverse();
+  var html = '';
+
+  /* --- 待核销：逻辑与原来完全一致（名称 + 券码 + 核销按钮） --- */
+  html += pending.length ? pending.map(function(c){
     var realIdx = state.coupons.indexOf(c);
     return '<div class="pticket" data-idx="'+realIdx+'">'+
       '<div class="pt-name">🎟️ '+c.name+'</div>'+
       '<div class="pt-code">'+c.code+'</div>'+
       '<button class="btn btn-sec pt-redeem" data-idx="'+realIdx+'">核销</button>'+
     '</div>';
-  }).join('');
+  }).join('') : '<div class="hint">暂无待核销奖券 🎉</div>';
+
+  /* --- 已核销：手风琴折叠，默认收起 --- */
+  html +=
+    '<div class="pacc'+(_ticketsUsedOpen?' open':'')+'" data-nid="panel.tickets.used" data-page-node-id="'+nid('panel.tickets.used')+'">'+
+      '<button class="pacc-hd" type="button" aria-expanded="'+(_ticketsUsedOpen?'true':'false')+'"'+
+        ' data-nid="panel.tickets.used.hd" data-page-node-id="'+nid('panel.tickets.used.hd')+'">'+
+        '<span class="pacc-caret" aria-hidden="true">▶</span>'+
+        '<span class="pacc-t">已核销</span>'+
+        '<span class="pacc-n">(' + used.length + ')</span>'+
+      '</button>'+
+      '<div class="pacc-body" data-nid="panel.tickets.used.body" data-page-node-id="'+nid('panel.tickets.used.body')+'">'+
+        (used.length ? used.map(function(c){
+          return ''+
+          '<div class="pticket pticket--used" data-nid="panel.tickets.used.row.'+c.code+'"'+
+            ' data-page-node-id="'+nid('panel.tickets.used.row.'+c.code)+'">'+
+            '<div class="pt-name">🎟️ '+c.name+'</div>'+
+            '<div class="pt-code">'+c.code+'</div>'+
+            /* 迁移数据可能没有 usedAt（v1 老券用的是 redeemedAt），没有就不硬凑一个日期 */
+            '<div class="pt-when">'+(c.usedAt ? '核销于 '+fmtDate(c.usedAt) : '已核销')+'</div>'+
+          '</div>';
+        }).join('') : '<div class="hint" data-nid="panel.tickets.used.empty" data-page-node-id="'+nid('panel.tickets.used.empty')+'">暂无已核销奖券</div>')+
+      '</div>'+
+    '</div>';
+
+  list.innerHTML = html;
   [].forEach.call(list.querySelectorAll('.pt-redeem'), function(b){
     b.addEventListener('click', function(){ redeemCoupon(parseInt(b.getAttribute('data-idx'),10)); });
+  });
+  /* 折叠开关：翻转状态变量后重渲染，open / aria-expanded 都由状态推导，只有一处真相 */
+  var hd = list.querySelector('.pacc-hd');
+  if(hd) hd.addEventListener('click', function(){
+    _ticketsUsedOpen = !_ticketsUsedOpen;
+    renderParentTickets();
   });
 }
 function redeemCoupon(idx){
