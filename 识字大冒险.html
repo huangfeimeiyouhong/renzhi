@@ -2011,8 +2011,15 @@ function migrate(s){
     if(!s.redeemed.hasOwnProperty(rid)) continue;
     var rw = null;
     for(var i2=0;i2<s.rewards.length;i2++) if(s.rewards[i2].id === rid) rw = s.rewards[i2];
+    /* v1 的 redeemed[rid] 存的是兑换时间（个别老版本只存了 true），取得到就用，
+       取不到退回 updatedAt —— 总之这张券的「已核销」时间要落在过去，别伪造今天。 */
+    var v1ts = s.redeemed[rid];
+    if(typeof v1ts !== "number" || !isFinite(v1ts) || v1ts <= 0) v1ts = s.updatedAt || Date.now();
+    /* used:true 必须带上：注释说了老数据视为已核销，不落这个标记的话老券会跑进
+       「待核销」列表、还挂着核销按钮，孩子能就同一份现实奖励重复找家长兑换。 */
     s.coupons.push({ id:"mig_"+rid, rewardId:rid, name: rw ? rw.name : "已兑换奖励",
-                     gotAt: s.updatedAt || Date.now(), redeemedAt: s.updatedAt || Date.now(),
+                     gotAt: s.updatedAt || Date.now(), redeemedAt: v1ts,
+                     used:true, usedAt:v1ts,
                      code:"MIGRATED", migrated:true });
   }
 
@@ -4345,10 +4352,14 @@ function showTicketReveal(ticket){
 var _ticketsUsedOpen = false;
 function renderParentTickets(){
   var list = $('parentTicketsList'); if(!list) return;
-  var all = state.coupons || [];
-  var pending = all.filter(function(c){ return !c.used; });
+  /* 云同步回来的 coupons 未必是数组（脏数据可能是对象/字符串），
+     不是数组就当空列表，别让整块奖券区渲染不出来。 */
+  var all = Array.isArray(state.coupons) ? state.coupons : [];
+  /* 云同步回来的 coupons 理论上可能夹带 null（见 applyCloudV2），两条 filter 都加 c && 守卫，
+     坏数据顶多是少显示一行，不该让整块奖券列表渲染不出来。 */
+  var pending = all.filter(function(c){ return !!(c && !c.used); });
   /* 已核销按「最近核销的排最前」回溯；coupons 是 append-only，只读展示，不提供取消核销 */
-  var used = all.filter(function(c){ return !!c.used; }).reverse();
+  var used = all.filter(function(c){ return !!(c && c.used); }).reverse();
   var html = '';
 
   /* --- 待核销：逻辑与原来完全一致（名称 + 券码 + 核销按钮） --- */
@@ -4372,9 +4383,13 @@ function renderParentTickets(){
       '</button>'+
       '<div class="pacc-body" data-nid="panel.tickets.used.body" data-page-node-id="'+nid('panel.tickets.used.body')+'">'+
         (used.length ? used.map(function(c){
+          /* node id 后缀必须用数组下标：券码只有 4 位 base24（约 200 张就有碰撞），
+             且 v1 迁移过来的老券券码统一是 "MIGRATED"，用券码拼 ID 会立刻重复。
+             这里跟待核销区的 data-idx 用同一口径（state.coupons 原数组下标），天然唯一。 */
+          var uIdx = state.coupons.indexOf(c);
           return ''+
-          '<div class="pticket pticket--used" data-nid="panel.tickets.used.row.'+c.code+'"'+
-            ' data-page-node-id="'+nid('panel.tickets.used.row.'+c.code)+'">'+
+          '<div class="pticket pticket--used" data-nid="panel.tickets.used.row.'+uIdx+'"'+
+            ' data-page-node-id="'+nid('panel.tickets.used.row.'+uIdx)+'">'+
             '<div class="pt-name">🎟️ '+c.name+'</div>'+
             '<div class="pt-code">'+c.code+'</div>'+
             /* 迁移数据可能没有 usedAt（v1 老券用的是 redeemedAt），没有就不硬凑一个日期 */
