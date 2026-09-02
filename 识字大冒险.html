@@ -250,30 +250,19 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .cur svg{ display:block; flex:0 0 auto; }
 .cur-n{ font-variant-numeric:tabular-nums; }
 .cur-sub{ font-size:var(--fs-mini); font-weight:700; color:var(--c-ink-2); }
-/* 家长入口：视觉 40×40，热区扩到 64×64（GDD §11.1 触控下限 + 防儿童误触） */
+/* 家长入口：右上角常驻可见「家长」胶囊按钮（珊瑚橙主色，复用 --c-pri token）；
+   点击触发 PIN 闸门（见 parentGate），PIN 本身即防儿童误触，不必再依赖长按。 */
 .pbtn{
   position:relative; flex:0 0 auto;
-  width:var(--tap-min); height:var(--tap-min);
-  display:grid; place-items:center;
-  background:transparent; border:0; padding:0; cursor:pointer;
+  height:40px; padding:0 16px;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  background:var(--c-pri); border:0; border-radius:var(--r-pill);
+  color:#fff; font-size:var(--fs-cap); font-weight:800; cursor:pointer;
+  box-shadow:0 2px 0 rgba(var(--c-shadow-rgb),.18);
   -webkit-touch-callout:none; user-select:none;
-}
-.pbtn-face{
-  width:40px; height:40px; border-radius:50%;
-  display:grid; place-items:center;
-  background:var(--c-surface-2); border:2.5px solid var(--c-line);
-  color:var(--c-pri-d); font-size:19px; line-height:1;
-  box-shadow:0 2px 0 rgba(var(--c-shadow-rgb),.12);
   transition:transform var(--dur-tap) var(--ease-tap), background var(--dur-tap) linear;
 }
-.pbtn:active .pbtn-face{ transform:scale(.94); background:var(--c-pri-l); }
-.pbtn-fill{
-  position:absolute; left:12px; right:12px; bottom:8px; height:4px;
-  border-radius:2px; background:var(--c-pri);
-  transform:scaleX(0); transform-origin:left center; opacity:0;
-}
-.pbtn.pressing .pbtn-fill{ opacity:1; animation:pressfill 2s linear forwards; }
-@keyframes pressfill{ from{transform:scaleX(0);} to{transform:scaleX(1);} }
+.pbtn:active{ transform:scale(.96); background:var(--c-pri-d); }
 
 /* ===================== 地图（美术 §16.7） ===================== */
 .map-wrap{
@@ -484,6 +473,35 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .row{ display:flex; align-items:center; gap:var(--sp-3); margin-bottom:var(--sp-3); }
 .row-lb{ flex:1 1 auto; font-size:var(--fs-body); font-weight:700; }
 .vol-slider{ flex:0 0 150px; max-width:150px; accent-color:#10B981; height:28px; cursor:pointer; }
+
+/* --- 家长中心 · 家长端功能区块（奖池/报告/数据/PIN），复用既有 token，不新增配色 --- */
+.btn-danger{ color:#FFFFFF; background:var(--c-err); box-shadow:0 3px 0 var(--c-err-d); }
+.btn-danger:active{ transform:translateY(3px); box-shadow:0 1px 0 var(--c-err-d); }
+.btn + .btn{ margin-top:var(--sp-2); }
+.sec-d{ margin:0 0 var(--sp-3); font-size:var(--fs-cap); color:var(--c-ink-2); line-height:1.5; }
+.saved{ text-align:center; color:var(--c-ok); font-weight:800; font-size:var(--fs-cap); min-height:18px; margin-top:6px; }
+
+/* 学习报告：统计卡（沿用 .statbox 视觉，复用 --c-surface-2 / --c-line / --c-pri-d） */
+.statgrid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-2); margin-bottom:var(--sp-3); }
+.statbox{ background:var(--c-surface-2); border:2px solid var(--c-line); border-radius:var(--r-lg); padding:var(--sp-3); text-align:center; }
+.statbox .n{ font-size:26px; font-weight:800; color:var(--c-pri-d); font-variant-numeric:tabular-nums; }
+.statbox .l{ font-size:var(--fs-mini); color:var(--c-ink-2); margin-top:2px; }
+
+/* 奖池设置：奖励编辑行（名称 + 积分 + 删除） */
+.rewardedit{ display:flex; gap:var(--sp-2); margin-bottom:var(--sp-2); align-items:stretch; }
+.rewardedit input{ flex:1 1 auto; min-width:0; border:2.5px solid var(--c-line); border-radius:var(--r-lg);
+  padding:0 12px; height:56px; font-size:var(--fs-body); background:var(--c-surface); color:var(--c-ink); }
+.rewardedit input.cost{ flex:0 0 96px; text-align:center; }
+.rewardedit .del{ flex:0 0 auto; width:56px; border:0; border-radius:var(--r-lg);
+  background:var(--c-err-l); color:var(--c-err); font-size:20px; font-weight:800; cursor:pointer; }
+.rewardedit .del:active{ transform:translateY(2px); }
+
+/* PIN 验证 / 设置密码 视图 */
+.panel-auth{ padding:var(--sp-2) 0; }
+.pin-wrap{ display:flex; flex-direction:column; gap:var(--sp-3); }
+.pin-input{ width:100%; height:60px; text-align:center; font-size:28px; letter-spacing:12px;
+  border:2.5px solid var(--c-line); border-radius:var(--r-lg); background:var(--c-surface); color:var(--c-ink); }
+.pin-hint{ font-size:var(--fs-cap); color:var(--c-ink-2); text-align:center; line-height:1.5; }
 .hint{ font-size:var(--fs-mini); color:var(--c-ink-2); margin:0 0 var(--sp-3); }
 .todo{
   font-size:var(--fs-mini); font-weight:800; color:var(--c-ink-2);
@@ -529,11 +547,6 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   .n-available .flag, .n-inProgress .flag,
   .n-perfect .disc, .n-perfect .crown,
   .n-boss .bossframe,
-  .pbtn.pressing .pbtn-fill{
-    animation:none !important;
-  }
-  /* 长按进度改用描边提示，不依赖动画传达（美术 §10.3「不依赖动画单独传达信息」） */
-  .pbtn.pressing .pbtn-face{ outline:3px solid var(--c-sky); outline-offset:2px; }
   *{ transition-duration:.01ms !important; }
   /* P5：每日挑战弹层 / 能量果飞行 / HUD 弹跳 降级（循环/强动效一律 animation:none） */
   .lv-ask-card{ animation:none !important; }
@@ -1063,12 +1076,9 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
       </span>
     </div>
 
-    <!-- 家长入口：视觉 40×40 / 热区 64×64 / 长按 2 秒触发（单击无响应） -->
+    <!-- 家长入口：右上角常驻可见「家长」胶囊按钮，点击触发 PIN 闸门（见 parentGate） -->
     <button class="pbtn" id="pBtn" data-nid="hud.parent" type="button"
-            aria-label="家长中心，长按两秒打开">
-      <span class="pbtn-face" data-nid="hud.parent.face" aria-hidden="true">⚙</span>
-      <span class="pbtn-fill" data-nid="hud.parent.fill" aria-hidden="true"></span>
-    </button>
+            aria-label="家长中心，点击打开">家长</button>
   </header>
 
   <!-- ===================== 主区（4 个 Tab 页 + 4 个关卡流程舞台） ===================== -->
@@ -1165,38 +1175,59 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
     <button class="panel-x" id="parentX" data-nid="panel.parent.close" type="button" aria-label="关闭">✕</button>
   </div>
 
-  <div class="panel-sec" data-nid="panel.sec.display">
-    <h3 data-nid="panel.sec.display.t">显示</h3>
-    <div class="row" data-nid="panel.row.fsscale">
-      <span class="row-lb" data-nid="panel.row.fsscale.lb">大字号模式</span>
-      <span class="seg" data-nid="panel.row.fsscale.seg">
-        <button class="btn btn-sec" type="button" data-fs="1"    aria-pressed="true"  data-nid="panel.fs.1">标准</button>
-        <button class="btn btn-sec" type="button" data-fs="1.15" aria-pressed="false" data-nid="panel.fs.115">较大</button>
-        <button class="btn btn-sec" type="button" data-fs="1.3"  aria-pressed="false" data-nid="panel.fs.13">最大</button>
-      </span>
-    </div>
-    <div class="row" data-nid="panel.row.sound">
-      <span class="row-lb" data-nid="panel.row.sound.lb">音效</span>
-      <button class="btn btn-sec" id="soundBtn" type="button" aria-pressed="true" data-nid="panel.sound">开</button>
-    </div>
-    <div class="row" data-nid="panel.row.vol">
-      <span class="row-lb" data-nid="panel.row.vol.lb">音量</span>
-      <input type="range" id="volSlider" class="vol-slider" min="0" max="100" value="100" data-nid="panel.vol" aria-label="音量">
-    </div>
-  </div>
+  <!-- PIN 验证 / 设置密码 视图：通过验证后才显示 #parentBody -->
+  <div class="panel-auth" id="parentAuth" data-nid="panel.auth" hidden></div>
 
-  <div class="panel-sec" data-nid="panel.sec.tickets">
-    <h3 data-nid="panel.sec.tickets.t">🎟️ 奖券</h3>
-    <div id="parentTicketsList" data-nid="panel.tickets.list"></div>
-  </div>
+  <!-- 家长端真实内容（PIN 通过后显示） -->
+  <div class="panel-body" id="parentBody" data-nid="panel.body" hidden>
+    <div class="panel-sec" data-nid="panel.sec.display">
+      <h3 data-nid="panel.sec.display.t">显示</h3>
+      <div class="row" data-nid="panel.row.fsscale">
+        <span class="row-lb" data-nid="panel.row.fsscale.lb">大字号模式</span>
+        <span class="seg" data-nid="panel.row.fsscale.seg">
+          <button class="btn btn-sec" type="button" data-fs="1"    aria-pressed="true"  data-nid="panel.fs.1">标准</button>
+          <button class="btn btn-sec" type="button" data-fs="1.15" aria-pressed="false" data-nid="panel.fs.115">较大</button>
+          <button class="btn btn-sec" type="button" data-fs="1.3"  aria-pressed="false" data-nid="panel.fs.13">最大</button>
+        </span>
+      </div>
+      <div class="row" data-nid="panel.row.sound">
+        <span class="row-lb" data-nid="panel.row.sound.lb">音效</span>
+        <button class="btn btn-sec" id="soundBtn" type="button" aria-pressed="true" data-nid="panel.sound">开</button>
+      </div>
+      <div class="row" data-nid="panel.row.vol">
+        <span class="row-lb" data-nid="panel.row.vol.lb">音量</span>
+        <input type="range" id="volSlider" class="vol-slider" min="0" max="100" value="100" data-nid="panel.vol" aria-label="音量">
+      </div>
+    </div>
 
-  <div class="panel-sec" data-nid="panel.sec.todo">
-    <h3 data-nid="panel.sec.todo.t">待办（后续阶段接入）</h3>
-    <p class="todo" data-nid="panel.todo.txt">
-      TODO(ENG-001-P3)：4 位 PIN 闸门 · 奖池设置 · 学习报告 ·
-      每日时长/休息提醒 · 导出备份 / 导入恢复 · 清空全部数据（须先自动导出）。
-      见 GDD §10 家长中心 / §12.6 第 12 条。
-    </p>
+    <div class="panel-sec" data-nid="panel.sec.tickets">
+      <h3 data-nid="panel.sec.tickets.t">🎟️ 奖券</h3>
+      <div id="parentTicketsList" data-nid="panel.tickets.list"></div>
+    </div>
+
+    <div class="panel-sec" data-nid="panel.sec.rewards">
+      <h3 data-nid="panel.sec.rewards.t">🎁 奖池设置</h3>
+      <p class="sec-d" data-nid="panel.sec.rewards.d">设置孩子能用积分兑换的奖励；改完点「保存奖池」。孩子端宝箱屋用同一份奖池。</p>
+      <div id="parentRewardsList" data-nid="panel.rewards.list"></div>
+      <button class="btn" id="addRewardBtn" type="button" data-nid="panel.rewards.add">+ 添加奖励</button>
+      <button class="btn" id="saveRewardsBtn" type="button" data-nid="panel.rewards.save">保存奖池</button>
+      <div class="saved" id="rewardSavedTip" data-nid="panel.rewards.saved"></div>
+    </div>
+
+    <div class="panel-sec" data-nid="panel.sec.report">
+      <h3 data-nid="panel.sec.report.t">📊 学习报告</h3>
+      <div class="statgrid" id="parentStats" data-nid="panel.stats"></div>
+      <p class="sec-d" id="parentDictLine" data-nid="panel.dictline"></p>
+    </div>
+
+    <div class="panel-sec" data-nid="panel.sec.data">
+      <h3 data-nid="panel.sec.data.t">💾 数据管理</h3>
+      <p class="sec-d" data-nid="panel.sec.data.d">备份到本机，换设备可导入恢复；清空全部数据会先自动导出一份。</p>
+      <button class="btn btn-sec" id="exportBtn" type="button" data-nid="panel.data.export">导出备份 (JSON)</button>
+      <button class="btn btn-sec" id="importBtn" type="button" data-nid="panel.data.import">导入恢复</button>
+      <input type="file" id="importFile" accept="application/json" hidden data-nid="panel.data.file">
+      <button class="btn btn-danger" id="clearBtn" type="button" data-nid="panel.data.clear">清空全部数据</button>
+    </div>
   </div>
 </aside>
 <!-- ===== /BLOCK: PARENT-PANEL ===== -->
@@ -2154,13 +2185,9 @@ function ensureDaily(){
 /* TODO(ENG-001-P2)：登录奖励与连续天数档位奖励（GDD §4.5 经济表）。骨架阶段为空实现。 */
 function grantLoginReward(streakDays){ /* 桩：P2 接入经济系统后发放能量果/碎片 */ }
 
-/* TODO(ENG-001-P3)：清空全部数据（GDD §12.6 验证清单第 12 条）。
-   要求：① 先自动导出 JSON 备份 ② 二次确认 ③ 云端同步。
-   本阶段按「append-only」硬约束故意不提供生效实现，避免误触丢学习记录。 */
-function resetAllData(){ if(typeof toast === "function") toast('「清空全部数据」P3 接入：先自动导出备份，再重置'); }
-/* TODO(ENG-001-P3)：导出备份 / 导入恢复（GDD §0.1 列为必须保留资产，P0 仅留桩） */
-function exportBackup(){ /* 桩 */ }
-function importBackup(file){ /* 桩 */ }
+/* 导出备份 / 导入恢复 / 清空全部数据：真实实现见 JS-BLOCK: PARENT-FEATURES
+   （doExportBackup / adoptBackup / resetAllData）。本阶段已落地，
+   仍遵循 GDD §12.6：清空前先自动导出、二次确认、syncSave 同步云端。 */
 
 /* ---- 读写 ---- */
 function save(){
@@ -3041,47 +3068,30 @@ function openParent(){
   var p = $("parentPanel"), s = $("scrim");
   if(p){ p.classList.add('on'); p.setAttribute('aria-hidden', 'false'); }
   if(s) s.classList.add('on');
-  renderParentTickets();   /* P3：打开即刷新待核销列表 */
   SFX.tap();
+}
+/* 家长入口：点击「家长」按钮进入。未设 PIN → 先设置；已设 → 验证；
+   通过后 showBody() 才显示真实内容（#parentBody），验证前只显示 #parentAuth。 */
+function parentGate(){
+  openParent();
+  if(state.pin === null || state.pin === '') setPinView();
+  else authView();
 }
 function closeParent(){
   var p = $("parentPanel"), s = $("scrim");
   if(p){ p.classList.remove('on'); p.setAttribute('aria-hidden', 'true'); }
   if(s) s.classList.remove('on');
+  /* 关闭时复位视图，下次打开重新走 PIN 流程 */
+  var auth = $("parentAuth"), body = $("parentBody");
+  if(auth){ auth.hidden = true; auth.innerHTML = ''; }
+  if(body) body.hidden = true;
+  var title = $("parentTitle"); if(title) title.textContent = '家长中心';
 }
 function bindParent(){
-  var btn = $("pBtn"), timer = null, sx = 0, sy = 0;
-  function clear(){ if(timer){ clearTimeout(timer); timer = null; } if(btn) btn.classList.remove('pressing'); }
-  function down(e){
-    if(timer) return;                    /* 防止 pointer + touch 双绑重复 */
-    sx = (e.touches ? e.touches[0].clientX : e.clientX) || 0;
-    sy = (e.touches ? e.touches[0].clientY : e.clientY) || 0;
-    btn.classList.add('pressing');
-    timer = setTimeout(function(){ clear(); openParent(); }, 2000);   /* 长按 2 秒 */
-  }
-  function move(e){
-    var x = (e.touches ? e.touches[0].clientX : e.clientX) || 0;
-    var y = (e.touches ? e.touches[0].clientY : e.clientY) || 0;
-    if(Math.abs(x-sx) > 10 || Math.abs(y-sy) > 10) clear();           /* 滚动中不算长按 */
-  }
+  var btn = $("pBtn");
   if(!btn) return;
-  if(typeof window !== "undefined" && window.PointerEvent){
-    btn.addEventListener('pointerdown', down);
-    btn.addEventListener('pointermove', move);
-    btn.addEventListener('pointerup', clear);
-    btn.addEventListener('pointercancel', clear);
-    btn.addEventListener('pointerleave', clear);
-  } else {
-    btn.addEventListener('touchstart', down, {passive:true});
-    btn.addEventListener('touchmove', move, {passive:true});
-    btn.addEventListener('touchend', clear);
-    btn.addEventListener('touchcancel', clear);
-    btn.addEventListener('mousedown', down);
-    btn.addEventListener('mouseup', clear);
-    btn.addEventListener('mouseleave', clear);
-  }
-  /* 单击无响应：5 岁儿童不会自发长按 2s，但会乱点 */
-  btn.addEventListener('click', function(e){ e.preventDefault(); clear(); });
+  /* 单击「家长」按钮 → PIN 闸门（不再用长按，避免入口隐蔽难发现） */
+  btn.addEventListener('click', function(e){ e.preventDefault(); parentGate(); });
   btn.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 
   var x = $("parentX"); if(x) x.addEventListener('click', closeParent);
@@ -3112,6 +3122,15 @@ function bindParent(){
       syncSave();
     });
   }
+
+  /* 家长端功能按钮（JS-BLOCK: PARENT-FEATURES） */
+  var ar = $("addRewardBtn");    if(ar) ar.addEventListener('click', addReward);
+  var sr = $("saveRewardsBtn");  if(sr) sr.addEventListener('click', saveRewards);
+  var ex = $("exportBtn");       if(ex) ex.addEventListener('click', function(){ doExportBackup(); toast('已导出备份 ✓'); });
+  var im = $("importBtn");       if(im) im.addEventListener('click', function(){ var f=$("importFile"); if(f) f.click(); });
+  var iff = $("importFile");     if(iff) iff.addEventListener('change', function(){ if(this.files && this.files[0]) importBackup(this.files[0]); });
+  var cl = $("clearBtn");        if(cl) cl.addEventListener('click', resetAllData);
+
   if(typeof document !== "undefined" && document.addEventListener){
     document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeParent(); });
   }
@@ -4418,6 +4437,200 @@ function redeemCoupon(idx){
 }
 /* ===== /JS-BLOCK: CHEST (P3) ===== */
 
+/* ===== JS-BLOCK: PARENT-FEATURES（家长端：PIN 闸门 + 奖池设置 + 学习报告 + 数据管理） ===== */
+/* 从 识字启蒙台.html 的家长中心迁移过来（用户要求「少了家长端的功能，迁移过去放到右上角」）。
+   入口在右上角 #pBtn「家长」按钮（点击触发 parentGate）；PIN 闸门防儿童误触。
+   复用既有 token（--c-pri / --c-ink / --c-line / --c-surface-2 / --c-ok / --c-err），
+   不新增配色、不新增视觉语言。 */
+
+function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ---------- PIN 闸门：设置 / 验证 / 忘记密码 ---------- */
+function setPinView(){
+  var auth = $('parentAuth'), body = $('parentBody'), title = $('parentTitle');
+  if(body) body.hidden = true;
+  if(title) title.textContent = '设置家长密码';
+  if(!auth) return;
+  auth.hidden = false;
+  auth.innerHTML =
+    '<div class="pin-wrap">'+
+      '<p class="pin-hint">首次使用请设置 4 位数字密码，防止宝宝误触进入家长中心。密码仅存本设备，用于防误触，不是加密保护。</p>'+
+      '<input class="pin-input" id="pinA" type="password" inputmode="numeric" maxlength="4" placeholder="如 1234" aria-label="设置密码">'+
+      '<input class="pin-input" id="pinB" type="password" inputmode="numeric" maxlength="4" placeholder="再次输入" aria-label="确认密码">'+
+      '<button class="btn" id="pinSetBtn" type="button" data-nid="panel.pin.set">确定</button>'+
+    '</div>';
+  var btn = auth.querySelector('#pinSetBtn');
+  if(btn) btn.addEventListener('click', savePin);
+}
+function savePin(){
+  var a = document.getElementById('pinA'), b = document.getElementById('pinB');
+  if(!a || !b) return;
+  var va = a.value, vb = b.value;
+  if(!/^\d{4}$/.test(va)){ toast('请输入 4 位数字'); return; }
+  if(va !== vb){ toast('两次输入不一致'); return; }
+  state.pin = va; syncSave();
+  toast('密码已设置 ✓');
+  showBody();
+}
+function authView(){
+  var auth = $('parentAuth'), body = $('parentBody'), title = $('parentTitle');
+  if(body) body.hidden = true;
+  if(title) title.textContent = '家长验证';
+  if(!auth) return;
+  auth.hidden = false;
+  auth.innerHTML =
+    '<div class="pin-wrap">'+
+      '<p class="pin-hint">请输入 4 位家长密码。</p>'+
+      '<input class="pin-input" id="pinIn" type="password" inputmode="numeric" maxlength="4" placeholder="请输入密码" aria-label="家长密码">'+
+      '<button class="btn" id="pinAuthBtn" type="button" data-nid="panel.pin.auth">进入</button>'+
+      '<button class="btn btn-sec" id="pinForget" type="button" data-nid="panel.pin.forget">忘记密码？</button>'+
+    '</div>';
+  var btn = auth.querySelector('#pinAuthBtn');
+  if(btn) btn.addEventListener('click', authPin);
+  var fg = auth.querySelector('#pinForget');
+  if(fg) fg.addEventListener('click', forgotPin);
+}
+function authPin(){
+  var inp = document.getElementById('pinIn');
+  if(!inp) return;
+  if(inp.value === state.pin) showBody();
+  else toast('密码错误');
+}
+function forgotPin(){
+  if(typeof confirm === 'function' && !confirm('忘记密码将清空全部学习数据并重新设置，确定吗？')) return;
+  doExportBackup();                              /* 先自动导出一份 */
+  state = defaultStateV2(); state.pin = null; syncSave();
+  render();
+  setPinView();
+  toast('已重置，请设置新密码');
+}
+
+/* ---------- 通过验证后显示真实内容 ---------- */
+function showBody(){
+  var auth = $('parentAuth'), body = $('parentBody'), title = $('parentTitle');
+  if(auth){ auth.hidden = true; auth.innerHTML = ''; }
+  if(title) title.textContent = '家长中心';
+  if(!body) return;
+  body.hidden = false;
+  renderParentTickets();
+  renderParentRewards();
+  renderParentStats();
+}
+
+/* ---------- 奖池设置：奖励增 / 删 / 改 ---------- */
+function renderParentRewards(){
+  var list = $('parentRewardsList'); if(!list) return;
+  if(!Array.isArray(state.rewards)) state.rewards = defaultStateV2().rewards;
+  list.innerHTML = state.rewards.map(function(r){
+    return '<div class="rewardedit" data-id="'+escAttr(r.id)+'">'+
+      '<input class="rname" value="'+escAttr(r.name)+'" placeholder="奖励名称" aria-label="奖励名称">'+
+      '<input class="cost" type="number" min="0" value="'+r.cost+'" placeholder="积分" aria-label="所需积分">'+
+      '<button class="del" type="button" data-del="'+escAttr(r.id)+'" aria-label="删除">✕</button>'+
+    '</div>';
+  }).join('') + (state.rewards.length ? '' : '<div class="hint">还没有奖励，点下面添加</div>');
+  [].forEach.call(list.querySelectorAll('.del'), function(b){
+    b.addEventListener('click', function(){ delReward(b.getAttribute('data-del')); });
+  });
+}
+function addReward(){
+  if(!Array.isArray(state.rewards)) state.rewards = [];
+  state.rewards.push({id:'r'+Date.now(), name:'新奖励', cost:30});
+  renderParentRewards();
+}
+function delReward(id){
+  state.rewards = state.rewards.filter(function(r){ return r.id !== id; });
+  /* 同步清理奖池映射里这条奖励，避免孤儿条目 */
+  if(state.settingsNew && state.settingsNew.chestPool) delete state.settingsNew.chestPool[id];
+  renderParentRewards();
+}
+function saveRewards(){
+  var list = $('parentRewardsList'); if(!list) return;
+  var rows = list.querySelectorAll('.rewardedit'), i, j;
+  for(i=0;i<rows.length;i++){
+    var row = rows[i], id = row.getAttribute('data-id');
+    var nm = row.querySelector('.rname'), co = row.querySelector('.cost');
+    for(j=0;j<state.rewards.length;j++) if(state.rewards[j].id === id){
+      if(nm) state.rewards[j].name = nm.value;
+      if(co) state.rewards[j].cost = Math.max(0, parseInt(co.value,10) || 0);
+    }
+  }
+  /* 奖池映射：新增的奖励补默认条目，保证孩子端宝箱屋能兑换 */
+  if(state.settingsNew){
+    state.settingsNew.chestPool = state.settingsNew.chestPool || {};
+    state.rewards.forEach(function(r){
+      if(!state.settingsNew.chestPool[r.id]) state.settingsNew.chestPool[r.id] = {inPool:true, needCoupons:1, dailyLimit:1};
+    });
+  }
+  syncSave(); render();
+  var tip = $('rewardSavedTip');
+  if(tip){ tip.textContent = '已保存 ✓'; setTimeout(function(){ tip.textContent=''; }, 1500); }
+}
+
+/* ---------- 学习报告：进度统计 + 字库完成度 ---------- */
+function learnedCount(){ return Object.keys(state.learned || {}).length; }
+function clearedCount(){
+  var n = 0, lv = state.game && state.game.levels;
+  if(lv) for(var k in lv){ if(lv.hasOwnProperty(k) && lv[k] && lv[k].cleared) n++; }
+  return n;
+}
+function statBox(n, l){ return '<div class="statbox"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'; }
+function renderParentStats(){
+  var box = $('parentStats'), line = $('parentDictLine');
+  if(!box) return;
+  var total = (typeof CHAR_DICT !== 'undefined' && CHAR_DICT.length) || 200;
+  var learned = learnedCount();
+  var pct = total ? Math.round(learned/total*100) : 0;
+  var daily = (state.settings && state.settings.dailyCount) || 5;
+  var days = total ? Math.ceil(total/daily) : 0;
+  box.innerHTML =
+    statBox(state.points, '总积分') +
+    statBox(learned, '已学汉字') +
+    statBox(clearedCount(), '闯关数') +
+    statBox((state.streak ? state.streak.cur : 0), '连续天数');
+  if(line) line.textContent = '字库共 '+total+' 个常用字，已学 '+learned+' 个（'+pct+'%）；按每天 '+daily+' 个字约 '+days+' 天学完一轮。';
+}
+
+/* ---------- 数据管理：导出 / 导入 / 清空 ---------- */
+function buildBackupJSON(){ return JSON.stringify(state, null, 2); }
+function doExportBackup(){
+  var json = buildBackupJSON();
+  try{
+    var blob = new Blob([json], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = (typeof URL !== 'undefined' && URL.createObjectURL) ? URL.createObjectURL(blob) : '';
+    a.download = '识字大冒险备份_' + todayStr() + '.json';
+    if(a.href) a.click();
+    if(typeof URL !== 'undefined' && URL.revokeObjectURL && a.href) URL.revokeObjectURL(a.href);
+  }catch(e){ /* 沙箱/旧浏览器无下载能力：caller 仍可通过返回值拿到 json */ }
+  return json;
+}
+function exportBackup(){ return doExportBackup(); }
+/* 解析并采用备份数据（与 v1/v2 兼容：老数据走 migrate，新数据走 normalizeV2） */
+function adoptBackup(data){
+  if(!data || typeof data !== 'object'){ toast('导入失败：文件无效'); return false; }
+  state = (data.version >= 2) ? normalizeV2(data) : migrate(data);
+  syncSave(); render(); renderMap();
+  toast('导入成功 ✓');
+  return true;
+}
+function importBackup(file){
+  if(!file) return false;
+  if(typeof FileReader === 'undefined'){ toast('当前环境不支持导入'); return false; }
+  var reader = new FileReader();
+  reader.onload = function(){ try{ adoptBackup(JSON.parse(reader.result)); }catch(e){ toast('导入失败：文件不是有效的备份'); } };
+  reader.readAsText(file);
+  return true;
+}
+function resetAllData(){
+  if(typeof confirm === 'function' && !confirm('确定清空所有学习数据吗？此操作不可恢复（会先自动导出一份备份）。')) return;
+  doExportBackup();                 /* ① 先自动导出 */
+  state = defaultStateV2();         /* ② 清空 */
+  syncSave();                       /* ③ 本地 + 云端同步 */
+  render(); renderMap();
+  toast('已清空全部数据');
+}
+/* ===== /JS-BLOCK: PARENT-FEATURES ===== */
+
 /* ===== JS-BLOCK: LEVEL-FLOW (P1) ===== */
 /* 核心循环：地图节点 → openLevel(idx) → S1 学字 → S2 小游戏 ×2 → S3 小考 → S4 演出结算。
    设计要点（GDD §3 / §9 / §4）：
@@ -5135,6 +5348,13 @@ var __SZ__ = {
   stageProgress:stageProgress, saveSectionProgress:saveSectionProgress,
   applyDailyResult:applyDailyResult, gainEnergy:gainEnergy, startDaily:startDaily, finishDaily:finishDaily,
   tapNode:tapNode, renderMap:renderMap,
+  /* PARENT-FEATURES 导出：供单测 vm 沙箱验证 PIN / 奖池 / 报告 / 数据管理 */
+  parentGate:parentGate, setPinView:setPinView, authView:authView, savePin:savePin,
+  authPin:authPin, forgotPin:forgotPin, showBody:showBody,
+  renderParentRewards:renderParentRewards, addReward:addReward, delReward:delReward, saveRewards:saveRewards,
+  renderParentStats:renderParentStats, learnedCount:learnedCount, clearedCount:clearedCount,
+  buildBackupJSON:buildBackupJSON, doExportBackup:doExportBackup, adoptBackup:adoptBackup,
+  importBackup:importBackup, resetAllData:resetAllData, escAttr:escAttr,
   /* P3 导出：供单测 vm 沙箱使用的纯逻辑 */
   GAME_ROTATION:GAME_ROTATION, doOpenChest:doOpenChest, simCombo:simCombo,
   couponCode:couponCode, buildCombo:buildCombo, renderChest:renderChest,
