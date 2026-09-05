@@ -183,6 +183,7 @@
   --zone3:#A9C8FF;  --zone3-sky1:#D6E4FF; --zone3-sky2:#F0E6FF;
   --zone4:#6C5CE7;  --zone4-sky1:#2E2A5E; --zone4-sky2:#5B4B9E;
   --pet1:#B9B4CC; --pet2:#A79BD6; --pet3:#9B6DFF; --pet4:#7C5CFF; --pet5:#5B3FE0;
+  --pet6:#4A2ECF; --pet7:#3A20B8; --pet8:#2E169E; --pet9:#220D82; --pet10:#1A0A66;
   --locked:#C9C2B8;
   --safe-top:env(safe-area-inset-top);
   --safe-bot:env(safe-area-inset-bottom);
@@ -2004,11 +2005,16 @@ var STAGE_THRESH = [10,25,45,70,100,140,190,250,320,400];   /* v1 10 关制门�
 /* GDD §5.2 + 美术 §15.2：五阶段参数表。bond 即「亲密度」(intimacy)；
    theme/hi/line/belly 供 petSVG 生成器上色（美术 §15.5）。 */
 var PET_STAGES = [
-  {lv:1, name:"蛋宝宝",  bond:0,   scale:.75, theme:"#B9B4CC", hi:"#DCD8EA", line:"#736E90", belly:"#F2F0F8"},
-  {lv:2, name:"墨墨·幼", bond:50,  scale:.85, theme:"#A79BD6", hi:"#CFC6EC", line:"#6B5FA4", belly:"#EFEBFA"},
-  {lv:3, name:"墨墨·灵", bond:150, scale:1.00,theme:"#9B6DFF", hi:"#C6ABFF", line:"#6A45C4", belly:"#EDE4FF"},
-  {lv:4, name:"墨墨·辉", bond:300, scale:1.15,theme:"#7C5CFF", hi:"#B69EFF", line:"#5238C4", belly:"#E8E0FF"},
-  {lv:5, name:"墨墨·圣", bond:500, scale:1.30,theme:"#5B3FE0", hi:"#9E8BFF", line:"#3A2599", belly:"#E2DBFF"}
+  {lv:1, name:"蛋宝宝",  bond:0,    scale:.75, theme:"#B9B4CC", hi:"#DCD8EA", line:"#736E90", belly:"#F2F0F8"},
+  {lv:2, name:"墨墨·幼", bond:50,   scale:.85, theme:"#A79BD6", hi:"#CFC6EC", line:"#6B5FA4", belly:"#EFEBFA"},
+  {lv:3, name:"墨墨·灵", bond:150,  scale:1.00,theme:"#9B6DFF", hi:"#C6ABFF", line:"#6A45C4", belly:"#EDE4FF"},
+  {lv:4, name:"墨墨·辉", bond:300,  scale:1.15,theme:"#7C5CFF", hi:"#B69EFF", line:"#5238C4", belly:"#E8E0FF"},
+  {lv:5, name:"墨墨·圣", bond:500,  scale:1.30,theme:"#5B3FE0", hi:"#9E8BFF", line:"#3A2599", belly:"#E2DBFF"},
+  {lv:6, name:"墨墨·星", bond:750,  scale:1.38,theme:"#4A2ECF", hi:"#8A6DFF", line:"#FFC93C", belly:"#DDD6FF"},
+  {lv:7, name:"墨墨·月", bond:1050, scale:1.45,theme:"#3A20B8", hi:"#7C5CFF", line:"#FFC93C", belly:"#D6CFFF"},
+  {lv:8, name:"墨墨·日", bond:1400, scale:1.52,theme:"#2E169E", hi:"#6A45FF", line:"#FFC93C", belly:"#CDC5FF"},
+  {lv:9, name:"墨墨·光", bond:1800, scale:1.58,theme:"#220D82", hi:"#5B3FE0", line:"#FFC93C", belly:"#C4BBFF"},
+  {lv:10,name:"墨墨·神", bond:2250, scale:1.65,theme:"#1A0A66", hi:"#4A2ECF", line:"#FFD86B", belly:"#BFB5FF"}
 ];
 function bondToLevel(bond){ var lv=1, i; for(i=0;i<PET_STAGES.length;i++) if(bond>=PET_STAGES[i].bond) lv=PET_STAGES[i].lv; return lv; }
 
@@ -3216,10 +3222,10 @@ function renderStubs(){
 
 /* ===== JS-BLOCK: PET ===== */
 /* TODO(ENG-001-P2): 宠物养成系统，见 GDD §5 / 美术 §15 */
-/* 阶段阈值（索引 0–4）：<50→0, <150→1, <300→2, <500→3, ≥500→4（GDD §5.2）。
+/* 阶段阈值（索引 0–9）：对应 Lv1–Lv10。原 5 级已扩到 10 级，bond 需求按 +50,+100,+150,+200,+250,+300,+350,+400,+450 递增。
    注意：用户 P2 描述里的 state.pet.intimacy / state.pet.stage 即本实现的
-   state.pet.bond（亲密度）/ state.pet.level（1–5）。沿用 P0/P1 既有字段，不新增平行字段以免破坏迁移。 */
-var PET_BOND_THRESH = [0,50,150,300,500];
+   state.pet.bond（亲密度）/ state.pet.level（1–10）。沿用 P0/P1 既有字段，不新增平行字段以免破坏迁移。 */
+var PET_BOND_THRESH = [0,50,150,300,500,750,1050,1400,1800,2250];
 function petStage(bond){ bond = bond||0; for(var i=PET_BOND_THRESH.length-1;i>=0;i--){ if(bond>=PET_BOND_THRESH[i]) return i; } return 0; }
 
 /* ---- 装扮件（美术 §15.4，零位图，参数化 SVG 片段）---- */
@@ -3311,15 +3317,15 @@ function ph(t, period){ return t ? -(t % period) : 0; }
 /* ---- 字灵「墨墨」参数化 SVG 生成器（美术 §15.5，已通过 node --check + SVG 校验）---- */
 function petSVG(opt){
   opt = opt || {};
-  var lv    = Math.min(5, Math.max(1, opt.level || 1));
+  var lv    = Math.min(PET_STAGES.length, Math.max(1, opt.level || 1));
   var mood  = opt.mood || 'happy';
   var wears = opt.wears || {};
   var t     = opt.t || 0;
   var chars = opt.chars || ['日','月','山','水','火'];
   var pref  = opt.idPrefix || '';   /* 支持同一页多个宠物（如地图 + 宠物页）避免 gradient id 冲突 */
   var S = PET_STAGES[lv-1];
-  var lineW = (lv === 5) ? 3 : 2.6;
-  var lineC = (lv === 5) ? '#FFC93C' : S.line;
+  var lineW = (lv >= 5) ? 3 : 2.6;
+  var lineC = (lv >= 5) ? '#FFC93C' : S.line;
   var phBreath = ph(t, 2600), phBlink = ph(t, 4200), phOrbit = ph(t, 4000), phHalo = ph(t, 6000);
   var out = '';
   out += '<svg class="pet pet-lv'+lv+'" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" '+
@@ -3418,17 +3424,17 @@ function petSVG(opt){
   }
   if(wears.hat && PET_HATS[wears.hat] && lv >= 2) out += PET_HATS[wears.hat](lineC);
   if(wears.scarf && PET_SCARFS[wears.scarf] && lv >= 2) out += PET_SCARFS[wears.scarf]();
-  if(lv === 5){
+  if(lv >= 5){
     out += '<g class="pk-crown" transform="translate(60,42)">'+
       '<path d="M-13 2 L-9 -11 L-4.5 -1 L0 -13 L4.5 -1 L9 -11 L13 2 Z" fill="#FFC93C" stroke="#B87400" stroke-width="2" stroke-linejoin="round"/>'+
       '<rect x="-14" y="2" width="28" height="6" rx="3" fill="#FFD86B" stroke="#B87400" stroke-width="2"/></g>';
   }
-  if(lv === 5){
+  if(lv >= 5){
     var orb='', i2, d5;
     for(i2=0;i2<5;i2++){ d5=phOrbit-(i2*800);
       orb += '<g class="pk-orbit" style="animation-delay:'+d5+'ms"><g class="pk-orbit-in" style="animation-delay:'+d5+'ms" transform="translate(60,22)">'+
-                 '<circle r="10" fill="#FFE9A8" stroke="#B87400" stroke-width="2"/>'+
-                 '<text y="4.5" text-anchor="middle" font-size="12" font-weight="800" font-family="Kaiti SC,STKaiti,KaiTi,PingFang SC,serif" fill="#7A5200">'+chars[i2]+'</text>'+
+                 '<circle r="11" fill="#FFE9A8" stroke="#B87400" stroke-width="2"/>'+
+                 '<text y="3.5" text-anchor="middle" font-size="10" font-weight="800" font-family="Kaiti SC,STKaiti,KaiTi,PingFang SC,serif" fill="#7A5200">'+chars[i2]+'</text>'+
                '</g></g>'; }
     out += '<g class="pk-satellites">'+orb+'</g>';
   }
@@ -3498,7 +3504,7 @@ function petBgSVG(id){
   }
   return o + '</svg>';
 }
-/* 取孩子已掌握的前 n 个字（供 Lv5 环绕小字灵显示），无则回退默认字 */
+/* 取孩子已掌握的前 n 个字（供 Lv5+ 环绕小字灵显示），无则回退默认字 */
 function learnedCharsTop(n){
   n = n||5; var out=[], z, k, L, chs, j;
   for(z=0; z<NUM_ZONES && out.length<n; z++){
@@ -3614,15 +3620,15 @@ function renderPet(keepScroll){
   /* 装扮交互需保留滚动位置：先在旧 .pet-page 上记录 scrollTop，重渲染后还原 */
   var _prevScroll = (keepScroll && host.querySelector('.pet-page')) ? host.querySelector('.pet-page').scrollTop : 0;
   var bond = state.pet.bond||0, st = petStage(bond), lv = st+1, S = PET_STAGES[st];
-  var lo = PET_BOND_THRESH[st], hi = (st<4 ? PET_BOND_THRESH[st+1] : PET_BOND_THRESH[4]);
-  var pct = st>=4 ? 100 : Math.max(0, Math.min(100, Math.round((bond-lo)/(hi-lo)*100)));
+  var lo = PET_BOND_THRESH[st], hi = (st < PET_BOND_THRESH.length-1 ? PET_BOND_THRESH[st+1] : PET_BOND_THRESH[PET_BOND_THRESH.length-1]);
+  var pct = (st >= PET_BOND_THRESH.length-1) ? 100 : Math.max(0, Math.min(100, Math.round((bond-lo)/(hi-lo)*100)));
   var mood = (_petMood && _petMood!=="happy") ? _petMood : "happy";
   var wearBg = state.pet.wears && state.pet.wears.bg;
   /* T3：原来是 (wearBg==="space"||wearBg==="forest") 硬编码白名单 —— 任何新背景都渲染不出来。
      改为按目录元数据判定，新增背景只要进了 PET_COSTUME_LIST 就自动生效。 */
   var bgMeta = wearBg ? costumeMeta(wearBg) : null;
   var bgId = (bgMeta && bgMeta.slot === 'bg') ? wearBg : "";
-  var stageTxt = st>=4 ? "已是最高形态啦，墨墨·圣！" : ("再 "+Math.max(0,(hi-bond))+" 亲密度就长大");
+  var stageTxt = (st >= PET_BOND_THRESH.length-1) ? ("已是最高形态啦，"+S.name+"！") : ("再 "+Math.max(0,(hi-bond))+" 亲密度就长大");
   var html =
     '<div class="pet-page" data-page-node-id="'+nid('pet.page')+'">'+
       '<div class="pet-stage" data-page-node-id="'+nid('pet.stage')+'">'+
