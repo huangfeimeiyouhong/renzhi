@@ -754,7 +754,9 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   background:var(--c-cream);
 }
 .pet-bg{ position:absolute; inset:0; width:100%; height:100%; }
-.pet-slot{ position:absolute; inset:0; display:grid; place-items:center; }
+/* T4：宠物本体可点。.pet-slot 覆盖 .pet-stage 整块且在 .pet-bg 之上，
+   给 5 岁孩子一个尽量大的点击热区；绑定在 .pet-slot 而非 .pet-bg，不与背景层抢事件。 */
+.pet-slot{ position:absolute; inset:0; display:grid; place-items:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
 .pet-slot .pet{ width:80%; height:80%; }
 .pet-praise{
   position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
@@ -851,8 +853,20 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 @keyframes pk-hop{ 0%,100%{ transform:translateY(0); } 25%{ transform:translateY(-14px); } 50%{ transform:translateY(0); } 75%{ transform:translateY(-6px); } }
 .pk-hat, .pk-scarf, .pk-wing, .pk-crown{ animation:pk-wear 200ms ease-out; }
 @keyframes pk-wear{ from{ opacity:0; transform:scale(.8); } to{ opacity:1; transform:scale(1); } }
+/* T4：点宠物的一次短促弹跳（挤压→回弹，380ms，非循环）。
+   注意 transform 加在根 <svg class="pet"> 上，不干扰内部的 .pk-all / .pk-body 循环动画。 */
+.pet-slot .pet.pet-tap{ transform-box:fill-box; transform-origin:50% 88%; animation:petTap 380ms cubic-bezier(.34,1.56,.64,1); }
+@keyframes petTap{
+  0%{ transform:scale(1,1); }
+  28%{ transform:scale(.92,1.09); }
+  58%{ transform:scale(1.08,.93); }
+  80%{ transform:scale(.98,1.02); }
+  100%{ transform:scale(1,1); }
+}
 @media (prefers-reduced-motion: reduce){
   .pk-body,.pk-egg,.pk-eyes,.pk-halo,.pk-orbit,.pk-orbit-in,.pk-think,.pk-zzz text,.pk-spark,.pet[data-mood="excited"] .pk-all,.pk-hat,.pk-scarf,.pk-wing,.pk-crown{ animation:none !important; }
+  /* T4：弹跳是纯装饰反馈，减弱动效下直接关掉；点击仍有音效 + 亲密度 + 文字提示三重反馈 */
+  .pet-slot .pet.pet-tap{ animation:none !important; }
   .pk-spark{ display:none; }
 }
 
@@ -1820,8 +1834,49 @@ function ttsVol(){
   v = (v==null ? 1 : v);
   return Math.max(0, Math.min(1, v));
 }
-function speak(text){
+/* ===== T5 · 语音降频（用户反馈「提示的语音太多了」）=====
+   两条通道：
+     A 内容/主动通道（force=true）—— 字的发音、词语连读、🔊 重听、点字点词、toast 反馈。
+       永不丢、永不限流。识字产品的核心就是听字音，这条通道任何情况下都不能被降频。
+     B 提示通道（force 为假）—— 引导语 / 玩法说明 / 表扬 / 鼓励 / 宠物台词。
+   三条硬边界：
+     ① 主动触发（A 通道）永不被吞；
+     ② 单字（text 长度 ≤1）走「仅同字去重」，不限流 —— 换目标时字的发音一次都不能丢；
+     ③ B 通道才降频，且两条规则叠加：
+        (a) 同一句话一关只说一遍（_spkSaid 备忘，openLevel / closeLevel / startDaily 时清空）；
+        (b) 两句提示语之间至少隔 SPEAK_AUTO_GAP。
+   注意：节流只决定「播不播」。guideNext 的按钮发光（.lv-glow）照常加，
+   信息走「颜色 + 形状」冗余通道，不依赖语音单通道。 */
+var SPEAK_AUTO_GAP = 2600;   /* 提示语之间的最小间隔（ms） */
+var SPEAK_DEDUPE   = 900;    /* 同一文本的去重窗口（ms） */
+var _spkText = '', _spkAt = 0, _spkAutoAt = 0, _spkSaid = {};
+function speakNow(){ return (typeof Date !== 'undefined' && Date.now) ? Date.now() : 0; }
+function speakGate(text, force){
+  if(!text) return false;
+  var s = String(text);
+  if(force) return true;                                   /* ① A 通道：直通 */
+  var t = speakNow();
+  if(s.length <= 1){                                       /* ② 单字：只做同字去重 */
+    return !(s === _spkText && (t - _spkAt) < SPEAK_DEDUPE);
+  }
+  if(_spkSaid[s]) return false;                            /* ③(a) 同一句话一关只一次 */
+  if((t - _spkAutoAt) < SPEAK_AUTO_GAP) return false;      /* ③(b) 两句提示语至少隔 2.6s */
+  return true;
+}
+/* 记录一次「真的播了」的语音。单字发音不消耗提示语额度（它是内容不是提示），
+   所以读字之后紧接着的引导语仍然会被 ③(b) 判掉 —— 提示语让位给字音。 */
+function speakMark(text, force){
+  var t = speakNow(), s = String(text||'');
+  _spkText = s; _spkAt = t;
+  if(!force && s.length > 1){ _spkAutoAt = t; _spkSaid[s] = 1; }
+}
+/* 进入 / 离开一关时清空「这关已经说过的话」，让下一关的引导语重新获得额度 */
+function speakResetAll(){ _spkText=''; _spkAt=0; _spkAutoAt=0; _spkSaid={}; }
+function speakThrottled(text, force){ if(speakGate(text, force)) speak(text, true); }
+function speak(text, force){
   if(!ttsOK()||!text) return;
+  if(!speakGate(text, force)) return;
+  speakMark(text, force);
   try{
     window.speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);
@@ -1834,9 +1889,12 @@ function speak(text){
 function cleanSpeakText(t){
   return String(t||'').replace(/[^\u4e00-\u9fff\u3400-\u4dbfA-Za-z0-9，。！？、：；· \-]/g, '').replace(/\s+/g, ' ').trim();
 }
-/* 排队播报：不打断正在朗读的字词，接在其后播放（用于步骤引导语） */
-function speakQueue(text){
+/* 排队播报：不打断正在朗读的字词，接在其后播放（用于步骤引导语）。
+   T5：与 speak 同一套节流规则（force 用于主动触发）。 */
+function speakQueue(text, force){
   if(!ttsOK()||!text) return;
+  if(!speakGate(text, force)) return;
+  speakMark(text, force);
   try{
     var u=new SpeechSynthesisUtterance(text);
     u.lang="zh-CN"; u.rate=(text.length>1?0.62:0.85); u.pitch=1.05; u.volume=ttsVol();
@@ -1845,7 +1903,9 @@ function speakQueue(text){
   }catch(e){}
 }
 /* REQ-102 下一步引导：到达新一步时，给目标按钮加发光颜色提醒，并语音提示点哪里。
-   el 为 null 时仅语音引导（如地图节点）；delayMs 内若页面已切换则自动放弃。 */
+   el 为 null 时仅语音引导（如地图节点）；delayMs 内若页面已切换则自动放弃。
+   T5：引导语属 B 通道，由 speakQueue → speakGate 统一降频（同一句话一关只播一次 +
+   两句之间至少隔 SPEAK_AUTO_GAP）。语音被吞掉不影响 .lv-glow 发光，视觉引导照常。 */
 function guideNext(el, sayText, delayMs){
   delayMs = delayMs || 0;
   var host = $('levelHost');
@@ -2177,6 +2237,7 @@ function ensureDaily(){
   }
   if(state.pet.lastCareDate !== t){
     state.pet.fedToday = 0; state.pet.petToday = 0; state.pet.lastCareDate = t;
+    if(typeof _petCapToasted !== "undefined") _petCapToasted = false;   /* T4：跨天复位抚摸上限提示 */
   }
   /* daily 是缓存不是学习记录，允许裁剪到最近 60 天 */
   var keys = Object.keys(state.daily).sort();
@@ -3060,9 +3121,10 @@ function toast(msg){
   t.classList.add('on');
   if(_toastT) clearTimeout(_toastT);
   _toastT = setTimeout(function(){ t.classList.remove('on'); }, 2200);
-  /* REQ-101：文字提示同时语音播报（朗读过滤 emoji） */
+  /* REQ-101：文字提示同时语音播报（朗读过滤 emoji）。T5：toast 是按钮点击后的直接反馈，
+     属「主动触发」，走 force 直通，永不被节流吞掉。 */
   var txt = cleanSpeakText(msg);
-  if(txt) speak(txt);
+  if(txt) speak(txt, true);
 }
 function openParent(){
   var p = $("parentPanel"), s = $("scrim");
@@ -3174,7 +3236,21 @@ var PET_HATS = {
     for(i=0;i<5;i++){ tri+='<path d="M'+(x[i]-5)+' 2 L'+x[i]+' '+(i===2?-14:-9)+' L'+(x[i]+5)+' 2 Z" fill="#FFC93C" stroke="#B87400" stroke-width="1.6" stroke-linejoin="round"/>'; }
     return '<g class="pk-hat" transform="translate(60,44)">'+tri+
       '<rect x="-16" y="2" width="32" height="7" rx="3.5" fill="#FFD86B" stroke="#B87400" stroke-width="1.6"/>'+
-      '<circle cx="-8" cy="5.5" r="2.4" fill="#FF6B9D"/><circle cx="0" cy="5.5" r="2.4" fill="#3DA5E0"/><circle cx="8" cy="5.5" r="2.4" fill="#8ED46E"/></g>'; }
+      '<circle cx="-8" cy="5.5" r="2.4" fill="#FF6B9D"/><circle cx="0" cy="5.5" r="2.4" fill="#3DA5E0"/><circle cx="8" cy="5.5" r="2.4" fill="#8ED46E"/></g>'; },
+  /* T3 新增：浆果帽（normal）—— 绿叶托 + 三颗小浆果，与 leaf 同组描边色 #377020 */
+  berry: function(){
+    return '<g class="pk-hat" transform="translate(60,44)">'+
+      '<path d="M-12 3 q12 -13 24 0 z" fill="#8ED46E" stroke="#377020" stroke-width="1.8" stroke-linejoin="round"/>'+
+      '<circle cx="-7" cy="-3" r="4.4" fill="#FF6B9D" stroke="#D96A8C" stroke-width="1.6"/>'+
+      '<circle cx="1" cy="-8" r="5" fill="#FF9AA6" stroke="#D96A8C" stroke-width="1.6"/>'+
+      '<circle cx="8" cy="-2" r="4.2" fill="#FF6B9D" stroke="#D96A8C" stroke-width="1.6"/>'+
+      '<circle cx="-0.4" cy="-9.6" r="1.3" fill="#FFFFFF" opacity=".85"/></g>'; },
+  /* T3 新增：太阳帽（rare）—— 宽檐草帽 + 粉色帽带 */
+  sunhat: function(){
+    return '<g class="pk-hat" transform="translate(60,44)">'+
+      '<ellipse cx="0" cy="5" rx="24" ry="6.5" fill="#FFD86B" stroke="#B87400" stroke-width="1.8"/>'+
+      '<path d="M-13 5 q0 -17 13 -17 q13 0 13 17 z" fill="#FFE9A8" stroke="#B87400" stroke-width="1.8" stroke-linejoin="round"/>'+
+      '<path d="M-13 0 q13 6 26 0" fill="none" stroke="#FF6B9D" stroke-width="4" stroke-linecap="round"/></g>'; }
 };
 var PET_SCARFS = {
   rainbow: function(){ return '<g class="pk-scarf" transform="translate(60,104)">'+
@@ -3183,14 +3259,51 @@ var PET_SCARFS = {
       '<path d="M-30 14 q30 14 60 0" fill="none" stroke="#3DA5E0" stroke-width="7" stroke-linecap="round"/></g>'; },
   star: function(){ var o='', i, sx=[-24,-12,0,12,24];
     for(i=0;i<5;i++){ o+='<path transform="translate('+sx[i]+',11)" d="M0 -4.4 l1.3 2.7 3 .4 -2.2 2.1 .5 3L0 2.7l-2.6 1.9 .5-3L-4.3 -1.3 l3-.4z" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'; }
-    return '<g class="pk-scarf" transform="translate(60,104)"><path d="M-30 0 q30 14 60 0" fill="none" stroke="#9B6DFF" stroke-width="8" stroke-linecap="round"/>'+o+'</g>'; }
+    return '<g class="pk-scarf" transform="translate(60,104)"><path d="M-30 0 q30 14 60 0" fill="none" stroke="#9B6DFF" stroke-width="8" stroke-linecap="round"/>'+o+'</g>'; },
+  /* T3 新增：爱心围巾（normal）—— 粉底 + 爱心吊坠 */
+  heart: function(){
+    return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FFB3C8" stroke-width="8" stroke-linecap="round"/>'+
+      '<path d="M0 8 c-5 -6 -11 -2 -11 4 c0 5 7 9 11 13 c4 -4 11 -8 11 -13 c0 -6 -6 -10 -11 -4 z" fill="#FF6B9D" stroke="#D96A8C" stroke-width="1.6" stroke-linejoin="round"/></g>'; },
+  /* T3 新增：波浪围巾（legend）—— 双色波浪 + 金点 */
+  wave: function(){
+    return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q15 14 30 0 q15 -14 30 0 q15 14 30 0" fill="none" stroke="#3DA5E0" stroke-width="8" stroke-linecap="round"/>'+
+      '<path d="M-30 10 q15 12 30 0 q15 -12 30 0 q15 12 30 0" fill="none" stroke="#9B6DFF" stroke-width="5" stroke-linecap="round"/>'+
+      '<circle cx="-15" cy="5" r="2.4" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'+
+      '<circle cx="15" cy="5" r="2.4" fill="#FFC93C" stroke="#B87400" stroke-width="1"/></g>'; }
 };
 var PET_WINGS = {
   small: function(lineC, pref){
     pref = pref || '';
     return '<g class="pk-wing">'+
       '<ellipse cx="26" cy="80" rx="15" ry="22" fill="url(#'+pref+'pkWing)" stroke="#9B6DFF" stroke-width="2.2" transform="rotate(-18 26 80)"/>'+
-      '<ellipse cx="94" cy="80" rx="15" ry="22" fill="url(#'+pref+'pkWing)" stroke="#9B6DFF" stroke-width="2.2" transform="rotate(18 94 80)"/></g>'; }
+      '<ellipse cx="94" cy="80" rx="15" ry="22" fill="url(#'+pref+'pkWing)" stroke="#9B6DFF" stroke-width="2.2" transform="rotate(18 94 80)"/></g>'; },
+  /* T3 新增：大翅膀（legend）—— 加大渐变翅 + 金色羽线（羽线放进 rotate 组，才跟着翅面一起转） */
+  big: function(lineC, pref){
+    pref = pref || '';
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-22 20 78)">'+
+        '<ellipse cx="20" cy="78" rx="20" ry="30" fill="url(#'+pref+'pkWing)" stroke="#9B6DFF" stroke-width="2.4"/>'+
+        '<path d="M20 52 q-7 24 0 52" fill="none" stroke="#FFD86B" stroke-width="1.6" opacity=".85"/>'+
+        '<path d="M20 60 q-4 18 0 36" fill="none" stroke="#FFD86B" stroke-width="1.2" opacity=".6"/></g>'+
+      '<g transform="rotate(22 100 78)">'+
+        '<ellipse cx="100" cy="78" rx="20" ry="30" fill="url(#'+pref+'pkWing)" stroke="#9B6DFF" stroke-width="2.4"/>'+
+        '<path d="M100 52 q7 24 0 52" fill="none" stroke="#FFD86B" stroke-width="1.6" opacity=".85"/>'+
+        '<path d="M100 60 q4 18 0 36" fill="none" stroke="#FFD86B" stroke-width="1.2" opacity=".6"/></g></g>'; },
+  /* T3 新增：叶翅膀（rare）—— 绿叶形翅 + 叶脉，与 leaf 帽同组色 #A3E081 / #377020 */
+  leafwing: function(lineC, pref){
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-20 24 80)">'+
+        '<path d="M24 54 C 4 62 4 96 24 106 C 40 96 40 62 24 54 Z" fill="#A3E081" stroke="#377020" stroke-width="2.2" stroke-linejoin="round"/>'+
+        '<path d="M24 58 v44" fill="none" stroke="#377020" stroke-width="1.4"/>'+
+        '<path d="M24 70 l-9 -7 M24 82 l-9 -6 M24 94 l-8 -5" fill="none" stroke="#377020" stroke-width="1.2"/>'+
+        '<path d="M24 70 l9 -7 M24 82 l9 -6 M24 94 l8 -5" fill="none" stroke="#377020" stroke-width="1.2"/></g>'+
+      '<g transform="rotate(20 96 80)">'+
+        '<path d="M96 54 C 76 62 76 96 96 106 C 112 96 112 62 96 54 Z" fill="#A3E081" stroke="#377020" stroke-width="2.2" stroke-linejoin="round"/>'+
+        '<path d="M96 58 v44" fill="none" stroke="#377020" stroke-width="1.4"/>'+
+        '<path d="M96 70 l-9 -7 M96 82 l-9 -6 M96 94 l-8 -5" fill="none" stroke="#377020" stroke-width="1.2"/>'+
+        '<path d="M96 70 l9 -7 M96 82 l9 -6 M96 94 l8 -5" fill="none" stroke="#377020" stroke-width="1.2"/></g></g>'; }
 };
 /* 相位：用负 delay 让重绘后动画不跳帧 */
 function ph(t, period){ return t ? -(t % period) : 0; }
@@ -3330,6 +3443,7 @@ function petSVG(opt){
 }
 /* 场景背景（独立层，放在宠物 SVG 之后面；美术 §15.5） */
 function petBgSVG(id){
+  if(!id) return '';   /* 空背景（未知/未装备）不渲染任何 pet-bg 层，避免透明空 svg 占位 */
   var o = '<svg class="pet-bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
   if(id === 'forest'){
     var i, tx=[36,100,164], th=[52,74,60];
@@ -3348,6 +3462,36 @@ function petBgSVG(id){
     for(r=0;r<20;r++){ sx=Math.round(rnd()*196)+2; sy=Math.round(rnd()*196)+2; sr=(rnd()*1.4+0.7).toFixed(1);
       o += '<circle cx="'+sx+'" cy="'+sy+'" r="'+sr+'" fill="#FFF6DF" opacity="'+(rnd()*0.5+0.4).toFixed(2)+'"/>'; }
     o += '<path d="M158 40 a22 22 0 1 0 16 34 a26 26 0 1 1 -16 -34 Z" fill="#FFE9A8" opacity=".85"/>';
+  } else if(id === 'sea'){
+    /* T3 新增：海底背景（normal）。浅蓝水层 + 水草 + 泡泡 + 小鱼 + 沙地。
+       仅 #E4F2FB / #C6E7F7 两个低饱和浅蓝是新色（与 forest 的 #EFF7E6 同族），其余全复用既有色。 */
+    var b, bxs=[42,96,150], bys=[128,96,116], brs=[7,5,9];
+    o += '<rect width="200" height="200" fill="#E4F2FB"/>';
+    o += '<rect width="200" height="42" fill="#C6E7F7"/>';
+    o += '<path d="M28 200 q-8 -34 6 -56 q12 -20 2 -44" fill="none" stroke="#377020" stroke-width="9" stroke-linecap="round" opacity=".5"/>';
+    o += '<path d="M178 200 q8 -30 -4 -50 q-10 -18 0 -40" fill="none" stroke="#377020" stroke-width="8" stroke-linecap="round" opacity=".4"/>';
+    for(b=0;b<3;b++){
+      o += '<circle cx="'+bxs[b]+'" cy="'+bys[b]+'" r="'+brs[b]+'" fill="#FFF6DF" opacity=".6" stroke="#3DA5E0" stroke-width="1.6"/>';
+    }
+    o += '<g transform="translate(116,72)">'+
+           '<ellipse rx="16" ry="10" fill="#FFB3C8" stroke="#D96A8C" stroke-width="2"/>'+
+           '<path d="M14 0 l12 -8 v16 z" fill="#FF9AA6" stroke="#D96A8C" stroke-width="1.8" stroke-linejoin="round"/>'+
+           '<circle cx="-6" cy="-2" r="2.4" fill="#3B2A22"/></g>';
+    o += '<path d="M0 176 q50 -14 100 0 q50 14 100 0 v24 H0 z" fill="#FFE9A8" opacity=".8"/>';
+  } else if(id === 'candy'){
+    /* T3 新增：糖果背景（rare）。奶油底 + 斜条纹 + 两支棒棒糖，全复用既有色 */
+    var k2;
+    o += '<rect width="200" height="200" fill="#FFF1E0"/>';
+    o += '<circle cx="100" cy="100" r="86" fill="#FFE6D5" opacity=".7"/>';
+    o += '<g opacity=".3">';
+    for(k2=0;k2<6;k2++){ o += '<path d="M'+(k2*40-60)+' 0 l40 0 l-60 200 l-40 0 z" fill="#FFB3C8"/>'; }
+    o += '</g>';
+    o += '<g transform="translate(38,150)"><rect x="-2" y="0" width="4" height="34" rx="2" fill="#C4544A"/>'+
+           '<circle cy="-4" r="13" fill="#FFB3C8" stroke="#D96A8C" stroke-width="2.4"/>'+
+           '<path d="M-9 -4 a9 9 0 0 1 18 0" fill="none" stroke="#FFF6DF" stroke-width="3"/></g>';
+    o += '<g transform="translate(164,146)"><rect x="-2" y="0" width="4" height="30" rx="2" fill="#C4544A"/>'+
+           '<circle cy="-4" r="11" fill="#8ED46E" stroke="#377020" stroke-width="2.4"/>'+
+           '<path d="M-7 -4 a7 7 0 0 1 14 0" fill="none" stroke="#FFF6DF" stroke-width="2.6"/></g>';
   } else {
     o += '<rect width="200" height="200" fill="#FFF1E0"/>';
     o += '<circle cx="100" cy="164" r="52" fill="#FFE6D5" opacity=".7"/>';
@@ -3368,8 +3512,12 @@ function learnedCharsTop(n){
   return out;
 }
 
-/* ===== 装扮系统（P4）：8 件装扮目录 + 购买/装备纯逻辑（美术 §15.4，经济 §4.4/§5.4）===== */
-/* 8 件合计 8+8+25+15+15+25+15+25 = 136⭐，与 GDD §4.3.1 经济闭环上限一致，不可上调。 */
+/* ===== 装扮系统（P4）：16 件装扮目录 + 购买/装备纯逻辑（美术 §15.4，经济 §4.4/§5.4）=====
+   原 8 件合计 8+8+25+15+15+25+15+25 = 136⭐，与 GDD §4.3.1 经济闭环上限一致，价格不可上调。
+   T3 扩到 16 件（每槽 +2），新增 8 件沿用既有价格梯度（normal=8 / rare=15 / legend=25），
+   原 8 件的 id / 价格 / 稀有度一律未动。全目录合计 255⭐。
+   注意：每新增一个 id，必须同时在 PET_HATS / PET_SCARFS / PET_WINGS / petBgSVG 补渲染分支，
+   否则会出现「商店列表里有、买了却戴不上」。 */
 var PET_COSTUME_LIST = [
   {id:'flower',  name:'小花帽',   slot:'hat',   price:8,  rarity:'normal'},
   {id:'leaf',    name:'树叶帽',   slot:'hat',   price:8,  rarity:'normal'},
@@ -3378,7 +3526,16 @@ var PET_COSTUME_LIST = [
   {id:'star',    name:'星星围巾', slot:'scarf', price:15, rarity:'rare'},
   {id:'small',   name:'小翅膀',   slot:'wing',  price:25, rarity:'legend'},
   {id:'forest',  name:'森林背景', slot:'bg',    price:15, rarity:'rare'},
-  {id:'space',   name:'星空背景', slot:'bg',    price:25, rarity:'legend'}  /* §5.5 逐项价=25（§4.4 的"背景=15"为稀有档归类笔误） */
+  {id:'space',   name:'星空背景', slot:'bg',    price:25, rarity:'legend'},  /* §5.5 逐项价=25（§4.4 的"背景=15"为稀有档归类笔误） */
+  /* ---- T3 新增 8 件 ---- */
+  {id:'berry',    name:'浆果帽',   slot:'hat',   price:8,  rarity:'normal'},
+  {id:'sunhat',   name:'太阳帽',   slot:'hat',   price:15, rarity:'rare'},
+  {id:'heart',    name:'爱心围巾', slot:'scarf', price:8,  rarity:'normal'},
+  {id:'wave',     name:'波浪围巾', slot:'scarf', price:25, rarity:'legend'},
+  {id:'leafwing', name:'叶翅膀',   slot:'wing',  price:15, rarity:'rare'},
+  {id:'big',      name:'大翅膀',   slot:'wing',  price:25, rarity:'legend'},
+  {id:'sea',      name:'海底背景', slot:'bg',    price:8,  rarity:'normal'},
+  {id:'candy',    name:'糖果背景', slot:'bg',    price:15, rarity:'rare'}
 ];
 var PET_COSTUME_SLOTS = [
   {slot:'hat',   label:'帽子'}, {slot:'scarf', label:'围巾'},
@@ -3419,10 +3576,11 @@ function equipCostume(s,id){
   return {ok:true, equipped:!on, slot:m.slot, name:m.name};
 }
 
-/* ---- 纯逻辑：喂食一次（不碰 DOM，便于单测）。用户 P2：每次消耗 1 🍎、+10 亲密度；GDD §5.4 每日上限 5 次 ---- */
+/* ---- 纯逻辑：喂食一次（不碰 DOM，便于单测）。用户 P2：每次消耗 1 🍎、+10 亲密度。
+   T2 变更：取消「每日 5 次」上限 —— 只要有能量果就能喂。
+   s.pet.fedToday 仍然累加（数据 append-only，家长中心学习报告可能用到），只是不再作为拦截条件。 ---- */
 function applyFeed(s){
   if(!s || !s.pet) return {ok:false, reason:"nopet"};
-  if(s.pet.fedToday >= 5) return {ok:false, reason:"cap"};
   if((s.energy||0) < 1)  return {ok:false, reason:"noenergy"};
   var prev = petStage(s.pet.bond);
   s.energy -= 1;
@@ -3447,6 +3605,8 @@ function applyPetStroke(s){
 var PET_LINES_HAPPY = ["你真棒！","我好喜欢和你一起学！","这个字好有趣呀～","哇，你好厉害！","我们继续吧！"];
 var _petMood = "happy", _petPraise = "";
 var _petShopOpen = false, _costumeConfirm = null;
+/* T4：当日抚摸已达上限后，只提示一次，避免孩子连点宠物时 toast/语音刷屏 */
+var _petCapToasted = false;
 
 /* ---- UI：渲染宠物页 ---- */
 function renderPet(keepScroll){
@@ -3458,7 +3618,10 @@ function renderPet(keepScroll){
   var pct = st>=4 ? 100 : Math.max(0, Math.min(100, Math.round((bond-lo)/(hi-lo)*100)));
   var mood = (_petMood && _petMood!=="happy") ? _petMood : "happy";
   var wearBg = state.pet.wears && state.pet.wears.bg;
-  var bgId = (wearBg==="space"||wearBg==="forest") ? wearBg : "";
+  /* T3：原来是 (wearBg==="space"||wearBg==="forest") 硬编码白名单 —— 任何新背景都渲染不出来。
+     改为按目录元数据判定，新增背景只要进了 PET_COSTUME_LIST 就自动生效。 */
+  var bgMeta = wearBg ? costumeMeta(wearBg) : null;
+  var bgId = (bgMeta && bgMeta.slot === 'bg') ? wearBg : "";
   var stageTxt = st>=4 ? "已是最高形态啦，墨墨·圣！" : ("再 "+Math.max(0,(hi-bond))+" 亲密度就长大");
   var html =
     '<div class="pet-page" data-page-node-id="'+nid('pet.page')+'">'+
@@ -3483,7 +3646,7 @@ function renderPet(keepScroll){
           '<button class="pet-dress" id="petDress" type="button" data-page-node-id="'+nid('pet.dress')+'">'+
             '<span class="pb-ic">🎀</span><span class="pb-txt">装扮</span></button>'+
         '</div>'+
-        '<div class="pet-hint" data-page-node-id="'+nid('pet.hint')+'">今天还能喂 '+(5-(state.pet.fedToday||0))+' 次 · 摸 '+(10-(state.pet.petToday||0))+' 次</div>'+
+        '<div class="pet-hint" data-page-node-id="'+nid('pet.hint')+'">🍎 能量果 '+(state.energy||0)+' 个 · 今天还能摸 '+Math.max(0,(10-(state.pet.petToday||0)))+' 次</div>'+
       '</div>'+
       (_petShopOpen ? costumeSectionHTML() : '')+
     '</div>';
@@ -3493,12 +3656,16 @@ function renderPet(keepScroll){
   var fs = $("petStroke"); if(fs) fs.addEventListener('click', petPet);
   var pd = $("petDress");  if(pd) pd.addEventListener('click', function(){ _petShopOpen=!_petShopOpen; _costumeConfirm=null; renderPet(); });
   var pc = $("petCostume"); if(pc) pc.addEventListener('click', onCostume);
+  /* T4：点宠物本体 → 弹跳互动。绑 .pet-slot（在 .pet-bg 之上，不与背景层抢事件） */
+  var ps = host.querySelector('.pet-slot');
+  if(ps) ps.addEventListener('click', petTap);
 }
 function feedPet(){
   var r = applyFeed(state);
   if(!r.ok){
+    /* T2：喂食已无每日上限，cap 分支不会再触发；保留兜底，但文案不再说「吃饱了」（与新规则矛盾） */
     if(r.reason==="noenergy") toast("能量果不够啦，先去学字赚 🍎 吧～");
-    else if(r.reason==="cap") toast("墨墨今天吃饱啦，明天再来好不好？");
+    else toast("暂时喂不了，等一下再试试～");
     return;
   }
   if(r.leveledUp){ _petMood="excited"; _petPraise="叮！我长大啦，变成「"+r.name+"」！"; }
@@ -3508,17 +3675,48 @@ function feedPet(){
   renderPet();
   if(r.leveledUp){ setTimeout(function(){ _petMood="happy"; _petPraise=""; renderPet(); }, 2600); }
 }
-function petPet(){
-  var r = applyPetStroke(state);
-  if(!r.ok){ if(r.reason==="cap") toast("墨墨今天被摸够啦，好幸福～"); return; }
-  _petMood = r.leveledUp ? "excited" : "happy";
-  _petPraise = r.leveledUp ? "叮！我长大啦，变成「"+r.name+"」！" : "";
-  if(SFX) SFX.tap();
-  if(typeof speak==="function") speak(pick(PET_LINES_HAPPY));
-  syncSave();
-  renderPet();
-  if(r.leveledUp){ setTimeout(function(){ _petMood="happy"; _petPraise=""; renderPet(); }, 2600); }
+/* ---- T4 · 点宠物互动 ----
+   取当前渲染出来的宠物 SVG 根节点（renderPet 会整块重绘 innerHTML，
+   所以弹跳必须在重绘「之后」再挂 class，否则动画元素当场被替换掉）。 */
+function petTapEl(){
+  var host = $("page-pet"); if(!host || !host.querySelector) return null;
+  return host.querySelector('.pet-slot .pet');
 }
+function petBounce(){
+  var el = petTapEl(); if(!el || !el.classList) return;
+  try{
+    el.classList.remove('pet-tap');
+    if(el.offsetWidth){}            /* 强制回流，让连点能重放同一次动画 */
+    el.classList.add('pet-tap');
+  }catch(e){ return; }
+  setTimeout(function(){ try{ el.classList.remove('pet-tap'); }catch(e){} }, 420);
+}
+/* 点宠物 = 一次抚摸（与「摸摸它」共用 petToday 上限，不是两套计数）：
+   未达上限 → 弹跳 + 音效 + 亲密度 +1 + 台词；已达上限 → 仍给弹跳 + 音效（点了必须有反应），
+   只不再加亲密度，并提示一次（不刷屏）。 */
+function petTap(){
+  var r = applyPetStroke(state);
+  if(SFX && SFX.tap) SFX.tap();
+  if(r.ok){
+    _petCapToasted = false;
+    _petMood = r.leveledUp ? "excited" : "happy";
+    _petPraise = r.leveledUp ? "叮！我长大啦，变成「"+r.name+"」！" : "";
+    syncSave();
+    renderPet();
+    petBounce();                     /* 重绘之后再弹，动画才不会被 innerHTML 冲掉 */
+    /* T5：宠物台词属自动播报，走节流（每 SPEAK_AUTO_GAP 最多一句），不再每点必播 */
+    if(typeof speak==="function") speak(pick(PET_LINES_HAPPY));
+    if(r.leveledUp){ setTimeout(function(){ _petMood="happy"; _petPraise=""; renderPet(); }, 2600); }
+  } else {
+    petBounce();
+    if(r.reason==="cap" && !_petCapToasted){
+      _petCapToasted = true;
+      toast("墨墨今天被摸够啦，好幸福～");
+    }
+  }
+  return r;
+}
+function petPet(){ return petTap(); }
 
 /* ---- 装扮商店 UI（P4）---- */
 function costumeSectionHTML(){
@@ -3567,7 +3765,8 @@ function onCostume(e){
     if(r.ok){
       _costumeConfirm=null; syncSave();
       if(SFX){ if(SFX.coin) SFX.coin(); else if(SFX.tap) SFX.tap(); }
-      if(typeof speak==='function') speak('买到啦，穿上'+r.name);
+      /* T5：原来的 speak('买到啦，穿上X') 与下一行 toast 的语音播报内容重复，
+         这里只保留 toast 一条（toast 内部会 speak，且为主动触发直通）。 */
       toast('🎉 买到'+r.name+'，穿上啦！');
       renderHUD();            /* 购买后立即刷新顶部星星计数 */
     } else if(r.reason==='nostar'){
@@ -3581,12 +3780,12 @@ function onCostume(e){
   if(lv < costumeUnlockLv(slot)){ toast('升到 Lv'+costumeUnlockLv(slot)+' 就能用'+card.querySelector('.pc-name').textContent+'啦'); return; }
   if(costumeEquipped(state,cid)){
     equipCostume(state,cid); syncSave();
-    if(typeof speak==='function') speak('脱下来啦'); toast('脱下来啦'); renderPet(true); return;
+    toast('脱下来啦'); renderPet(true); return;   /* T5：去掉与 toast 重复的 speak */
   }
   if(costumeOwned(state,cid)){
     var r3 = equipCostume(state,cid); syncSave();
     if(SFX && SFX.tap) SFX.tap();
-    if(typeof speak==='function') speak('穿上'+r3.name); toast('穿上'+r3.name+'！'); renderPet(true); return;
+    toast('穿上'+r3.name+'！'); renderPet(true); return;   /* T5：去掉与 toast 重复的 speak */
   }
   /* 未拥有 → 内联二次确认（不弹模态框，符合"排斥模态框"偏好） */
   _costumeConfirm = (_costumeConfirm===cid) ? null : cid;
@@ -3664,10 +3863,11 @@ function renderDex(){
   html += '</div>';
   setHTML(host, html);
   [].forEach.call(host.querySelectorAll('.dex-cell.known'), function(el){
-    el.addEventListener('click', function(){ if(typeof speak==="function") speak(el.getAttribute('data-c')); });
+    /* T5：孩子主动点字 → force 直通 */
+    el.addEventListener('click', function(){ if(typeof speak==="function") speak(el.getAttribute('data-c'), true); });
   });
 }
-function openCharDetail(ch){ if(ch && typeof speak==="function") speak(ch.c); }
+function openCharDetail(ch){ if(ch && typeof speak==="function") speak(ch.c, true); }
 /* ===== /JS-BLOCK: DEX ===== */
 
 /* ===== JS-BLOCK: MINIGAMES (P3) ===== */
@@ -3757,10 +3957,29 @@ function mgG3(g, done){
     if(tpicEl) tpicEl.innerHTML = picSVG(t.c);
     speak(t.c);
   }
-  function clearRoundTimers(){
+  /* 计时器解耦（T1 修复）：「清缩回计时器」与「停刷新循环」必须是两个独立动作。
+     历史 bug：spawnRound() 里调 clearRoundTimers()，而 clearRoundTimers 会顺手清掉
+     spawnTimer —— 可 spawnRound 恰恰是被 spawnTimer 触发的，于是 interval 回调一进来
+     就把自己杀了，而 spawnRound 自身不会重建 interval（重建只在打中后的 nextRound）。
+     表现：第一波没打中 → 第二波由 interval 触发（同时自杀）→ 缩回后再也不刷新。
+     现在 spawnRound 只清 hideTimers，spawnTimer 由 startSpawn/stopSpawnTimer 独占管理。 */
+  function clearHideTimers(){
     for(var i=0;i<hideTimers.length;i++) clearTimeout(hideTimers[i]);
     hideTimers.length = 0;
+  }
+  function stopSpawnTimer(){
     if(spawnTimer){ clearInterval(spawnTimer); spawnTimer = null; }
+  }
+  function startSpawn(){
+    stopSpawnTimer();
+    spawnTimer = setInterval(spawnRound, showMs + roundGap);
+    /* 登记进 MG_TIMERS：spawnTimer 是 mgG3 的局部变量，光靠 mgClearTimers() 收不到，
+       玩家中途退出（closeLevel）时会漏成永久 interval。 */
+    MG_TIMERS.push(spawnTimer);
+  }
+  function clearRoundTimers(){   /* 兼容旧调用点：全清（仅在结束/退出时使用） */
+    clearHideTimers();
+    stopSpawnTimer();
   }
   function clearMoles(){
     for(var i=0;i<holes.length;i++){
@@ -3772,7 +3991,7 @@ function mgG3(g, done){
   }
   function spawnRound(){
     if(!holes.length) return;
-    clearRoundTimers();
+    clearHideTimers();          /* T1：绝不能碰 spawnTimer */
     clearMoles();
     var order = shuffle([0,1,2,3,4,5]);
     var chosen = order.slice(0, numMoles);
@@ -3789,18 +4008,20 @@ function mgG3(g, done){
       h.classList.remove('g3-down','g3-hit','g3-wrong');
       h.classList.add('g3-up');
       (function(hh){
-        hideTimers.push(setTimeout(function(){
+        var hid = setTimeout(function(){
           if(hh.classList.contains('g3-up') && !hh.classList.contains('g3-hit')){
             hh.classList.remove('g3-up'); hh.classList.add('g3-down');
           }
-        }, showMs));
+        }, showMs);
+        hideTimers.push(hid); MG_TIMERS.push(hid);
       })(h);
     }
   }
   function nextRound(){
+    stopSpawnTimer();           /* T1：换目标期间先停表，避免与 480ms 后的新循环叠加成双循环 */
     updateTarget();
     spawnRound();
-    spawnTimer = setInterval(spawnRound, showMs + roundGap);
+    startSpawn();
   }
   function onHole(btn){
     if(!btn.classList.contains('g3-up') || btn.classList.contains('g3-hit')) return;
@@ -3808,8 +4029,8 @@ function mgG3(g, done){
     if(ch === curTarget().c){
       btn.classList.add('g3-hit');
       SFX.right(); hits++; mgCorrect(); qPos++;
-      clearRoundTimers();
-      setTimeout(nextRound, 480);
+      stopSpawnTimer(); clearHideTimers();   /* T1：停刷新 + 清本波缩回，480ms 后由 nextRound 重建循环 */
+      MG_TIMERS.push(setTimeout(nextRound, 480));
     } else {
       btn.classList.add('g3-wrong');
       SFX.wrong(); mgWrong();
@@ -3826,7 +4047,7 @@ function mgG3(g, done){
     }
   }
   function endGame(){
-    clearRoundTimers(); mgClearTimers(); mgClearHost();
+    stopSpawnTimer(); clearHideTimers(); mgClearTimers(); mgClearHost();
     var html = '<div class="lv-s4">'+
       '<div class="lv-hero" style="font-size:48px">🎉</div>'+
       '<div class="lv-hd-t" style="font-size:var(--fs-h2)">拍中 '+hits+' 个！</div>'+
@@ -3865,13 +4086,14 @@ function mgG3(g, done){
     holes = [].slice.call(host.querySelectorAll('.g3-hole'));
     router = function(e){
       var sp = e.target.closest && e.target.closest('[data-act="speak"]');
-      if(sp){ speak(curTarget().c); return; }
+      /* T5：🔊 重听是孩子主动点的，force 直通，绝不能被节流吞 */
+      if(sp){ speak(curTarget().c, true); return; }
       var btn = e.target.closest && e.target.closest('.g3-hole');
       if(btn) onHole(btn);
     };
     host.addEventListener('click', router); MG_ROUTER = router;
     spawnRound();
-    spawnTimer = setInterval(spawnRound, showMs + roundGap);
+    startSpawn();               /* T1：刷新循环独立于 spawnRound，不再自杀 */
     endTime = Date.now() + TOTAL;
     MG_TIMERS.push(setInterval(tick, 120));
     setTimeout(function(){ speak(curTarget().c); }, 260);
@@ -4691,8 +4913,9 @@ function askLeave(){
   try{ stay.classList.add('lv-glow'); }catch(e){}
 }
 function bindSpeak(host, txt){
+  /* T5：绑定在任意 [data-act="speak"] 上的喇叭按钮都是主动重听 → force 直通 */
   [].forEach.call(host.querySelectorAll('[data-act="speak"]'), function(el){
-    el.addEventListener('click', function(e){ if(e&&e.stopPropagation) e.stopPropagation(); if(txt) speak(txt); });
+    el.addEventListener('click', function(e){ if(e&&e.stopPropagation) e.stopPropagation(); if(txt) speak(txt, true); });
   });
 }
 
@@ -4862,6 +5085,7 @@ function makeChoices(target, pool, distract, n){
 /* ============ 关卡总控 ============ */
 function openLevel(idx){
   idx = idx|0;
+  speakResetAll();  /* T5：进入新关卡，提示语重新获得「一关一次」的播放额度 */
   if(idx<0 || idx>19) return;
   var st = levelStates()[idx];
   if(st.state === 'locked'){ toast('先把上一关闯过去吧！'); return; }
@@ -4888,6 +5112,7 @@ function openLevel(idx){
 }
 function closeLevel(){
   mgClearTimers(); mgClearHost();   /* P3：清掉小游戏可能遗留的计时器/点击路由 */
+  speakResetAll();  /* T5：离开关卡，清空「这关已经说过的提示语」 */
   var host = $('levelHost');
   if(host){ host.classList.remove('on'); host.setAttribute('aria-hidden','true'); host.innerHTML=''; }
   LV = null;
@@ -4904,6 +5129,7 @@ function closeLevel(){
 /* 复用关卡流水线，但跳过 S1 学字（复习不是学新字），走「2 个不同小游戏承载 3 题 → 结算」。
    题量 3 题、玩法随机 2 个不同小游戏、固定难度、时长 ≈2min。 */
 function startDaily(){
+  speakResetAll();  /* T5：每日挑战同样重置提示语额度 */
   var chars = dailyChars(state);
   if(!chars || chars.length < 1){ toast('还没有学过的字，先去闯关吧！'); return; }
   /* 干扰项：全部已学字（非相邻关），保证 4 选 1 成立 */
@@ -4985,7 +5211,7 @@ function renderDailyResult(res){
   host.innerHTML = lvWrap(html);
   SFX.clear();
   [].forEach.call(host.querySelectorAll('.lv-chip'), function(b){
-    b.addEventListener('click', function(){ speak(b.getAttribute('data-c')); });
+    b.addEventListener('click', function(){ speak(b.getAttribute('data-c'), true); });   /* T5：点字发音 → force 直通 */
   });
   host.querySelector('#lvBack').addEventListener('click', function(){ closeLevel(); });
   /* REQ-101/102：播报完成 + 提醒点「返回地图」 */
@@ -5021,14 +5247,16 @@ function renderS1(){
   bindSpeak(host, ch.c + (allWords?'，'+allWords:''));
   /* 点单个词语：只读该词 */
   [].forEach.call(host.querySelectorAll('[data-act="speak-word"]'), function(el){
-    el.addEventListener('click', function(e){ if(e&&e.stopPropagation) e.stopPropagation(); var w=this.getAttribute('data-w'); if(w) speak(w); });
+    el.addEventListener('click', function(e){ if(e&&e.stopPropagation) e.stopPropagation(); var w=this.getAttribute('data-w'); if(w) speak(w, true); });
   });
   host.querySelector('#lvLearn').addEventListener('click', function(){
     SFX.right(); LV.learned++; gainEnergy(1, this);
     if(LV.learned >= 5) startS2(); else renderS1();
   });
   speak(ch.c);
-  if(allWords) setTimeout(function(){ speak(allWords); }, 900);
+  /* T5：词语连读是「教学内容」不是提示语 —— 走 force 直通保住它；
+     改用 speakQueue 排队，避免 speak() 的 cancel 把上一个字的发音掐断（原有缺陷：+900ms 抢读）。 */
+  if(allWords) setTimeout(function(){ speakQueue(allWords, true); }, 900);
   /* REQ-102：学完读完后，提醒点「我学会了」 */
   guideNext(host.querySelector('#lvLearn'), '学会了就点亮下面的按钮，点「我学会了」', 2600);
 }
@@ -5041,7 +5269,7 @@ function qG1(t){
     stimSpeak: t.c,
     instruct: '点小喇叭听一听，是哪个字？找到它点一点',
     choices: opts.map(function(o){ return {html: lvCharHTML(o.ch), correct: o.correct}; }),
-    hint: function(){ speak(t.c); }
+    hint: function(){ speak(t.c, true); }   /* T5：点击发音 → force 直通 */
   };
 }
 function gameName(type){
@@ -5114,7 +5342,7 @@ function qQuiz(t){
     stimSpeak: t.c,
     instruct: '看一看图，点小喇叭听一听，是哪个字？',
     choices: opts.map(function(o){ return {html: lvCharHTML(o.ch), correct: o.correct}; }),
-    hint: function(){ speak(t.c); }
+    hint: function(){ speak(t.c, true); }   /* T5：点击发音 → force 直通 */
   };
 }
 function startS3(){
@@ -5179,7 +5407,7 @@ function renderS4(res){
   host.innerHTML = lvWrap(html);
   SFX.clear();
   [].forEach.call(host.querySelectorAll('.lv-chip'), function(b){
-    b.addEventListener('click', function(){ speak(b.getAttribute('data-c')); });
+    b.addEventListener('click', function(){ speak(b.getAttribute('data-c'), true); });   /* T5：点字发音 → force 直通 */
   });
   host.querySelector('#lvBack').addEventListener('click', function(){ closeLevel(); });
   host.querySelector('#lvReplay').addEventListener('click', function(){ openLevel(LV.idx); });
@@ -5366,6 +5594,16 @@ var __SZ__ = {
   PET_COSTUME_LIST:PET_COSTUME_LIST, PET_COSTUME_SLOTS:PET_COSTUME_SLOTS,
   costumeMeta:costumeMeta, costumeUnlockLv:costumeUnlockLv, costumeOwned:costumeOwned, costumeEquipped:costumeEquipped,
   costumePreviewSVG:costumePreviewSVG, buyCostume:buyCostume, equipCostume:equipCostume,
+  /* T3 导出：装扮查表本体（供单测逐个 id 验证「列表里有 → 一定渲染得出来」） */
+  PET_HATS:PET_HATS, PET_SCARFS:PET_SCARFS, PET_WINGS:PET_WINGS,
+  /* T4 导出：点宠物互动 */
+  petTap:petTap, petBounce:petBounce, petTapEl:petTapEl, petPet:petPet,
+  /* T5 导出：语音节流（供单测验证「主动直通 / 自动限流 / 单字不限流」） */
+  speak:speak, speakQueue:speakQueue, speakGate:speakGate, speakThrottled:speakThrottled,
+  SPEAK_AUTO_GAP:SPEAK_AUTO_GAP, SPEAK_DEDUPE:SPEAK_DEDUPE,
+  speakReset:speakResetAll, speakResetAll:speakResetAll, guideNext:guideNext,
+  /* 小游戏 / 计时器（T1 回归用） */
+  mgG3:mgG3, mgClearTimers:mgClearTimers, MG_TIMERS:MG_TIMERS,
   getState:function(){ return state; }, setState:function(s){ state = s; },
   getHASV2:function(){ return HAS_V2_FIELDS; }, setHASV2:function(v){ HAS_V2_FIELDS = !!v; }
 };
