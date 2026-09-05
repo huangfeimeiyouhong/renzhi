@@ -758,7 +758,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 /* T4：宠物本体可点。.pet-slot 覆盖 .pet-stage 整块且在 .pet-bg 之上，
    给 5 岁孩子一个尽量大的点击热区；绑定在 .pet-slot 而非 .pet-bg，不与背景层抢事件。 */
 .pet-slot{ position:absolute; inset:0; display:grid; place-items:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-.pet-slot .pet{ width:68%; height:68%; }
+.pet-slot .pet{ width:64%; height:64%; overflow:hidden; }
 .pet-praise{
   position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
   background:rgba(255,255,255,.92); color:var(--c-pri-d);
@@ -5019,8 +5019,8 @@ function saveSectionProgress(s, lv){
 /* ---- 纯函数：三星判定（GDD §3.5） ---- */
 function computeStars(quizCorrect, quizTotal, hintsUsed, maxCombo){
   var s = 1;                                                   /* ★1：走完 S4 */
-  if(quizTotal>0 && (quizCorrect/quizTotal) >= 0.8) s = 2;      /* ★2：小考首答 ≥80% */
-  if(quizCorrect===quizTotal && hintsUsed===0 && maxCombo>=5) s = 3;  /* ★3 */
+  if(quizTotal>0 && (quizCorrect/quizTotal) >= 0.6) s = 2;      /* ★2：小考首答 ≥60%（放宽，避免太难） */
+  if(quizTotal>0 && quizCorrect===quizTotal && hintsUsed===0) s = 3;  /* ★3：小考全对且不用提示（去掉 combo≥5 硬门槛；quizTotal>0 防 0 题关误判 3 星） */
   return s;
 }
 /* ---- 纯函数：关卡通关奖励（GDD §4.3 产出表；Boss ×2；任务要求 3★ 给 🔑碎片×3） ---- */
