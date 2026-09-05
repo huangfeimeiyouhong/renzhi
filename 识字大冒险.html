@@ -749,7 +749,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 /* ===================== P2 · 宠物页（字灵「墨墨」） ===================== */
 .pet-page{ height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:var(--sp-5) var(--sp-4) var(--sp-6); }
 .pet-stage{
-  position:relative; width:100%; max-width:300px; margin:0 auto;
+  position:relative; width:100%; max-width:340px; margin:0 auto;
   aspect-ratio:1/1; border-radius:var(--r-xl); overflow:hidden;
   border:var(--bw-ui) solid var(--c-line); box-shadow:var(--sh-2);
   background:var(--c-cream);
@@ -758,7 +758,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 /* T4：宠物本体可点。.pet-slot 覆盖 .pet-stage 整块且在 .pet-bg 之上，
    给 5 岁孩子一个尽量大的点击热区；绑定在 .pet-slot 而非 .pet-bg，不与背景层抢事件。 */
 .pet-slot{ position:absolute; inset:0; display:grid; place-items:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-.pet-slot .pet{ width:64%; height:64%; overflow:hidden; }
+.pet-slot .pet{ width:82%; height:82%; overflow:visible; }
 .pet-praise{
   position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
   background:rgba(255,255,255,.92); color:var(--c-pri-d);
@@ -3328,7 +3328,7 @@ function petSVG(opt){
   var lineC = (lv >= 5) ? '#FFC93C' : S.line;
   var phBreath = ph(t, 2600), phBlink = ph(t, 4200), phOrbit = ph(t, 4000), phHalo = ph(t, 6000);
   var out = '';
-  out += '<svg class="pet pet-lv'+lv+'" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" '+
+  out += '<svg class="pet pet-lv'+lv+'" viewBox="-15 11 150 150" xmlns="http://www.w3.org/2000/svg" '+
          'data-level="'+lv+'" data-mood="'+mood+'" aria-hidden="true">';
   out += '<defs>'+
     '<radialGradient id="'+pref+'pkBody'+lv+'" cx="36%" cy="26%" r="82%">'+
