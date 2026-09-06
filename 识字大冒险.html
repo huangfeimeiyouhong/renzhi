@@ -4391,13 +4391,27 @@ function mgG5(g, done){
   qCount = Math.min(qCount, valid.length);
   if(qCount===0){ done(); return; }
   valid = shuffle(valid).slice(0, qCount);
-  var qi = 0, router, curTargetChar=null, curCorrect=null, curCands=null;
+  var qi = 0, router, curTargetChar=null, curCorrect=null, curCands=null, curPair=null, curWord='';
   var g5Opened = false;
   function buildQuestion(){
     curTargetChar = valid[qi];
-    var partners = (COMBO[curTargetChar.c]||[]).filter(function(p){ return chObj(p); });
-    curCorrect = chObj(pick(partners));
-    var comboSet={}; (COMBO[curTargetChar.c]||[]).forEach(function(p){ comboSet[p]=1; });
+    /* 组词伙伴带真实词序（修复：伞+打 曾显示成「伞打」的误导）。
+       从 CHAR_DICT.w 推导 {伙伴字, 完整词}，保留词内顺序；短词优先（预览框最常见 2 字词）。 */
+    var pairs=[], seenP={}, wList=(curTargetChar.w||[]).slice().sort(function(a,b){ return a.length-b.length; });
+    wList.forEach(function(w2){
+      var ti = w2.indexOf(curTargetChar.c);
+      if(ti<0) return;
+      for(var wi=0; wi<w2.length; wi++){
+        if(wi===ti) continue;
+        var p=w2[wi];
+        if(!chObj(p) || seenP[p]) continue;
+        seenP[p]=1; pairs.push({ p:p, word:w2 });
+      }
+    });
+    curPair = pick(pairs);
+    curCorrect = chObj(curPair.p);
+    curWord = curPair.word;
+    var comboSet={}; pairs.forEach(function(x){ comboSet[x.p]=1; });
     var distPool = LV.pool.concat(LV.distract).filter(function(c){ return c.c!==curTargetChar.c && c.c!==curCorrect.c && !comboSet[c.c]; });
     var distract = shuffle(distPool).slice(0, Math.max(2, 5-1));
     var cands = shuffle([curCorrect].concat(distract));
@@ -4435,8 +4449,9 @@ function mgG5(g, done){
       var btn = host.querySelector('[data-ci="'+ci+'"]'); if(btn) btn.classList.add('picked');
       SFX.right(); mgCorrect();
       var word = host.querySelector('#g5Word');
-      if(word) word.innerHTML = '<span class="lv-ch">'+curTargetChar.c+'</span><span class="lv-ch">'+curCorrect.c+'</span>';
-      speak(curTargetChar.c + curCorrect.c);
+      /* 按词语真实顺序展示与朗读（如 伞+打 → 打伞，而非 伞打） */
+      if(word) word.innerHTML = curWord.split('').map(function(ch){ return '<span class="lv-ch">'+ch+'</span>'; }).join('');
+      speak(curWord);
       qi++;
       setTimeout(function(){ if(qi>=qCount) finish(); else buildQuestion(); }, 720);
     } else {
@@ -5413,6 +5428,9 @@ function startReadAlong(){
   LV.stage = 'S1R';
   LV.readIdx = 0;
   renderReadAlong();
+  /* 提示语本身也要读出来，小朋友听到才知道要张嘴跟着念；
+     force 排队播（不打断、不被节流吞掉），先念提示、600ms 后再慢速读字词。 */
+  speakQueue('张嘴，跟着小字灵一起念～', true);
 }
 function renderReadAlong(){
   var host = $('levelHost');
