@@ -2149,13 +2149,14 @@ function buildDefaultChestPool(rewards){
   return pool;
 }
 function recalcZones(s){
-  var z=new Array(NUM_ZONES).fill(0), maxCleared=0, n, L;
+  var z=new Array(NUM_ZONES).fill(0), maxStar2=0, n, L;
   for(n=1;n<=NUM_LEVELS;n++){
     L = s.game.levels["L"+n];
-    if(L && L.cleared){ z[Math.floor((n-1)/5)]++; if(n>maxCleared) maxCleared=n; }
+    if(L && L.cleared){ z[Math.floor((n-1)/5)]++; }   /* 区域进度按「已通关」计 */
+    if(L && L.stars >= 2){ if(n>maxStar2) maxStar2=n; }  /* 解锁下一关需 ★2 */
   }
   s.game.zones = z;
-  s.game.unlockedThrough = Math.min(NUM_LEVELS, maxCleared+1);
+  s.game.unlockedThrough = Math.min(NUM_LEVELS, maxStar2+1);
 }
 /* 幂等补齐：任何字段缺失都补默认值，可重复调用 */
 function normalizeV2(s){
@@ -2510,7 +2511,7 @@ function nodePos(i){                       /* i: 0..NUM_LEVELS-1，DAILY_IDX = �
 function isBoss(i){ return (i%5)===4; }    /* 每区第 5 关：L5/L10/.../L40 */
 
 /* P5 · 每日字灵挑战（GDD §2.7.2）。全部 NUM_LEVELS 关 cleared 才解锁。
-   注意：不能用 unlockedThrough===NUM_LEVELS 判断 —— recalcZones 用 min(NUM_LEVELS,maxCleared+1)，最后一区通关时已经是 NUM_LEVELS。 */
+   注意：不能用 unlockedThrough===NUM_LEVELS 判断 —— recalcZones 用 min(NUM_LEVELS,maxStar2+1)，最后一区通关时已经是 NUM_LEVELS。 */
 function dailyUnlocked(s){
   s = s || state;
   if(!s.game || !s.game.levels) return false;
@@ -5056,7 +5057,7 @@ function applyLevelResult(s, idx, stars, hintsUsed, maxCombo, quizCorrect, quizT
     if(!ce.firstAt) ce.firstAt = Date.now();
     s.codex[cc] = ce;
   }
-  recalcZones(s);   /* 顺带把 unlockedThrough 推进到「最高已通关 +1」 */
+  recalcZones(s);   /* 顺带把 unlockedThrough 推进到「最高 2 星关卡 +1」 */
   /* 防刷（GDD §4.3）：星星/碎片按关卡取历史最大补差，不重复给；能量果每次都给。
      Boss 关奖励按 GDD §4.3 整体 ×2：把「本次提升的星数差」再乘 2（普通关 ×1）。 */
   var gainedStar  = Math.max(0, newStars - (prev.stars||0)) * (isB ? 2 : 1);
