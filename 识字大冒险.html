@@ -1796,21 +1796,25 @@ function picSVG(ch){
 
 /* ============ 拼音发音（浏览器内置 TTS，零外链/离线可用） ============ */
 var _zhVoice=null;
-/* 选声：优先更自然的中文嗓音，避免机械感。评分越高越优先：
-   +3 命中「高质量/神经嗓音」名单（Apple Ting-Ting/Yu-Shu/Mei-Jia/Sin-Ji、微软 Xiaoxiao/Yunyang 神经嗓、Google 普通话、常见中文名）
+/* 选声：优先「温柔女声」，像妈妈讲故事；男声降权。评分越高越优先：
+   +3 命中温柔女声名单（微软晓晓 Xiaoxiao 神经嗓、Apple 婷婷 Ting-Ting / 雨桐 Yu-Shu / 美佳 Mei-Jia /
+       信菁 Sin-Ji / 雅筑 Ya-Chu、Google 普通话、常见中文名）
+   -2 男声（微软云扬 Yunyang / 云希 Yunxi / 云健 Yunjian 等）—— 绘本场景优先温婉女声
    +2 本地嗓音（localService，延迟低、通常更顺）
    +1 普通话（zh-CN 优先于 zh-TW/zh-HK） */
 function _initVoices(){
   if(!('speechSynthesis' in window)) return;
   var vs=window.speechSynthesis.getVoices();
   if(!vs || !vs.length) return;
-  var PREMIUM = /Ting-Ting|Yu-Shu|Mei-Jia|Sin-Ji|Ya-Chu|Xiaoxiao|XiaoxiaoNeural|Yunyang|YunyangNeural|Google\s*普通话|Google\s*中文|Microsoft\s*Xiaoxiao|Microsoft\s*Yunyang|婷婷|雨桐|美佳|小云|小萍|普通话\s*\(.*神经/i;
+  var PREMIUM = /Xiaoxiao|XiaoxiaoNeural|Ting-Ting|婷婷|Yu-Shu|雨桐|Mei-Jia|美佳|Sin-Ji|信菁|Ya-Chu|雅筑|晓晓|Google\s*普通话|Google\s*中文|Microsoft\s*Xiaoxiao|普通话\s*\(.*神经/i;
+  var MALE    = /Yunyang|云扬|Yunxi|云希|Yunjian|云健|Yunye|云野|Kang-Kang|康康/i;
   var best=null, bestScore=-1;
   for(var i=0;i<vs.length;i++){
     var v=vs[i], name=(v.name||''), lang=(v.lang||'');
     if(!/zh|Chinese|普通话|Mandarin|Yue|漢語|国语/i.test(lang+" "+name)) continue;
     var score=0;
     if(PREMIUM.test(name)) score+=3;
+    if(MALE.test(name))    score-=2;
     if(v.localService) score+=2;
     if(/^zh-CN/i.test(lang)) score+=1;
     if(score>bestScore){ bestScore=score; best=v; }
@@ -1882,17 +1886,66 @@ function speakMark(text, force){
 /* 进入 / 离开一关时清空「这关已经说过的话」，让下一关的引导语重新获得额度 */
 function speakResetAll(){ _spkText=''; _spkAt=0; _spkAutoAt=0; _spkSaid={}; }
 function speakThrottled(text, force){ if(speakGate(text, force)) speak(text, true); }
+/* ===== TTS-GENTLE：温柔「妈妈讲故事」朗读引擎 =====
+   浏览器 speechSynthesis 不支持 SSML，用「分句 + 短语切分 + 停顿队列」模拟绘本共读节奏：
+     ① 选声：优先温柔女声（见 _initVoices），男声降权；
+     ② 语速按实际字数分档，慢而不拖：单字 0.72（吐字清晰）、短语 0.55、整句 0.60；
+     ③ 音调放柔：单字 1.08（辨音清亮、方便跟读），句子 1.02（接近大人讲故事的温婉音高）；
+     ④ 停顿：句末标点（。！？；…）后停 ~420ms，句内逗号/顿号后停 ~180ms，
+        整体节奏变成「读一句、歇一下」，像妈妈翻着绘本讲故事。 */
+var GENTLE_SENT_PAUSE   = 420;   /* 句间停顿（ms） */
+var GENTLE_CLAUSE_PAUSE = 180;   /* 句内短语停顿（ms） */
+var _gentleSeq = 0;              /* 语音代次：新一轮播报让上一轮还没播的待播短语全部作废 */
+/* 把文本切成「短语队列」：句末标点 → 长停顿，逗号/顿号 → 短停顿。
+   不用正则 lookbehind（兼容旧 iPad Safari）。 */
+function _gentleChunks(text){
+  var s = String(text||'').trim();
+  if(!s) return [];
+  var out = [];
+  s.replace(/([。！？；!?;…]+)/g, '$1\u0001').split('\u0001').forEach(function(sent){
+    sent = sent.trim();
+    if(!sent) return;
+    var clauses = sent.replace(/([，、,])/g, '$1\u0001').split('\u0001');
+    clauses.forEach(function(c, i){
+      c = c.trim();
+      if(!c) return;
+      out.push({ t: c, pause: (i === clauses.length-1) ? GENTLE_SENT_PAUSE : GENTLE_CLAUSE_PAUSE });
+    });
+  });
+  return out;
+}
+/* 按文本实际字数（去掉标点）分档的温柔语速/音调 */
+function _gentleProsody(text){
+  var n = String(text||'').replace(/[。！？，、；…!?,:;\s]/g, '').length;
+  if(n <= 1) return { rate: 0.72, pitch: 1.08 };   /* 单字：慢一点、亮一点，方便跟读辨音 */
+  if(n <= 6) return { rate: 0.55, pitch: 1.04 };   /* 短语：词语连读 */
+  return        { rate: 0.60, pitch: 1.02 };       /* 整句：温婉平稳，不疾不徐 */
+}
+/* 温柔播报核心：cancel=true 打断当前语音从头播（主动点击），
+   cancel=false 排在当前语音后面继续播（引导语/逐词连读）。多短语按停顿节奏排队。 */
+function _speakGentle(text, cancel){
+  try{
+    if(cancel) window.speechSynthesis.cancel();
+    var seq = ++_gentleSeq;
+    var chunks = _gentleChunks(text);
+    if(!chunks.length) return;
+    var vol = ttsVol();
+    (function push(i){
+      if(seq !== _gentleSeq) return;               /* 已被新一轮播报取代，旧定时器作废 */
+      var c = chunks[i], p = _gentleProsody(text);
+      var u = new SpeechSynthesisUtterance(c.t);
+      u.lang="zh-CN"; u.rate=p.rate; u.pitch=p.pitch; u.volume=vol;
+      if(_zhVoice) u.voice=_zhVoice;
+      window.speechSynthesis.speak(u);
+      if(i < chunks.length-1) setTimeout(function(){ push(i+1); }, c.pause);
+    })(0);
+  }catch(e){}
+}
 function speak(text, force){
   if(!ttsOK()||!text) return;
   if(!speakGate(text, force)) return;
   speakMark(text, force);
-  try{
-    window.speechSynthesis.cancel();
-    var u=new SpeechSynthesisUtterance(text);
-    u.lang="zh-CN"; u.rate=(text.length>1?0.5:0.7); u.pitch=1.05; u.volume=ttsVol();
-    if(_zhVoice) u.voice=_zhVoice;
-    window.speechSynthesis.speak(u);
-  }catch(e){}
+  _speakGentle(text, true);
 }
 /* 朗读前过滤 emoji 等符号，避免 TTS 读出怪音 */
 function cleanSpeakText(t){
@@ -1904,12 +1957,7 @@ function speakQueue(text, force){
   if(!ttsOK()||!text) return;
   if(!speakGate(text, force)) return;
   speakMark(text, force);
-  try{
-    var u=new SpeechSynthesisUtterance(text);
-    u.lang="zh-CN"; u.rate=(text.length>1?0.5:0.7); u.pitch=1.05; u.volume=ttsVol();
-    if(_zhVoice) u.voice=_zhVoice;
-    window.speechSynthesis.speak(u);
-  }catch(e){}
+  _speakGentle(text, false);
 }
 /* TTS-PACE：把一串「字/词」按标点拆开，逐词朗读，词与词之间停顿 gapMs（默认 1000ms）。
    用于「学字」页连读词语、点击「听一听」重读等，让小朋友看得清、跟得上、能跟读。 */
