@@ -1065,6 +1065,14 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .ticket.is-redeemed{ filter:saturate(.5); opacity:.78; }
 .ticket.is-redeemed .t-code{ text-decoration:line-through; }
 
+/* ===== S1R 跟读：会张嘴的小字灵，引导小朋友开口念 ===== */
+.lv-face{ position:relative; width:88px; height:88px; border-radius:50%; background:#FFE3B3; border:3px solid #FFC98A; box-shadow:var(--sh-1); }
+.lv-face-eye{ position:absolute; top:30px; width:11px; height:11px; border-radius:50%; background:#7A4A1E; }
+.lv-face-eye-l{ left:26px; } .lv-face-eye-r{ right:26px; }
+.lv-mouth{ position:absolute; left:50%; top:54px; width:38px; height:34px; margin-left:-19px; border-radius:0 0 38px 38px; background:#EF7C7C; transform-origin:top center; animation:lvtalk 1s ease-in-out infinite; }
+.lv-face.talking .lv-mouth{ animation-duration:.45s; }
+@keyframes lvtalk{ 0%,100%{ transform:scaleY(.28); } 50%{ transform:scaleY(1); } }
+.lv-read-tip{ font-size:var(--fs-cap); color:var(--c-pri-d); font-weight:800; text-align:center; }
 </style>
 <!-- ===== /BLOCK: CSS-TOKENS ===== -->
 </head>
@@ -5124,6 +5132,7 @@ function openLevel(idx){
     gameCorrect: 0, gameTotal: 0,
     quizFirstCorrect: 0, quizTotal: 5,
     learned: 0,
+    readIdx: 0,
     pool: pl.pool, distract: pl.distract,
     gameNo: 0, qInGame: 0, games: null,
     quizIdx: 0, quizPlan: null
@@ -5275,7 +5284,7 @@ function renderS1(){
   });
   host.querySelector('#lvLearn').addEventListener('click', function(){
     SFX.right(); LV.learned++; gainEnergy(1, this);
-    if(LV.learned >= 5) startS2(); else renderS1();
+    if(LV.learned >= 5) startReadAlong(); else renderS1();
   });
   speak(ch.c);
   /* T5：词语连读是「教学内容」不是提示语 —— 走 force 直通保住它；
@@ -5299,6 +5308,54 @@ function qG1(t){
 function gameName(type){
   return ({g1:'听音找字', g2:'字图配对', g3:'拍字地鼠', g4:'认字小路', g5:'连线成词'})[type] || '小游戏';
 }
+/* ============ S1R 跟读（开口念） ============ */
+/* 学完 5 个字后，插入一个「跟读」环节：App 慢速朗读（词间停顿 1 秒，见 speakWordList），
+   屏幕上一个会张嘴的小字灵引导小朋友张嘴跟着念；念完点「我念好啦」进入下一个，5 个都念完再开始小游戏。 */
+function startReadAlong(){
+  LV.stage = 'S1R';
+  LV.readIdx = 0;
+  renderReadAlong();
+}
+function renderReadAlong(){
+  var host = $('levelHost');
+  var ch = LV.chars[LV.readIdx];
+  var words = (ch.w||[]).map(function(w){
+    return '<button class="lv-word" data-act="speak-word" data-w="'+w.replace(/"/g,'&quot;')+'">'+w+'</button>';
+  }).join('');
+  var readText = ch.c + (ch.w && ch.w.length ? ('，'+ch.w.join('、')) : '');
+  var html =
+    '<header class="lv-hd">'+
+      '<button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
+      '<div class="lv-hd-t">跟读 · 第 '+(LV.readIdx+1)+' / 5 个</div>'+
+      '<div style="width:64px"></div>'+
+    '</header>'+
+    '<div class="lv-s1card">'+
+      '<div class="lv-face" id="lvFace"><div class="lv-face-eye lv-face-eye-l"></div><div class="lv-face-eye lv-face-eye-r"></div><div class="lv-mouth"></div></div>'+
+      '<div class="lv-pic" data-act="speak">'+picSVG(ch.c)+'</div>'+
+      '<div class="lv-hero" data-act="speak">'+ch.c+'</div>'+
+      '<div class="lv-py">'+ch.py+'</div>'+
+      (words ? '<div class="lv-words">'+words+'</div>' : '')+
+      '<div class="lv-read-tip">👄 张嘴，跟着小字灵一起念～</div>'+
+      '<button class="lv-listen" id="lvReplay">🔊 再听一次</button>'+
+      '<button class="lv-btn" id="lvReadOk">我念好啦 ✅</button>'+
+    '</div>';
+  host.innerHTML = lvWrap(html);
+  bindExit(host);
+  /* 点字/图重读整组（拆词 + 1 秒间隔，见 speakWordList） */
+  bindSpeak(host, readText);
+  /* 点单个词语只读该词 */
+  [].forEach.call(host.querySelectorAll('[data-act="speak-word"]'), function(el){
+    el.addEventListener('click', function(e){ if(e&&e.stopPropagation) e.stopPropagation(); var w=this.getAttribute('data-w'); if(w) speak(w, true); });
+  });
+  host.querySelector('#lvReplay').addEventListener('click', function(){ SFX.tap(); speakWordList(readText, 1000); });
+  host.querySelector('#lvReadOk').addEventListener('click', function(){
+    SFX.right(); LV.readIdx++;
+    if(LV.readIdx >= 5) startS2(); else renderReadAlong();
+  });
+  /* 进入即慢速跟读一遍 */
+  setTimeout(function(){ speakWordList(readText, 1000); }, 600);
+}
+
 function startS2(){
   LV.stage = 'S2';
   LV.gameNo = 0; LV.qInGame = 0;
