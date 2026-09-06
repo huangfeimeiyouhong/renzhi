@@ -1881,7 +1881,7 @@ function speak(text, force){
   try{
     window.speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);
-    u.lang="zh-CN"; u.rate=(text.length>1?0.62:0.85); u.pitch=1.05; u.volume=ttsVol();
+    u.lang="zh-CN"; u.rate=(text.length>1?0.5:0.7); u.pitch=1.05; u.volume=ttsVol();
     if(_zhVoice) u.voice=_zhVoice;
     window.speechSynthesis.speak(u);
   }catch(e){}
@@ -1898,10 +1898,24 @@ function speakQueue(text, force){
   speakMark(text, force);
   try{
     var u=new SpeechSynthesisUtterance(text);
-    u.lang="zh-CN"; u.rate=(text.length>1?0.62:0.85); u.pitch=1.05; u.volume=ttsVol();
+    u.lang="zh-CN"; u.rate=(text.length>1?0.5:0.7); u.pitch=1.05; u.volume=ttsVol();
     if(_zhVoice) u.voice=_zhVoice;
     window.speechSynthesis.speak(u);
   }catch(e){}
+}
+/* TTS-PACE：把一串「字/词」按标点拆开，逐词朗读，词与词之间停顿 gapMs（默认 1000ms）。
+   用于「学字」页连读词语、点击「听一听」重读等，让小朋友看得清、跟得上、能跟读。 */
+function speakWordList(text, gapMs){
+  gapMs = gapMs || 1000;
+  var parts = cleanSpeakText(text).split(/[、，,\s]+/).filter(Boolean);
+  if(!parts.length) return;
+  var i = 0;
+  (function step(){
+    if(i >= parts.length) return;
+    speakQueue(parts[i], true);
+    i++;
+    if(i < parts.length) setTimeout(step, gapMs);
+  })();
 }
 /* REQ-102 下一步引导：到达新一步时，给目标按钮加发光颜色提醒，并语音提示点哪里。
    el 为 null 时仅语音引导（如地图节点）；delayMs 内若页面已切换则自动放弃。
@@ -4922,9 +4936,10 @@ function askLeave(){
   try{ stay.classList.add('lv-glow'); }catch(e){}
 }
 function bindSpeak(host, txt){
-  /* T5：绑定在任意 [data-act="speak"] 上的喇叭按钮都是主动重听 → force 直通 */
+  /* T5：绑定在任意 [data-act="speak"] 上的喇叭按钮都是主动重听 → force 直通。
+     TTS-PACE：拆词逐读、词间停顿 1 秒，方便小朋友跟读。 */
   [].forEach.call(host.querySelectorAll('[data-act="speak"]'), function(el){
-    el.addEventListener('click', function(e){ if(e&&e.stopPropagation) e.stopPropagation(); if(txt) speak(txt, true); });
+    el.addEventListener('click', function(e){ if(e&&e.stopPropagation) e.stopPropagation(); if(txt) speakWordList(txt, 1000); });
   });
 }
 
@@ -5265,7 +5280,7 @@ function renderS1(){
   speak(ch.c);
   /* T5：词语连读是「教学内容」不是提示语 —— 走 force 直通保住它；
      改用 speakQueue 排队，避免 speak() 的 cancel 把上一个字的发音掐断（原有缺陷：+900ms 抢读）。 */
-  if(allWords) setTimeout(function(){ speakQueue(allWords, true); }, 900);
+  if(allWords) setTimeout(function(){ speakWordList(allWords, 1000); }, 900);
   /* REQ-102：学完读完后，提醒点「我学会了」 */
   guideNext(host.querySelector('#lvLearn'), '学会了就点亮下面的按钮，点「我学会了」', 2600);
 }
