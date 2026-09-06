@@ -2081,7 +2081,7 @@ function migrate(s){
   /* 步骤 2：v1 积分 → 星星 / 能量果 */
   s.starsTotal = Math.floor(s.points / 10);
   s.stars      = s.starsTotal;
-  s.energy     = Math.min(999, Math.floor(s.points / 2));
+  s.energy     = Math.floor(s.points / 2);   /* 能量果无上限 */
   s.shards     = 0;
   s.keys       = 0;
 
@@ -2949,12 +2949,14 @@ function currentLevel(){
 }
 function levelStates(){
   var out=[], i, n, L, cur = currentLevel();
+  var unlock = (state.game && state.game.unlockedThrough) || 1;  /* ★2 解锁门槛 */
   for(i=0;i<NUM_LEVELS;i++){
     n = i+1; L = state.game.levels["L"+n] || {};
     out.push({
       state: (L.cleared && L.stars>=3) ? 'perfect'
            : L.cleared ? 'cleared'
            : (n === cur) ? ((L.sections || 0) ? 'inProgress' : 'available')
+           : (n <= unlock) ? 'available'      /* 已满足 ★2 前置，解锁 */
            : 'locked',
       stars: L.stars || 0,
       sub:   L.sections || 0,
@@ -2996,7 +2998,7 @@ function scrollToCurrent(){
   wrap.scrollTop = Math.max(0, p.y*scale - wrap.clientHeight/2);
 }
 function tapNode(n){
-  if(n === 21){
+  if(n === NUM_LEVELS+1){          /* 每日挑战节点 data-lv = NUM_LEVELS+1 */
     SFX.tap();
     if(!dailyUnlocked(state)){ toast('把 '+NUM_LEVELS+' 关全部闯完，就能解锁每日挑战啦！'); return; }
     if(dailyDone(state)){ toast('今天的字灵挑战已经完成啦，明天再来！'); return; }
@@ -3025,7 +3027,7 @@ function enterLevel(n, st){
 }
 function bindMap(){
   var host = $("mapHost"); if(!host) return;
-  /* 20 个节点用事件委托，不逐个绑 click（美术 §16.7 要点 1） */
+  /* 全部关卡节点（含每日挑战）用事件委托，不逐个绑 click（美术 §16.7 要点 1） */
   host.addEventListener('click', function(e){
     var g = (e.target && e.target.closest) ? e.target.closest('.node') : null;
     if(!g) return;
@@ -3101,11 +3103,11 @@ function flyFruit(fromEl){
     target.classList.remove('cur-bump');
   }, 720));
 }
-/* 发能量果：写 state + 刷 HUD + 飞行反馈。上限 999 与 applyLevelResult 一致 */
+/* 发能量果：写 state + 刷 HUD + 飞行反馈。能量果无上限（已移除原 999 限制） */
 function gainEnergy(n, fromEl){
   n = n|0; if(n<=0) return 0;
   var before = state.energy||0;
-  state.energy = Math.min(999, before + n);
+  state.energy = before + n;
   var t = todayStr();
   if(state.daily && state.daily[t]) state.daily[t].energyEarned = (state.daily[t].energyEarned||0) + (state.energy - before);
   renderHUD();
@@ -5064,7 +5066,7 @@ function applyLevelResult(s, idx, stars, hintsUsed, maxCombo, quizCorrect, quizT
   var gainedShard = (newStars===3 && (prev.stars||0) < 3) ? rwd.shard : 0;
   s.stars      = (s.stars||0)      + gainedStar;
   s.starsTotal = (s.starsTotal||0) + gainedStar;
-  s.energy     = Math.min(999, (s.energy||0) + rwd.energy);
+  s.energy     = (s.energy||0) + rwd.energy;   /* 能量果无上限 */
   if(gainedShard){
     s.shards = (s.shards||0) + gainedShard;
     while(s.shards >= 3){ s.shards -= 3; s.keys = (s.keys||0) + 1; }   /* 满 3 合成 1 钥匙 */
@@ -5077,7 +5079,7 @@ function buildChoicePool(idx){
   var pool = levelChars(idx);
   var adj = [];
   if(idx-1>=0) adj = adj.concat(levelChars(idx-1));
-  if(idx+1<=19) adj = adj.concat(levelChars(idx+1));
+  if(idx+1 < NUM_LEVELS) adj = adj.concat(levelChars(idx+1));   /* 下一关存在才取相邻干扰项 */
   var seen = {}; pool.forEach(function(c){ seen[c.c]=1; });
   var distract = adj.filter(function(c){ return !seen[c.c]; });   /* 相邻关干扰项 */
   return { pool:pool, distract:distract };
@@ -5093,7 +5095,7 @@ function makeChoices(target, pool, distract, n){
 function openLevel(idx){
   idx = idx|0;
   speakResetAll();  /* T5：进入新关卡，提示语重新获得「一关一次」的播放额度 */
-  if(idx<0 || idx>19) return;
+  if(idx<0 || idx>=NUM_LEVELS) return;   /* 关卡数已随 NUM_ZONES 扩展到 40，idx 上限随之放开 */
   var st = levelStates()[idx];
   if(st.state === 'locked'){ toast('先把上一关闯过去吧！'); return; }
   var pl = buildChoicePool(idx);
@@ -5183,7 +5185,7 @@ function applyDailyResult(s){
   s.daily[t].dailyDone = true;
   s.stars      = (s.stars||0) + 1;
   s.starsTotal = (s.starsTotal||0) + 1;
-  s.energy     = Math.min(999, (s.energy||0) + 15);
+  s.energy     = (s.energy||0) + 15;   /* 能量果无上限 */
   if(s.pet){
     s.pet.bond = (s.pet.bond||0) + 5;
     s.pet.level = bondToLevel(s.pet.bond);
