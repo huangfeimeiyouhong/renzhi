@@ -603,7 +603,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   /* 小游戏：网格适度加宽，卡片不至于过小 */
   .g2-grid{ max-width: 560px; }
   .g4-grid{ max-width: 520px; }
-  .g3-holes{ max-width: 440px; margin-top:14px; margin-bottom:14px; }
+  .hw-canvas{ max-width: 300px; height:auto; }
   .g5-cand{ width: 92px; height: 92px; }
   .g5-top{ margin: 8px 0; }
   /* 宠物 / 图鉴 / 宝箱：限宽居中，左右留白 */
@@ -904,26 +904,16 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 
 
 /* ===================== P3 · 小游戏 G3/G4/G5 ===================== */
-.g3-target{ display:flex; flex-direction:column; align-items:center; gap:6px; margin:10px 0 4px; }
-.g3-pic{ cursor:pointer; }
-.g3-tchar{ font-family:var(--font-hanzi); font-size:72px; line-height:1; color:var(--c-hanzi); cursor:pointer; }
-.g3-lab{ font-size:var(--fs-cap); font-weight:700; color:var(--c-ink-2); }
-/* 真·地鼠洞：6 个洞固定，字以"地鼠"形式从洞里冒出/缩回 */
-.g3-holes{ display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; justify-items:center; margin:22px auto; max-width:340px; }
-.g3-hole{ position:relative; width:92px; height:92px; border:none; background:transparent; padding:0; cursor:pointer; outline:none; }
-.g3-hole .g3-mound{ position:absolute; left:50%; bottom:4px; transform:translateX(-50%); width:70px; height:22px; border-radius:50%; background:#CDBEA6; box-shadow:inset 0 3px 6px rgba(0,0,0,.18); pointer-events:none; }
-.g3-hole .g3-mole{ position:absolute; left:50%; bottom:8px; transform:translateX(-50%) translateY(44px) scale(.25); width:72px; height:72px; border-radius:22px; background:var(--c-surface); border:3px solid var(--c-line); box-shadow:var(--sh-1); display:flex; align-items:center; justify-content:center; font-family:var(--font-hanzi); font-size:42px; color:var(--c-hanzi); opacity:0; pointer-events:none; }
-.g3-hole.g3-up .g3-mole{ animation:g3pop .34s cubic-bezier(.175,.885,.32,1.275) forwards; }
-.g3-hole.g3-down .g3-mole{ animation:g3down .22s ease-in forwards; }
-.g3-hole.g3-hit .g3-mole{ animation:g3hit .32s ease forwards; }
-.g3-hole.g3-wrong .g3-mole{ animation:lvshake .42s ease; }
-@keyframes g3pop{ 0%{ transform:translateX(-50%) translateY(44px) scale(.25); opacity:0; } 70%{ transform:translateX(-50%) translateY(-10px) scale(1.08); opacity:1; } 100%{ transform:translateX(-50%) translateY(0) scale(1); opacity:1; } }
-@keyframes g3down{ to{ transform:translateX(-50%) translateY(44px) scale(.25); opacity:0; } }
+/* 手写字（描红临摹）：田字格 canvas + 引导 + 反馈 + 按钮 */
+.hw{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:6px 0; }
+.hw-top{ display:flex; flex-direction:column; align-items:center; gap:2px; }
+.hw-py{ font-size:var(--fs-cap); color:var(--c-ink-2); }
+.hw-lab{ font-size:var(--fs-cap); font-weight:800; color:var(--c-pri-d); }
+.hw-canvas{ touch-action:none; border-radius:18px; background:var(--c-surface); box-shadow:var(--sh-1); cursor:crosshair; }
+.hw-fb{ min-height:24px; text-align:center; font-weight:800; color:var(--c-pri-d); }
+.hw-btns{ display:flex; gap:12px; margin-top:6px; }
+/* g3hit 仍被 G5 连线成词复用（.g5-cand.picked），保留 */
 @keyframes g3hit{ 0%{ transform:translateX(-50%) translateY(0) scale(1); opacity:1; } 50%{ transform:translateX(-50%) translateY(-20px) scale(1.2); opacity:1; } 100%{ transform:translateX(-50%) translateY(44px) scale(.25); opacity:0; } }
-.g3-bar{ height:14px; background:var(--c-track); border-radius:99px; overflow:hidden; margin:6px 8px 0; }
-.g3-fill{ height:100%; width:100%; background:var(--c-ok); transition:width .12s linear; }
-.g3-fill.g3-warn{ background:var(--c-warn); }
-.g3-fill.g3-danger{ background:var(--c-err); }
 
 .g4-grid{ display:grid; gap:10px; margin:14px auto; max-width:440px; }
 .g4-cell{ aspect-ratio:1; min-height:64px; border-radius:16px; border:3px solid var(--c-line); background:var(--c-surface-2);
@@ -4048,7 +4038,7 @@ function openCharDetail(ch){ if(ch && typeof speak==="function") speak(ch.c, tru
 /* ===== /JS-BLOCK: DEX ===== */
 
 /* ===== JS-BLOCK: MINIGAMES (P3) ===== */
-/* G3 拍字地鼠 / G4 认字小路 / G5 连线成词，接入 S2 轮换（GAME_ROTATION）。
+/* G3 手写字（描红）/ G4 认字小路 / G5 连线成词，接入 S2 轮换（GAME_ROTATION）。
    设计：每个新游戏自管内部循环，结束后回调 done（= nextGameOrS3）；正确性折叠进
    LV.combo / LV.maxCombo，从而与 computeStars(quizFirstCorrect, quizTotal, hintsUsed, maxCombo)
    三星契约保持一致（契约本身不变，见 P1 §3.5）。
@@ -4108,177 +4098,217 @@ function runMinigame(g, done){
 
 var DAILY_DIFF = 10;   /* P5 对齐 GDD §2.7.2：每日字灵挑战固定中档难度（≈第三区），不随 currentLevelIdx 递增（daily 时各 minigame 取此值而非 19 最难关） */
 
-/* ---------- G3 拍字地鼠 ---------- */
-/* ---------- G3 拍字地鼠（真·地鼠洞：洞固定，字从洞里冒出/缩回） ---------- */
+/* ---------- G3 手写字（描红临摹） ---------- */
+/* 玩法：田字格里显示灰色范字，小朋友用手指沿着描。
+   判定（宽松 + 鼓励，GDD §9.1 零惩罚）：范字栅格化成 HW_N×HW_N 墨迹网格，
+   笔迹同样栅格化并按容差半径扩张，用「覆盖率 / 出格率」评价：
+     覆盖率 = 笔迹盖住的范字格子 / 范字格子总数
+     出格率 = 落在范字(含容差)之外的笔迹格子 / 笔迹格子总数
+   及格线宽松（cover ≥ 0.45 且 stray ≤ 0.45）；同一字试 2 次仍不达标也放行并表扬。
+   纯函数 hwRaster / hwDilate / hwScore 独立成全局，便于无 canvas 环境单测。 */
+var HW_N = 64, HW_COVER = 0.45, HW_STRAY = 0.45;
+var HW_FONT = '"Kaiti SC","STKaiti","KaiTi","Kaiti TC",serif';
+function hwRaster(pts, n, r){
+  var g = [], i, x, y, p, x0, x1, y0, y1, dx, dy;
+  for(i=0;i<n*n;i++) g.push(0);
+  if(!pts) return g;
+  for(i=0;i<pts.length;i++){
+    p = pts[i];
+    x0 = Math.max(0, Math.round(p.x)-r); x1 = Math.min(n-1, Math.round(p.x)+r);
+    y0 = Math.max(0, Math.round(p.y)-r); y1 = Math.min(n-1, Math.round(p.y)+r);
+    for(y=y0;y<=y1;y++){ for(x=x0;x<=x1;x++){
+      dx = x - p.x; dy = y - p.y;
+      if(dx*dx + dy*dy <= r*r) g[y*n+x] = 1;
+    } }
+  }
+  return g;
+}
+function hwDilate(mask, n, r){
+  var g = [], i, x, y, cx, cy, x0, x1, y0, y1, dx, dy;
+  for(i=0;i<n*n;i++) g.push(0);
+  for(i=0;i<mask.length;i++){
+    if(!mask[i]) continue;
+    cy = Math.floor(i/n); cx = i - cy*n;
+    x0 = Math.max(0, cx-r); x1 = Math.min(n-1, cx+r);
+    y0 = Math.max(0, cy-r); y1 = Math.min(n-1, cy+r);
+    for(y=y0;y<=y1;y++){ for(x=x0;x<=x1;x++){
+      dx = x - cx; dy = y - cy;
+      if(dx*dx + dy*dy <= r*r) g[y*n+x] = 1;
+    } }
+  }
+  return g;
+}
+function hwScore(mask, pts, r){
+  r = r || 3;
+  if(!mask || !mask.length || !pts || !pts.length) return {cover:0, stray:1, pass:false};
+  var n = Math.round(Math.sqrt(mask.length));
+  var trace = hwRaster(pts, n, r), dil = hwDilate(mask, n, r);
+  var maskTotal = 0, hit = 0, traceTotal = 0, out = 0, i;
+  for(i=0;i<mask.length;i++){ if(mask[i]) maskTotal++; }
+  for(i=0;i<trace.length;i++){
+    if(!trace[i]) continue;
+    traceTotal++;
+    if(mask[i]) hit++;
+    if(!dil[i]) out++;
+  }
+  if(!maskTotal || !traceTotal) return {cover:0, stray:1, pass:false};
+  var cover = hit/maskTotal, stray = out/traceTotal;
+  return {cover:cover, stray:stray, pass:(cover>=HW_COVER && stray<=HW_STRAY)};
+}
+
 function mgG3(g, done){
   var host = $('levelHost');
   var idx = (LV && LV.daily) ? DAILY_DIFF : currentLevelIdx();
-  var maxHoles = 6;
-  /* 6 个固定洞，早期冒出 3 只、中期 4 只、后期 5 只，营造"地鼠突然冒出来"的惊喜感 */
-  var numMoles = idx<6 ? 3 : (idx<12 ? 4 : 5);
-  var showMs   = idx<6 ? 2500 : (idx<12 ? 2200 : 1800); /* 地鼠停留时间 */
-  var roundGap = 450;                                   /* 两波地鼠间隔 */
-  var TOTAL = 30000;
-  var queue = shuffle(LV.chars).concat(shuffle(LV.chars)).concat(shuffle(LV.chars));
-  var qPos = 0, hits = 0;
-  var distractorPool = LV.pool.concat(LV.distract);
-  var endTime = 0, fillEl, tcharEl, tpicEl, router;
-  var holes = [];
-  var spawnTimer = null;
-  var hideTimers = [];
+  var qCount = idx<8 ? 3 : (idx<14 ? 4 : 5);
+  var targets = shuffle(LV.chars).slice(0, Math.min(qCount, LV.chars.length));
+  if(!targets.length){ done(); return; }
+  var BOX = 260, RCELL = 3, qi = 0, tries = 0, router = null;
+  var canvas = null, ctx = null, drawing = false, pts = [], mask = null, last = null, hasInk = false;
+  var canEval = false;
 
-  function curTarget(){ return queue[qPos % queue.length]; }
-  function updateTarget(){
-    var t = curTarget();
-    if(tcharEl) tcharEl.textContent = t.c;
-    if(tpicEl) tpicEl.innerHTML = picSVG(t.c);
-    speak(t.c);
+  function cur(){ return targets[qi]; }
+  function fb(t){ var el = host.querySelector('#hwfb'); if(el) el.textContent = t; }
+  /* 把范字画到离屏 canvas 上，栅格化成墨迹网格（无 canvas 环境自动降级为只鼓励不判分） */
+  function buildMask(ch){
+    canEval = false;
+    try{
+      var c = document.createElement('canvas');
+      c.width = HW_N; c.height = HW_N;
+      var mc = c.getContext ? c.getContext('2d') : null;
+      if(!mc) return;
+      mc.fillStyle = '#ffffff'; mc.fillRect(0,0,HW_N,HW_N);
+      mc.fillStyle = '#000000'; mc.textAlign = 'center'; mc.textBaseline = 'middle';
+      mc.font = Math.round(HW_N*0.76)+'px '+HW_FONT;
+      mc.fillText(ch, HW_N/2, HW_N/2+1);
+      var d = mc.getImageData(0,0,HW_N,HW_N).data, arr = [], i;
+      for(i=0;i<HW_N*HW_N;i++) arr.push(d[i*4] < 160 ? 1 : 0);
+      mask = arr; canEval = true;
+    }catch(e){ canEval = false; }
   }
-  /* 计时器解耦（T1 修复）：「清缩回计时器」与「停刷新循环」必须是两个独立动作。
-     历史 bug：spawnRound() 里调 clearRoundTimers()，而 clearRoundTimers 会顺手清掉
-     spawnTimer —— 可 spawnRound 恰恰是被 spawnTimer 触发的，于是 interval 回调一进来
-     就把自己杀了，而 spawnRound 自身不会重建 interval（重建只在打中后的 nextRound）。
-     表现：第一波没打中 → 第二波由 interval 触发（同时自杀）→ 缩回后再也不刷新。
-     现在 spawnRound 只清 hideTimers，spawnTimer 由 startSpawn/stopSpawnTimer 独占管理。 */
-  function clearHideTimers(){
-    for(var i=0;i<hideTimers.length;i++) clearTimeout(hideTimers[i]);
-    hideTimers.length = 0;
+  function drawGuide(){
+    if(!ctx) return;
+    ctx.clearRect(0,0,BOX,BOX);
+    ctx.save();
+    ctx.strokeStyle = '#E2E8F0'; ctx.lineWidth = 2;
+    ctx.strokeRect(2,2,BOX-4,BOX-4);
+    ctx.strokeStyle = '#CBD5E1'; ctx.lineWidth = 1.5; ctx.setLineDash([7,7]);
+    ctx.beginPath();
+    ctx.moveTo(BOX/2, 6); ctx.lineTo(BOX/2, BOX-6);
+    ctx.moveTo(6, BOX/2); ctx.lineTo(BOX-6, BOX/2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#D8DEE9';
+    ctx.font = Math.round(BOX*0.78)+'px '+HW_FONT;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(cur().c, BOX/2, BOX/2+2);
+    ctx.restore();
   }
-  function stopSpawnTimer(){
-    if(spawnTimer){ clearInterval(spawnTimer); spawnTimer = null; }
+  function inkStyle(){
+    ctx.strokeStyle = '#3B82F6'; ctx.lineWidth = 18; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.fillStyle = '#3B82F6';
   }
-  function startSpawn(){
-    stopSpawnTimer();
-    spawnTimer = setInterval(spawnRound, showMs + roundGap);
-    /* 登记进 MG_TIMERS：spawnTimer 是 mgG3 的局部变量，光靠 mgClearTimers() 收不到，
-       玩家中途退出（closeLevel）时会漏成永久 interval。 */
-    MG_TIMERS.push(spawnTimer);
+  function dot(p){ if(!ctx) return; inkStyle(); ctx.beginPath(); ctx.arc(p.bx, p.by, 9, 0, Math.PI*2); ctx.fill(); }
+  function seg(a,b){ if(!ctx) return; inkStyle(); ctx.beginPath(); ctx.moveTo(a.bx,a.by); ctx.lineTo(b.bx,b.by); ctx.stroke(); }
+  function toPt(e){
+    var r = canvas.getBoundingClientRect(), x = e.clientX - (r.left||0), y = e.clientY - (r.top||0);
+    if(r.width){ x = x * BOX / r.width; y = y * BOX / r.height; }
+    return { x: x*HW_N/BOX, y: y*HW_N/BOX, bx: x, by: y };
   }
-  function clearRoundTimers(){   /* 兼容旧调用点：全清（仅在结束/退出时使用） */
-    clearHideTimers();
-    stopSpawnTimer();
-  }
-  function clearMoles(){
-    for(var i=0;i<holes.length;i++){
-      var h = holes[i];
-      h.classList.remove('g3-up','g3-hit','g3-wrong');
-      if(!h.classList.contains('g3-down')) h.classList.add('g3-down');
-      h.removeAttribute('data-ch');
+  function onDown(e){ drawing = true; hasInk = true; last = toPt(e); pts.push(last); dot(last); }
+  function onMove(e){ if(!drawing) return; var p = toPt(e); if(last) seg(last, p); pts.push(p); last = p; }
+  function onUp(){ drawing = false; last = null; }
+  function bindCanvas(){
+    canvas = host.querySelector('#hwCanvas');
+    if(!canvas) return;
+    ctx = canvas.getContext ? canvas.getContext('2d') : null;
+    if(ctx){
+      var dpr = Math.min(3, (window.devicePixelRatio||1));
+      canvas.width = Math.round(BOX*dpr); canvas.height = Math.round(BOX*dpr);
+      canvas.style.width = BOX+'px'; canvas.style.height = BOX+'px';
+      ctx.scale(dpr, dpr);
     }
-  }
-  function spawnRound(){
-    if(!holes.length) return;
-    clearHideTimers();          /* T1：绝不能碰 spawnTimer */
-    clearMoles();
-    var order = shuffle([0,1,2,3,4,5]);
-    var chosen = order.slice(0, numMoles);
-    var t = curTarget();
-    var assigns = [t];
-    var others = shuffle(distractorPool.filter(function(c){ return c.c !== t.c; })).slice(0, numMoles-1);
-    assigns = shuffle(assigns.concat(others));
-    for(var i=0;i<chosen.length;i++){
-      var h = holes[chosen[i]];
-      var a = assigns[i];
-      var mole = h.querySelector('.g3-mole');
-      h.setAttribute('data-ch', a.c);
-      if(mole) mole.textContent = a.c;
-      h.classList.remove('g3-down','g3-hit','g3-wrong');
-      h.classList.add('g3-up');
-      (function(hh){
-        var hid = setTimeout(function(){
-          if(hh.classList.contains('g3-up') && !hh.classList.contains('g3-hit')){
-            hh.classList.remove('g3-up'); hh.classList.add('g3-down');
-          }
-        }, showMs);
-        hideTimers.push(hid); MG_TIMERS.push(hid);
-      })(h);
-    }
-  }
-  function nextRound(){
-    stopSpawnTimer();           /* T1：换目标期间先停表，避免与 480ms 后的新循环叠加成双循环 */
-    updateTarget();
-    spawnRound();
-    startSpawn();
-  }
-  function onHole(btn){
-    if(!btn.classList.contains('g3-up') || btn.classList.contains('g3-hit')) return;
-    var ch = btn.getAttribute('data-ch');
-    if(ch === curTarget().c){
-      btn.classList.add('g3-hit');
-      SFX.right(); hits++; mgCorrect(); qPos++;
-      stopSpawnTimer(); clearHideTimers();   /* T1：停刷新 + 清本波缩回，480ms 后由 nextRound 重建循环 */
-      MG_TIMERS.push(setTimeout(nextRound, 480));
+    if(window.PointerEvent){
+      canvas.addEventListener('pointerdown', onDown);
+      canvas.addEventListener('pointermove', onMove);
+      canvas.addEventListener('pointerup', onUp);
+      canvas.addEventListener('pointercancel', onUp);
     } else {
-      btn.classList.add('g3-wrong');
-      SFX.wrong(); mgWrong();
-      setTimeout(function(){ btn.classList.remove('g3-wrong','g3-up'); btn.classList.add('g3-down'); }, 420);
+      canvas.addEventListener('touchstart', function(e){ if(e.preventDefault) e.preventDefault(); var t = e.changedTouches && e.changedTouches[0]; if(t) onDown(t); });
+      canvas.addEventListener('touchmove',  function(e){ if(e.preventDefault) e.preventDefault(); var t = e.changedTouches && e.changedTouches[0]; if(t) onMove(t); });
+      canvas.addEventListener('touchend',   function(e){ if(e.preventDefault) e.preventDefault(); onUp(); });
+      canvas.addEventListener('mousedown', onDown);
+      canvas.addEventListener('mousemove', onMove);
+      canvas.addEventListener('mouseup', onUp);
     }
   }
-  function tick(){
-    var rem = endTime - Date.now();
-    if(rem <= 0){ endGame(); return; }
-    var pct = Math.max(0, rem/TOTAL*100);
-    if(fillEl){
-      fillEl.style.width = pct + '%';
-      fillEl.className = 'g3-fill' + (rem<=10000?' g3-warn':'') + (rem<=5000?' g3-danger':'');
-    }
+  function clearTrace(){ pts = []; last = null; hasInk = false; drawGuide(); }
+  function submit(){
+    if(!hasInk){ fb('先用手指沿灰色的字描一描～'); return; }
+    var pass = true;
+    if(canEval){ pass = hwScore(mask, pts, RCELL).pass; }
+    if(pass || tries >= 2) succeed();
+    else { tries++; SFX.wrong(); fb(pick(GENTLE) + ' 再描一次'); clearTrace(); }
   }
-  function endGame(){
-    stopSpawnTimer(); clearHideTimers(); mgClearTimers(); mgClearHost();
+  function succeed(){
+    SFX.right(); mgCorrect();
+    fb(pick(PRAISE));
+    speakQueue(cleanSpeakText(pick(PRAISE)));
+    var t = setTimeout(function(){ next(); }, 950);
+    MG_TIMERS.push(t);
+  }
+  function next(){
+    qi++; tries = 0;
+    if(qi >= targets.length) finish(); else renderQuestion();
+  }
+  function finish(){
+    mgClearTimers(); mgClearHost();
     var html = '<div class="lv-s4">'+
-      '<div class="lv-hero" style="font-size:48px">🎉</div>'+
-      '<div class="lv-hd-t" style="font-size:var(--fs-h2)">拍中 '+hits+' 个！</div>'+
-      '<div class="lv-s4tip">你真棒！</div>'+
+      '<div class="lv-hero" style="font-size:48px">✍️</div>'+
+      '<div class="lv-hd-t" style="font-size:var(--fs-h2)">写好 '+targets.length+' 个字！</div>'+
+      '<div class="lv-s4tip">你的字越来越漂亮啦！</div>'+
       '<button class="lv-btn" id="mgNext">继续 ➜</button></div>';
-    host.innerHTML = lvWrap(html);
-    SFX.clear();
+    host.innerHTML = lvWrap(html); SFX.clear();
     host.querySelector('#mgNext').addEventListener('click', function(){ done(); });
-    speak('拍中 '+hits+' 个！');
-    guideNext(host.querySelector('#mgNext'), '你真棒！点发光的继续按钮，我们接着玩', 1300);
+    speak('写好 '+targets.length+' 个字！');
+    guideNext(host.querySelector('#mgNext'), '点发光的继续按钮，我们接着玩', 1300);
   }
-  function init(){
-    var t0 = curTarget();
-    var holesHtml = '';
-    for(var i=0;i<maxHoles;i++){
-      holesHtml += '<button class="g3-hole" data-idx="'+i+'" aria-label="地鼠洞">'+
-                    '<div class="g3-mound"></div><div class="g3-mole"></div></button>';
-    }
+  function renderQuestion(){
+    if(MG_ROUTER){ host.removeEventListener('click', MG_ROUTER); MG_ROUTER = null; }
+    var ch = cur();
     var html =
       '<header class="lv-hd"><button class="lv-x" data-act="exit" aria-label="返回地图">✕</button>'+
-        '<div class="lv-hd-t">拍字地鼠</div>'+
+        '<div class="lv-hd-t">手写字 · 第 '+(qi+1)+' / '+targets.length+'</div>'+
         '<button class="lv-hint" data-act="speak" aria-label="重听">🔊</button></header>'+
-      '<div class="g3">'+
-        '<div class="g3-target">'+
-          '<div class="g3-pic" data-act="speak">'+picSVG(t0.c)+'</div>'+
-          '<div class="g3-tchar" data-act="speak">'+t0.c+'</div>'+
-          '<div class="g3-lab">拍一拍这个字！</div>'+
+      '<div class="hw">'+
+        '<div class="hw-top">'+
+          '<div class="hw-py">'+ch.py+'</div>'+
+          '<div class="hw-lab">沿灰色的字描一描</div>'+
         '</div>'+
-        '<div class="g3-holes">'+holesHtml+'</div>'+
-        '<div class="g3-bar"><div class="g3-fill"></div></div>'+
+        '<canvas id="hwCanvas" class="hw-canvas" width="'+BOX+'" height="'+BOX+'"></canvas>'+
+        '<div class="hw-fb" id="hwfb"></div>'+
+        '<div class="hw-btns">'+
+          '<button class="lv-btn lv-btn-ghost lv-btn-sm" id="hwRedo">重描</button>'+
+          '<button class="lv-btn lv-btn-sm" id="hwDone">我写好啦 ✅</button>'+
+        '</div>'+
       '</div>';
     host.innerHTML = lvWrap(html);
     bindExit(host);
-    tcharEl = host.querySelector('.g3-tchar'); tpicEl = host.querySelector('.g3-pic');
-    fillEl = host.querySelector('.g3-fill');
-    holes = [].slice.call(host.querySelectorAll('.g3-hole'));
+    bindCanvas();
+    buildMask(ch.c);
+    drawGuide();
+    speak(ch.c);
     router = function(e){
-      var sp = e.target.closest && e.target.closest('[data-act="speak"]');
-      /* T5：🔊 重听是孩子主动点的，force 直通，绝不能被节流吞 */
-      if(sp){ speak(curTarget().c, true); return; }
-      var btn = e.target.closest && e.target.closest('.g3-hole');
-      if(btn) onHole(btn);
+      if(e.target && e.target.closest){
+        if(e.target.closest('[data-act="speak"]')){ speak(cur().c, true); return; }
+        if(e.target.closest('[data-act="exit"]')) return;
+        if(e.target.closest('#hwRedo')){ clearTrace(); return; }
+        if(e.target.closest('#hwDone')){ submit(); return; }
+      }
     };
     host.addEventListener('click', router); MG_ROUTER = router;
-    spawnRound();
-    startSpawn();               /* T1：刷新循环独立于 spawnRound，不再自杀 */
-    endTime = Date.now() + TOTAL;
-    MG_TIMERS.push(setInterval(tick, 120));
-    setTimeout(function(){ speak(curTarget().c); }, 260);
-    /* REQ-101/102：开局报玩法指令，并高亮地鼠洞区域 */
-    var g3holes = host.querySelector('.g3-holes');
-    if(g3holes) guideNext(g3holes, '等这个字冒出来，拍它！', 1500);
+    if(qi === 0) guideNext(host.querySelector('#hwDone'), '用手指沿灰色的字描一描，写好了点这里', 1500);
   }
-  init();
+  renderQuestion();
 }
 
 /* ---------- G4 认字小路 ---------- */
@@ -5467,7 +5497,7 @@ function qG1(t){
   };
 }
 function gameName(type){
-  return ({g1:'听音找字', g2:'字图配对', g3:'拍字地鼠', g4:'认字小路', g5:'连线成词'})[type] || '小游戏';
+  return ({g1:'听音找字', g2:'字图配对', g3:'手写字', g4:'认字小路', g5:'连线成词'})[type] || '小游戏';
 }
 /* ============ S1R 跟读（开口念） ============ */
 /* 学完 5 个字后，插入一个「跟读」环节：App 慢速朗读（词间停顿 1 秒，见 speakWordList），
@@ -5553,7 +5583,7 @@ function renderGameIntro(no){
 }
 function renderGameQuestion(){
   var g = LV.games[LV.gameNo];
-  /* P3/P6：G2–G5 是自管内部循环的小游戏（G2 字图配对记忆翻牌 / G3 拍字地鼠 / G4 认字小路 / G5 连线成词），
+  /* P3/P6：G2–G5 是自管内部循环的小游戏（G2 字图配对记忆翻牌 / G3 手写字描红 / G4 认字小路 / G5 连线成词），
      跑完回调 nextGameOrS3；G1 听音找字仍是 quiz 式（qG1 + lvAsk），逐题驱动 */
   if(g.type==='g2' || g.type==='g3' || g.type==='g4' || g.type==='g5'){
     runMinigame(g, nextGameOrS3);
