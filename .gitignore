@@ -4,3 +4,10 @@
 # 旧原型/本地备份（非当前游戏）
 识字启蒙台.html
 识字启蒙台_v1备份.html
+history/
+
+# 设计/预览产物（不随站点发布）
+map-preview.svg
+
+# 本地工具目录
+.apps-builder/
