@@ -1570,7 +1570,26 @@ var CHAR_DICT = [
   {c:"想",py:"xiǎng",w:["想想","想法","想象","心想"],d:"在脑子里想"},
   {c:"问",py:"wèn",w:["问问","问题","问好","提问"],d:"开口问问题"},
   {c:"答",py:"dá",w:["回答","答对","答案","报答"],d:"回答出问题"},
-  {c:"学",py:"xué",w:["学习","上学","同学","学会"],d:"学新的本领"}
+  {c:"学",py:"xué",w:["学习","上学","同学","学会"],d:"学新的本领"},
+  {c:"辰",py:"chén",w:["星辰","时辰","生辰"],d:"日月星辰；也指时辰"},
+  {c:"银",py:"yín",w:["银河","银子","银色"],d:"白银，一种亮闪闪的金属"},
+  {c:"宇",py:"yǔ",w:["宇宙","屋宇","玉宇"],d:"指天空和整个世界"},
+  {c:"宙",py:"zhòu",w:["宇宙"],d:"古往今来的时间叫宙"},
+  {c:"幻",py:"huàn",w:["幻彩","幻想","梦幻"],d:"像梦一样奇妙多变"},
+  {c:"彩",py:"cǎi",w:["彩虹","彩色","精彩"],d:"多种颜色放在一起"},
+  {c:"紫",py:"zǐ",w:["紫霞","紫色","紫罗兰"],d:"像葡萄一样的颜色"},
+  {c:"霞",py:"xiá",w:["紫霞","彩霞","霞光"],d:"日出日落时天边的彩云"},
+  {c:"虹",py:"hóng",w:["彩虹","虹桥"],d:"雨后天上的七彩拱桥"},
+  {c:"凤",py:"fèng",w:["彩凤","凤凰","飞凤"],d:"传说里最美丽的神鸟"},
+  {c:"朝",py:"zhāo",w:["朝阳","朝霞","朝气"],d:"早晨，太阳升起来的时候"},
+  {c:"阳",py:"yáng",w:["朝阳","太阳","阳光"],d:"太阳，暖暖地照着大地"},
+  {c:"辉",py:"huī",w:["金辉","光辉","辉煌"],d:"亮闪闪的光芒"},
+  {c:"冠",py:"guān",w:["金冠","王冠","桂冠"],d:"戴在头上的帽子"},
+  {c:"王",py:"wáng",w:["天王","大王","王国"],d:"首领，最厉害的那个"},
+  {c:"至",py:"zhì",w:["至尊","至今","冬至"],d:"最、极的意思"},
+  {c:"尊",py:"zūn",w:["至尊","尊敬","尊贵"],d:"尊贵，最值得敬重的"},
+  /* ↑ Lv21–Lv40 宠物名用字（17 个）：不在前 100 关卡字内（levelChars 切片安全），
+     专供图鉴「宠物名字」分区点读；chObj/_DICT_MAP 运行时惰性重建，追加即生效。 */
 ];
 /* 象形图 / 示意图 SVG（简化手绘风） */
 function picSVG(ch){
@@ -2093,7 +2112,37 @@ var PET_STAGES = [
   {lv:17,name:"墨墨·圣皇",bond:4350, scale:1.72,theme:"#8A7CFF", hi:"#C6ABFF", line:"#FFEFB0", belly:"#F6F2FF"},
   {lv:18,name:"墨墨·天麟",bond:4650, scale:1.73,theme:"#9A8CFF", hi:"#D2BBFF", line:"#FFEFB0", belly:"#FAF8FF"},
   {lv:19,name:"墨墨·麒瑞",bond:4950, scale:1.74,theme:"#AB9CFF", hi:"#DCCBFF", line:"#FFF2C0", belly:"#FCFBFF"},
-  {lv:20,name:"墨墨·昊穹",bond:5250, scale:1.75,theme:"#BCADFF", hi:"#E6DBFF", line:"#FFF2C0", belly:"#FFFFFF"}
+  {lv:20,name:"墨墨·昊穹",bond:5250, scale:1.75,theme:"#BCADFF", hi:"#E6DBFF", line:"#FFF2C0", belly:"#FFFFFF"},
+  /* 宠物等级扩展二期：Lv21–Lv40，bond 5500–9750（每级 +250，策划方案 C），scale 锁 1.75（美术 R1）。
+     配色按美术 R2 裁定「停止变浅、加深+加金」：theme 稳在 #5B3FE0–#7A5CAE，hi 由紫渐金，
+     belly 暖色化且不低于 #E8E2FF，line 恒为金/琥珀系（R6，深色背景下靠金描边分离主体）。
+     命名三段叙事：星空段(21-26) → 霞凤段(27-32) → 金阙段(33-40)。 */
+  {lv:21,name:"墨墨·星辰",bond:5500, scale:1.75,theme:"#5B3FE0", hi:"#9E8BFF", line:"#FFD86B", belly:"#E8E2FF"},
+  {lv:22,name:"墨墨·星海",bond:5750, scale:1.75,theme:"#5E42E2", hi:"#A490FF", line:"#FFD86B", belly:"#E9E3FF"},
+  {lv:23,name:"墨墨·银河",bond:6000, scale:1.75,theme:"#6145E4", hi:"#AA96FF", line:"#FFD96F", belly:"#EAE4FF"},
+  {lv:24,name:"墨墨·宇宙",bond:6250, scale:1.75,theme:"#6448E6", hi:"#B09CFF", line:"#FFDA73", belly:"#EBE5FF"},
+  {lv:25,name:"墨墨·幻彩",bond:6500, scale:1.75,theme:"#674BE8", hi:"#B6A2FF", line:"#FFDB77", belly:"#ECE6FF"},
+  {lv:26,name:"墨墨·紫霞",bond:6750, scale:1.75,theme:"#6A4EE8", hi:"#BCA8FF", line:"#FFDC7B", belly:"#EDE7FF"},
+  {lv:27,name:"墨墨·彩虹",bond:7000, scale:1.75,theme:"#6D4FE6", hi:"#C2AEFF", line:"#FFDD7F", belly:"#EEE6FF"},
+  {lv:28,name:"墨墨·彩云",bond:7250, scale:1.75,theme:"#704FE4", hi:"#C8B4FF", line:"#FFDE7A", belly:"#EFE6FE"},
+  {lv:29,name:"墨墨·霞光",bond:7500, scale:1.75,theme:"#734FE2", hi:"#CEB4FF", line:"#FFDF7E", belly:"#F0E7FB"},
+  {lv:30,name:"墨墨·彩凤",bond:7750, scale:1.75,theme:"#764FE0", hi:"#D4BAFF", line:"#FFE082", belly:"#F1E8F8"},
+  {lv:31,name:"墨墨·飞凤",bond:7950, scale:1.75,theme:"#784FDE", hi:"#DABEFA", line:"#FFE186", belly:"#F2E9F5"},
+  {lv:32,name:"墨墨·火凤",bond:8150, scale:1.75,theme:"#7A4FDC", hi:"#E0C2F6", line:"#FFE28A", belly:"#F3EAF2"},
+  {lv:33,name:"墨墨·金凤",bond:8350, scale:1.75,theme:"#7A50D8", hi:"#E6C8EE", line:"#FFE390", belly:"#F5EEF0"},
+  {lv:34,name:"墨墨·金龙",bond:8550, scale:1.75,theme:"#7A51D2", hi:"#ECCEDC", line:"#FFE496", belly:"#F6F0EC"},
+  {lv:35,name:"墨墨·龙凤",bond:8750, scale:1.75,theme:"#7A52CC", hi:"#F0D4D2", line:"#FFE59C", belly:"#F7F2E8"},
+  {lv:36,name:"墨墨·朝阳",bond:8950, scale:1.75,theme:"#7A54C6", hi:"#F4DAC8", line:"#FFE6A2", belly:"#F8F4E4"},
+  {lv:37,name:"墨墨·金辉",bond:9150, scale:1.75,theme:"#7A56C0", hi:"#F8E0BE", line:"#FFE7A8", belly:"#F9F6E0"},
+  {lv:38,name:"墨墨·金冠",bond:9350, scale:1.75,theme:"#7A58BA", hi:"#FAE6B4", line:"#FFE8AE", belly:"#FAF8DC"},
+  {lv:39,name:"墨墨·天王",bond:9550, scale:1.75,theme:"#7A5AB4", hi:"#FCECAA", line:"#FFE9B4", belly:"#FBFAE0"},
+  {lv:40,name:"墨墨·至尊",bond:9750, scale:1.75,theme:"#7A5CAE", hi:"#FFF2A0", line:"#FFEABE", belly:"#FCFCE6"}
+];
+/* Lv21–Lv40 宠物名（图鉴「宠物名字」分区的识字素材来源，难字随名认读） */
+var PET_NAMES_LV21_40 = [
+  "星辰","星海","银河","宇宙","幻彩","紫霞",
+  "彩虹","彩云","霞光","彩凤","飞凤","火凤",
+  "金凤","金龙","龙凤","朝阳","金辉","金冠","天王","至尊"
 ];
 function bondToLevel(bond){ var lv=1, i; for(i=0;i<PET_STAGES.length;i++) if(bond>=PET_STAGES[i].bond) lv=PET_STAGES[i].lv; return lv; }
 
@@ -2120,10 +2169,13 @@ function defaultStateV2(){
     pet:{ name:"墨墨", species:"ink", bond:0, level:1,
           fedToday:0, petToday:0, lastCareDate:"",
           wears:{hat:null,scarf:null,wing:null,bg:null},
-          owned:[], mood:"happy", friends:[] },
+          owned:[], granted:[], mood:"happy", friends:[] },
     codex:{},
     chest:{ opened:0, log:[] },
     coupons:[],
+    /* 归档出口（team-lead 裁决：维持 append-only，不实现「清空全部数据」）。
+       每次「归档重开」push 一条 {at, snapshot}，永不删除；实现排在 P5。 */
+    archives:[],
     daily:{},
     streak:{cur:0, best:0, lastDate:""},
     stats:{ totalRight:0, totalWrong:0, playSeconds:0, sessions:0, wrongByChar:{} },
@@ -2247,10 +2299,12 @@ function normalizeV2(s){
   if(!s.pet) s.pet = d.pet;
   if(!s.pet.wears) s.pet.wears = {hat:null,scarf:null,wing:null,bg:null};
   if(!Array.isArray(s.pet.owned)) s.pet.owned = [];
+  if(!Array.isArray(s.pet.granted)) s.pet.granted = [];   /* Lv21+ 等级达成奖励去重账本（append-only） */
   if(!Array.isArray(s.pet.friends)) s.pet.friends = [];
   if(!s.chest) s.chest = {opened:0, log:[]};
   if(!Array.isArray(s.chest.log)) s.chest.log = [];
   if(!Array.isArray(s.coupons)) s.coupons = [];
+  if(!Array.isArray(s.archives)) s.archives = [];   /* 归档出口兜底，append-only 永不清空 */
   if(!s.daily) s.daily = {};
   if(!s.streak) s.streak = {cur:0,best:0,lastDate:""};
   if(!s.stats) s.stats = d.stats;
@@ -2397,7 +2451,8 @@ function mergeSettings(){
     r: {stars:state.stars, starsTotal:state.starsTotal, energy:state.energy,
         shards:state.shards, keys:state.keys},
     s: {daily:state.daily, streak:state.streak, stats:state.stats,
-        coupons:state.coupons, chest:state.chest, settingsNew:state.settingsNew}
+        coupons:state.coupons, chest:state.chest, settingsNew:state.settingsNew,
+        archives:state.archives}
   };
   return s;
 }
@@ -2421,7 +2476,7 @@ function buildProps(){
                        energy:state.energy, shards:state.shards, keys:state.keys})};
     props["统计"]   = {text:JSON.stringify({daily:state.daily, streak:state.streak,
                        stats:state.stats, coupons:state.coupons, chest:state.chest,
-                       settingsNew:state.settingsNew})};
+                       settingsNew:state.settingsNew, archives:state.archives})};
   }
   return props;
 }
@@ -2456,6 +2511,7 @@ function applyCloudV2(row){
          state.stats=s.stats||state.stats;
          state.coupons=s.coupons||[];
          state.chest=s.chest||{opened:0,log:[]};
+         if(Array.isArray(s.archives)) state.archives=s.archives;
          state.settingsNew=mergeDeep(state.settingsNew, s.settingsNew||{}); }
   return {g:!!g, p:!!p, c:!!c, r:!!r, s:!!s};
 }
@@ -3304,11 +3360,27 @@ function renderStubs(){
 
 /* ===== JS-BLOCK: PET ===== */
 /* TODO(ENG-001-P2): 宠物养成系统，见 GDD §5 / 美术 §15 */
-/* 阶段阈值（索引 0–19）：对应 Lv1–Lv20。原 5 级 → 10 级 → 20 级；
-   Lv1–Lv10 沿用 +50,+100,+150,+200,+250,+300,+350,+400,+450；Lv11–Lv20 每级再 +300（2550…5250）。
+/* 阶段阈值（索引 0–39）：对应 Lv1–Lv40。原 5 级 → 10 级 → 20 级 → 40 级；
+   Lv1–Lv10 沿用 +50,+100,…,+450；Lv11–Lv20 每级 +300（2550…5250）；Lv21–Lv40 每级 +250（5500…9750，方案 C）。
    注意：用户 P2 描述里的 state.pet.intimacy / state.pet.stage 即本实现的
-   state.pet.bond（亲密度）/ state.pet.level（1–20）。沿用 P0/P1 既有字段，不新增平行字段以免破坏迁移。 */
-var PET_BOND_THRESH = [0,50,150,300,500,750,1050,1400,1800,2250, 2550,2850,3150,3450,3750,4050,4350,4650,4950,5250];
+   state.pet.bond（亲密度）/ state.pet.level（1–40）。沿用既有字段，不新增平行字段以免破坏迁移。 */
+var PET_BOND_THRESH = [
+  0,50,150,300,500,750,1050,1400,1800,2250,
+  2550,2850,3150,3450,3750,4050,4350,4650,4950,5250,
+  5500,5750,6000,6250,6500,6750,7000,7250,7500,7750,
+  7950,8150,8350,8550,8750,8950,9150,9350,9550,9750
+];
+/* 宠物名用字（Lv21–Lv40 名字去重），供图鉴分区派生，零新增 state */
+function petNameChars(){
+  var out = [], seen = {}, i, k, ns = PET_NAMES_LV21_40;
+  for(i=0;i<ns.length;i++){
+    for(k=0;k<ns[i].length;k++){
+      var c = ns[i].charAt(k);
+      if(!seen[c]){ seen[c] = 1; out.push(c); }
+    }
+  }
+  return out;
+}
 function petStage(bond){ bond = bond||0; for(var i=PET_BOND_THRESH.length-1;i>=0;i--){ if(bond>=PET_BOND_THRESH[i]) return i; } return 0; }
 
 /* ---- 装扮件（美术 §15.4，零位图，参数化 SVG 片段）---- */
@@ -3355,7 +3427,55 @@ var PET_HATS = {
     return '<g class="pk-hat" transform="translate(60,46)">'+
       '<path d="M-18 4 q0 -22 18 -22 q18 0 18 22 q-18 6 -36 0 z" fill="#E5564B" stroke="#A8352C" stroke-width="1.8" stroke-linejoin="round"/>'+
       '<circle cx="-9" cy="-6" r="3" fill="#FFFFFF"/><circle cx="6" cy="-10" r="3.4" fill="#FFFFFF"/><circle cx="12" cy="-2" r="2.6" fill="#FFFFFF"/>'+
-      '<rect x="-5" y="4" width="10" height="12" rx="4" fill="#FBE9C8" stroke="#C9A86A" stroke-width="1.6"/></g>'; }
+      '<rect x="-5" y="4" width="10" height="12" rx="4" fill="#FBE9C8" stroke="#C9A86A" stroke-width="1.6"/></g>'; },
+  /* ---- Lv21+ 高阶冠冕（美术规格 v1.0 §4.1；戴上时跳过内建王冠，见 PET_HAT_CROWN）---- */
+  aurora: function(){
+    return '<g class="pk-hat" transform="translate(60,44)">'+
+      '<path d="M-13 3 C -16 -4 -13 -8 -9 -7 C -8 -3 -9 0 -13 3 Z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M13 3 C 16 -4 13 -8 9 -7 C 8 -3 9 0 13 3 Z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M0 3 C -5 -4 -4 -11 0 -12 C 4 -11 5 -4 0 3 Z" fill="#8ED46E" stroke="#377020" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M-22 0 Q0 -8 22 0 L22 6 Q0 -2 -22 6 Z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.8" stroke-linejoin="round"/>'+
+      '<circle cx="-11" cy="0" r="2.4" fill="#FFC93C" stroke="#B87400" stroke-width="1.1"/>'+
+      '<rect x="-3.2" y="-4.2" width="6.4" height="6.4" rx="1" transform="rotate(45 0 -1)" fill="#FF6B9D" stroke="#D96A8C" stroke-width="1.1"/>'+
+      '<circle cx="11" cy="0" r="2.4" fill="#FFC93C" stroke="#B87400" stroke-width="1.1"/>'+
+    '</g>'; },
+  gemcrown: function(){
+    var o='', bx=[-18,-9,0,9,18], by=[-1,-4,-6,-4,-1], br=[3.6,4.2,4.8,4.2,3.6], bh=[4.8,5.6,6.4,5.6,4.8], i;
+    for(i=0;i<5;i++){
+      o += '<ellipse cx="'+bx[i]+'" cy="'+by[i]+'" rx="'+br[i]+'" ry="'+bh[i]+'" fill="#FFE9A8" stroke="#B87400" stroke-width="1.4"/>';
+    }
+    return '<g class="pk-hat" transform="translate(60,44)">'+o+
+      '<path d="M-22 4 Q0 -2 22 4 L22 10 Q0 4 -22 10 Z" fill="#FFD86B" stroke="#B87400" stroke-width="1.8" stroke-linejoin="round"/>'+
+      '<circle cx="-18" cy="6" r="2.2" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1"/>'+
+      '<rect x="-11.3" y="2.2" width="4.6" height="4.6" rx=".8" transform="rotate(45 -9 4.5)" fill="#FF6B9D" stroke="#D96A8C" stroke-width="1"/>'+
+      '<circle cx="0" cy="4" r="2.8" fill="#8ED46E" stroke="#377020" stroke-width="1"/>'+
+      '<rect x="6.7" y="2.2" width="4.6" height="4.6" rx=".8" transform="rotate(45 9 4.5)" fill="#FF6B9D" stroke="#D96A8C" stroke-width="1"/>'+
+      '<circle cx="18" cy="6" r="2.2" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1"/>'+
+    '</g>'; },
+  mooncrown: function(){
+    function mspark(x,y,sc){
+      return '<path transform="translate('+x+','+y+') scale('+sc+')" '+
+        'd="M0 -4 Q.8 -1 4 0 Q.8 1 0 4 Q-.8 1 -4 0 Q-.8 -1 0 -4 Z" '+
+        'fill="#FFF6DF" stroke="#B87400" stroke-width="1.1" stroke-linejoin="round"/>';
+    }
+    return '<g class="pk-hat" transform="translate(60,44)">'+
+      '<path d="M-24 4 Q0 -2 24 4 L24 9 Q0 3 -24 9 Z" fill="#FFE9A8" stroke="#B87400" stroke-width="1.6" stroke-linejoin="round"/>'+
+      '<path d="M-12 -5 C -12 10 12 10 12 -5 C 6 -1 -6 -1 -12 -5 Z" fill="#FFD86B" stroke="#B87400" stroke-width="1.6" stroke-linejoin="round"/>'+
+      mspark(0,-10,.85)+mspark(-17,-3,.6)+mspark(17,-3,.6)+
+    '</g>'; },
+  phoenix: function(){
+    return '<g class="pk-hat" transform="translate(60,44)">'+
+      '<path d="M-17 3 C -22 -1 -21 -6 -17 -7 C -14 -6 -14 0 -17 3 Z" fill="#FFDCC9" stroke="#C4683F" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M17 3 C 22 -1 21 -6 17 -7 C 14 -6 14 0 17 3 Z" fill="#FFDCC9" stroke="#C4683F" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M-9 4 C -15 -2 -14 -9 -9 -10 C -5 -8 -5 -1 -9 4 Z" fill="#FFB79B" stroke="#C4683F" stroke-width="1.5" stroke-linejoin="round"/>'+
+      '<path d="M9 4 C 15 -2 14 -9 9 -10 C 5 -8 5 -1 9 4 Z" fill="#FFB79B" stroke="#C4683F" stroke-width="1.5" stroke-linejoin="round"/>'+
+      '<path d="M0 5 C -7 -3 -5 -11 0 -12 C 5 -11 7 -3 0 5 Z" fill="#FFB79B" stroke="#C4683F" stroke-width="1.6" stroke-linejoin="round"/>'+
+      '<path d="M0 4 V-9" fill="none" stroke="#C4683F" stroke-width="1" stroke-linecap="round"/>'+
+      '<path d="M-22 4 Q0 -2 22 4 L22 10 Q0 4 -22 10 Z" fill="#FFD86B" stroke="#B87400" stroke-width="1.8" stroke-linejoin="round"/>'+
+      '<circle cx="-12" cy="5.8" r="2.2" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'+
+      '<circle cx="0" cy="4" r="2.2" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'+
+      '<circle cx="12" cy="5.8" r="2.2" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'+
+    '</g>'; }
 };
 var PET_SCARFS = {
   rainbow: function(){ return '<g class="pk-scarf" transform="translate(60,104)">'+
@@ -3392,7 +3512,56 @@ var PET_SCARFS = {
     return '<g class="pk-scarf" transform="translate(60,104)">'+
       '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FF8A3D" stroke-width="8" stroke-linecap="round"/>'+
       '<path d="M-10 9 c-5 -6 -10 0 -6 6 c4 5 10 1 6 -6 z" fill="#FFC93C" stroke="#B87400" stroke-width="1.2"/>'+
-      '<path d="M10 9 c-5 -6 -10 0 -6 6 c4 5 10 1 6 -6 z" fill="#FFC93C" stroke="#B87400" stroke-width="1.2"/></g>'; }
+      '<path d="M10 9 c-5 -6 -10 0 -6 6 c4 5 10 1 6 -6 z" fill="#FFC93C" stroke="#B87400" stroke-width="1.2"/></g>'; },
+  /* ---- Lv21+ 高阶围巾（美术规格 v1.0 §4.2）---- */
+  nebula: function(){
+    function nsp(x,y,sc){
+      return '<path transform="translate('+x+','+y+') scale('+sc+')" '+
+        'd="M0 -4 Q.8 -1 4 0 Q.8 1 0 4 Q-.8 1 -4 0 Q-.8 -1 0 -4 Z" '+
+        'fill="#FFF6DF" stroke="#B87400" stroke-width="1.1" stroke-linejoin="round"/>';
+    }
+    return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q30 15 60 0" fill="none" stroke="#7FC7EE" stroke-width="8" stroke-linecap="round"/>'+
+      '<path d="M-26 6 q26 12 52 0" fill="none" stroke="#CDEEFF" stroke-width="4" stroke-linecap="round"/>'+
+      '<circle cx="-24" cy="3" r="1.8" fill="#FFF6DF" stroke="#B87400" stroke-width=".9"/>'+
+      '<circle cx="24" cy="3" r="1.8" fill="#FFF6DF" stroke="#B87400" stroke-width=".9"/>'+
+      nsp(-16,5,.7)+nsp(0,7.5,1.05)+nsp(16,5,.7)+
+    '</g>'; },
+  pearl: function(){
+    var px=[-24,-18,-12,-6,0,6,12,18,24],
+        py=[8.2,10.3,11.8,12.7,13,12.7,11.8,10.3,8.2],
+        pr=[3,2.2,3,2.2,3.4,2.2,3,2.2,3], o='', i;
+    for(i=0;i<9;i++){
+      o += '<circle cx="'+px[i]+'" cy="'+py[i]+'" r="'+pr[i]+'" fill="#FFF6DF" stroke="#C9A86A" stroke-width="1.1"/>';
+      if(pr[i] >= 3){
+        o += '<circle cx="'+(px[i]-1)+'" cy="'+(py[i]-1.1)+'" r=".9" fill="#FFFFFF" opacity=".9"/>';
+      }
+    }
+    return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q30 15 60 0" fill="none" stroke="#FFF6DF" stroke-width="9" stroke-linecap="round"/>'+
+      '<path d="M-30 0 q30 15 60 0" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".7"/>'+
+      o+'</g>'; },
+  ribbon: function(){
+    return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FF6B9D" stroke-width="7" stroke-linecap="round"/>'+
+      '<path d="M-6 6 C -10 12 -8 17 -4 19 C -1 17 -2 12 -6 6 Z" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M6 6 C 10 12 8 17 4 19 C 1 17 2 12 6 6 Z" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M-2 1 C -12 -8 -21 -3 -14 3 C -10 6 -5 5 -2 1 Z" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.6" stroke-linejoin="round"/>'+
+      '<path d="M2 1 C 12 -8 21 -3 14 3 C 10 6 5 5 2 1 Z" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.6" stroke-linejoin="round"/>'+
+      '<rect x="-4.2" y="-1.6" width="8.4" height="8.4" rx="3.2" fill="#FF6B9D" stroke="#D96A8C" stroke-width="1.6"/>'+
+    '</g>'; },
+  cloudscarf: function(){
+    var cc=[[-22,4,10,7],[-11,7,11,8],[0,9,12,9],[11,7,11,8],[22,4,10,7]], o='', i;
+    for(i=0;i<5;i++){
+      o += '<ellipse cx="'+cc[i][0]+'" cy="'+cc[i][1]+'" rx="'+cc[i][2]+'" ry="'+cc[i][3]+
+           '" fill="#E8F1FB" stroke="#9DB8D4" stroke-width="1.6"/>';
+    }
+    return '<g class="pk-scarf" transform="translate(60,104)">'+o+
+      '<circle cx="-14" cy="15" r="2.8" fill="#E8F1FB" stroke="#9DB8D4" stroke-width="1.4"/>'+
+      '<circle cx="0" cy="17" r="3.2" fill="#E8F1FB" stroke="#9DB8D4" stroke-width="1.4"/>'+
+      '<circle cx="14" cy="15" r="2.8" fill="#E8F1FB" stroke="#9DB8D4" stroke-width="1.4"/>'+
+      '<ellipse cx="-4" cy="5" rx="5.4" ry="3.2" fill="#FFFFFF" opacity=".85"/>'+
+    '</g>'; }
 };
 var PET_WINGS = {
   small: function(lineC, pref){
@@ -3446,7 +3615,68 @@ var PET_WINGS = {
       '<g transform="rotate(-18 24 80)"><path d="M24 80 C 2 60 2 44 18 50 C 30 54 30 72 24 80 C 30 88 30 104 18 108 C 2 114 2 98 24 80 Z" fill="#FFB3C8" stroke="#D96A8C" stroke-width="2.2"/>'+
         '<circle cx="14" cy="64" r="3" fill="#FFFFFF" opacity=".8"/></g>'+
       '<g transform="rotate(18 96 80)"><path d="M96 80 C 118 60 118 44 102 50 C 90 54 90 72 96 80 C 90 88 90 104 102 108 C 118 114 118 98 96 80 Z" fill="#FFB3C8" stroke="#D96A8C" stroke-width="2.2"/>'+
-        '<circle cx="106" cy="64" r="3" fill="#FFFFFF" opacity=".8"/></g></g>'; }
+        '<circle cx="106" cy="64" r="3" fill="#FFFFFF" opacity=".8"/></g></g>'; },
+  /* ---- Lv21+ 高阶翅膀（美术规格 v1.0 §4.3）---- */
+  aurorawing: function(lineC, pref){
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-20 26 78)">'+
+        '<path d="M26 54 C 8 62 4 86 14 108" fill="none" stroke="#7FC7EE" stroke-width="7" stroke-linecap="round"/>'+
+        '<path d="M26 60 C 14 66 10 86 18 102" fill="none" stroke="#8ED46E" stroke-width="5" stroke-linecap="round" opacity=".92"/>'+
+        '<path d="M26 68 C 20 72 17 86 22 96" fill="none" stroke="#CDEEFF" stroke-width="3" stroke-linecap="round"/>'+
+        '<circle cx="13" cy="107" r="2.6" fill="#FFF6DF" stroke="#B87400" stroke-width="1"/>'+
+      '</g>'+
+      '<g transform="rotate(20 94 78)">'+
+        '<path d="M94 54 C 112 62 116 86 106 108" fill="none" stroke="#7FC7EE" stroke-width="7" stroke-linecap="round"/>'+
+        '<path d="M94 60 C 106 66 110 86 102 102" fill="none" stroke="#8ED46E" stroke-width="5" stroke-linecap="round" opacity=".92"/>'+
+        '<path d="M94 68 C 100 72 103 86 98 96" fill="none" stroke="#CDEEFF" stroke-width="3" stroke-linecap="round"/>'+
+        '<circle cx="107" cy="107" r="2.6" fill="#FFF6DF" stroke="#B87400" stroke-width="1"/>'+
+      '</g></g>'; },
+  angelwing: function(lineC, pref){
+    var L=[[9,66,6.5,17,-30],[14,74,6.5,20,-16],[19,82,6.2,18,-2],[24,89,5.6,14,12]],
+        o='', r='', i, f;
+    for(i=0;i<4;i++){
+      f = L[i];
+      o += '<ellipse cx="'+f[0]+'" cy="'+f[1]+'" rx="'+f[2]+'" ry="'+f[3]+
+           '" transform="rotate('+f[4]+' '+f[0]+' '+f[1]+')" fill="#FFF6DF" stroke="#C9A86A" stroke-width="1.6"/>';
+      r += '<ellipse cx="'+(120-f[0])+'" cy="'+f[1]+'" rx="'+f[2]+'" ry="'+f[3]+
+           '" transform="rotate('+(-f[4])+' '+(120-f[0])+' '+f[1]+')" fill="#FFF6DF" stroke="#C9A86A" stroke-width="1.6"/>';
+    }
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-12 26 80)">'+o+
+        '<ellipse cx="25" cy="70" rx="8" ry="6" fill="#FFFFFF" stroke="#C9A86A" stroke-width="1.4"/></g>'+
+      '<g transform="rotate(12 94 80)">'+r+
+        '<ellipse cx="95" cy="70" rx="8" ry="6" fill="#FFFFFF" stroke="#C9A86A" stroke-width="1.4"/></g></g>'; },
+  crystalwing: function(lineC, pref){
+    var C=[[13,70,.85,-30],[19,79,1.1,-10],[26,88,.8,12]], o='', r='', i, c, face;
+    face = '<path d="M0 -17 L6 -5 L4 13 L-4 13 L-6 -5 Z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.8" stroke-linejoin="round"/>'+
+           '<path d="M0 -17 V13" fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity=".85"/>'+
+           '<path d="M-6 -5 L0 -17 L6 -5" fill="none" stroke="#FFFFFF" stroke-width="1" opacity=".7"/>';
+    for(i=0;i<3;i++){
+      c = C[i];
+      o += '<g transform="translate('+c[0]+','+c[1]+') rotate('+c[3]+') scale('+c[2]+')">'+face+'</g>';
+      r += '<g transform="translate('+(120-c[0])+','+c[1]+') rotate('+(-c[3])+') scale('+c[2]+')">'+face+'</g>';
+    }
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-18 26 80)">'+o+'</g>'+
+      '<g transform="rotate(18 94 80)">'+r+'</g></g>'; },
+  dragonwing: function(lineC, pref){
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-14 27 76)">'+
+        '<path d="M27 74 C 18 58 11 51 5 55 C 9 62 8 68 4 72 C 9 74 12 74 14 78 C 9 82 7 88 11 92 C 16 90 23 84 27 74 Z" '+
+          'fill="#FFB79B" stroke="#C4683F" stroke-width="2.2" stroke-linejoin="round"/>'+
+        '<path d="M27 74 L6 56 M27 74 L5 72 M27 74 L11 91" fill="none" stroke="#FFC93C" stroke-width="2" stroke-linecap="round" opacity=".9"/>'+
+        '<circle cx="17" cy="64" r="2.4" fill="#FFDCC9" stroke="#C4683F" stroke-width="1"/>'+
+        '<circle cx="24" cy="74" r="2" fill="#FFDCC9" stroke="#C4683F" stroke-width="1"/>'+
+        '<circle cx="19" cy="84" r="2.2" fill="#FFDCC9" stroke="#C4683F" stroke-width="1"/>'+
+      '</g>'+
+      '<g transform="rotate(14 93 76)">'+
+        '<path d="M93 74 C 102 58 109 51 115 55 C 111 62 112 68 116 72 C 111 74 108 74 106 78 C 111 82 113 88 109 92 C 104 90 97 84 93 74 Z" '+
+          'fill="#FFB79B" stroke="#C4683F" stroke-width="2.2" stroke-linejoin="round"/>'+
+        '<path d="M93 74 L114 56 M93 74 L115 72 M93 74 L109 91" fill="none" stroke="#FFC93C" stroke-width="2" stroke-linecap="round" opacity=".9"/>'+
+        '<circle cx="103" cy="64" r="2.4" fill="#FFDCC9" stroke="#C4683F" stroke-width="1"/>'+
+        '<circle cx="96" cy="74" r="2" fill="#FFDCC9" stroke="#C4683F" stroke-width="1"/>'+
+        '<circle cx="101" cy="84" r="2.2" fill="#FFDCC9" stroke="#C4683F" stroke-width="1"/>'+
+      '</g></g>'; }
 };
 /* 相位：用负 delay 让重绘后动画不跳帧 */
 function ph(t, period){ return t ? -(t % period) : 0; }
@@ -3522,9 +3752,12 @@ function petFxBackSVG(F, lv, pref, phHalo){
          '" stroke-linecap="round" stroke-dasharray="34 18"/></g>';
   return o + '</g>';
 }
+/* 冠冕类帽子：戴上时内建王冠会与帽区完全重叠且盖住帽子（美术 R4）→ 跳过内建王冠 */
+var PET_HAT_CROWN = { aurora:1, gemcrown:1, mooncrown:1, phoenix:1 };
 /* 王冠（画在宠物前面；Lv5 起才有）。定位放在外层 g 的属性上，内层 .pk-crown 只负责佩戴动画 */
-function petCrownSVG(F, lv){
+function petCrownSVG(F, lv, wears){
   if(lv < 5) return '';
+  if(wears && wears.hat && PET_HAT_CROWN[wears.hat]) return '';
   return '<g class="pk-fx"><g transform="translate(60,'+petFxNum(F.crown.cy)+') scale('+petFxNum(F.crown.k)+')">'+
       '<g class="pk-crown">'+
       '<path d="M-13 2 L-9 -11 L-4.5 -1 L0 -13 L4.5 -1 L9 -11 L13 2 Z" fill="#FFC93C" stroke="#B87400" stroke-width="2" stroke-linejoin="round"/>'+
@@ -3667,7 +3900,7 @@ function petSVG(opt){
   /* 关闭 .pk-hop 与 .pk-all —— 王冠/星轨不再进缩放组（会被 scale 推出可视区），改用画面固定坐标 */
   out += '</g></g>';
   if(!compact){
-    out += petCrownSVG(F, lv);
+    out += petCrownSVG(F, lv, wears);
     out += petSatellitesSVG(F, lv, chars, phOrbit);
   }
   out += '</svg>';
@@ -3744,6 +3977,103 @@ function petBgSVG(id){
     o += '<path d="M50 110 L60 86 L70 110 Z" fill="#9B6DFF" stroke="#7C5CFF" stroke-width="2"/>';
     o += '<path d="M130 110 L140 86 L150 110 Z" fill="#9B6DFF" stroke="#7C5CFF" stroke-width="2"/>';
     o += '<rect x="92" y="140" width="16" height="36" rx="8" fill="#7C5CFF"/>';
+  } else if(id === 'skygarden'){
+    /* Lv21+ 高阶背景（美术规格 v1.0 §4.4）：装饰只进四角/上下边，主体框 x∈[60,140]/y∈[55,145] 只留柔光板 */
+    var sg, fx=[24,52,148,176,100], fy=[168,180,176,166,188];
+    o += '<defs><radialGradient id="skyG" cx="50%" cy="50%" r="50%">'+
+         '<stop offset="0" stop-color="#5A3C28" stop-opacity=".10"/>'+
+         '<stop offset="1" stop-color="#5A3C28" stop-opacity="0"/></radialGradient></defs>';
+    o += '<rect width="200" height="200" fill="#E4F2FB"/>';
+    o += '<rect y="146" width="200" height="54" fill="#EFF7E6"/>';
+    o += '<path d="M0 150 q40 -12 80 0 q40 12 80 0 q20 -6 40 0 v50 H0 z" fill="#BFE0A8"/>';
+    o += '<ellipse cx="100" cy="104" rx="62" ry="66" fill="url(#skyG)"/>';
+    o += '<g fill="#FFFFFF" opacity=".92">'+
+         '<ellipse cx="34" cy="34" rx="17" ry="12"/><ellipse cx="49" cy="29" rx="13" ry="10"/>'+
+         '<ellipse cx="21" cy="38" rx="11" ry="8"/><ellipse cx="167" cy="45" rx="15" ry="11"/>'+
+         '<ellipse cx="152" cy="40" rx="11" ry="8"/><ellipse cx="100" cy="19" rx="21" ry="9"/></g>';
+    for(sg=0;sg<5;sg++){
+      o += '<g transform="translate('+fx[sg]+','+fy[sg]+')">'+
+        '<circle cx="0" cy="-4.4" r="3.4" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.1"/>'+
+        '<circle cx="4.2" cy="-1.4" r="3.4" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.1"/>'+
+        '<circle cx="2.6" cy="3.4" r="3.4" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.1"/>'+
+        '<circle cx="-2.6" cy="3.4" r="3.4" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.1"/>'+
+        '<circle cx="-4.2" cy="-1.4" r="3.4" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.1"/>'+
+        '<circle r="2.4" fill="#FFC93C" stroke="#B87400" stroke-width="1"/></g>';
+    }
+  } else if(id === 'starsea'){
+    var ss, sx2=[18,44,72,120,158,182,186,170,32,16],
+            sy2=[22,40,16,18,30,58,120,168,96,140],
+            ss2=[3.4,2.6,4.2,3,3.6,2.6,2.4,3,2.4,2.8];
+    o += '<defs>'+
+      '<linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0" stop-color="#1E3A5E"/><stop offset="1" stop-color="#4E7BA8"/></linearGradient>'+
+      '<radialGradient id="seaGlow" cx="50%" cy="50%" r="50%">'+
+        '<stop offset="0" stop-color="#FFFFFF" stop-opacity=".22"/>'+
+        '<stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient></defs>';
+    o += '<rect width="200" height="200" fill="url(#seaG)"/>';
+    for(ss=0;ss<10;ss++){
+      o += '<path transform="translate('+sx2[ss]+','+sy2[ss]+') scale('+(ss2[ss]/4)+')" '+
+        'd="M0 -4 Q.8 -1 4 0 Q.8 1 0 4 Q-.8 1 -4 0 Q-.8 -1 0 -4 Z" fill="#FFF6DF" opacity=".9"/>';
+    }
+    o += '<path d="M166 20 a16 16 0 1 0 12 26 a19 19 0 1 1 -12 -26 Z" fill="#FFE9A8" opacity=".9"/>';
+    o += '<path d="M22 68 l32 -19" fill="none" stroke="#FFF6DF" stroke-width="2.6" stroke-linecap="round" opacity=".5"/>';
+    o += '<circle cx="22" cy="68" r="2.8" fill="#FFF6DF"/>';
+    o += '<ellipse cx="100" cy="104" rx="60" ry="64" fill="url(#seaGlow)"/>';
+    o += '<path d="M0 158 q34 -12 68 0 q34 12 68 0 q32 -10 64 0 v42 H0 z" fill="#2C5580" opacity=".9"/>';
+    o += '<path d="M0 174 q40 -10 80 0 q40 10 80 0 q20 -6 40 0 v26 H0 z" fill="#1E3A5E"/>';
+    o += '<circle cx="40" cy="168" r="2" fill="#FFF6DF" opacity=".5"/>'+
+         '<circle cx="100" cy="182" r="1.8" fill="#FFF6DF" opacity=".45"/>'+
+         '<circle cx="158" cy="170" r="2.2" fill="#FFF6DF" opacity=".5"/>';
+  } else if(id === 'gemcave'){
+    var gc, cx2=[26,44,168,150,100], cy2=[152,166,150,168,184],
+            cs2=[1.2,.8,1.1,.75,.6], cr2=[-12,8,14,-6,0];
+    o += '<defs>'+
+      '<linearGradient id="caveG" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0" stop-color="#1F5150"/><stop offset="1" stop-color="#4E9E96"/></linearGradient>'+
+      '<radialGradient id="caveGlow" cx="50%" cy="50%" r="50%">'+
+        '<stop offset="0" stop-color="#FFFFFF" stop-opacity=".20"/>'+
+        '<stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient></defs>';
+    o += '<rect width="200" height="200" fill="url(#caveG)"/>';
+    o += '<path d="M0 0 q28 92 0 200 z" fill="#173F3E" opacity=".5"/>';
+    o += '<path d="M200 0 q-28 92 0 200 z" fill="#173F3E" opacity=".5"/>';
+    o += '<g fill="#2A6B68"><path d="M12 0 l14 0 l-7 34 z"/><path d="M52 0 l12 0 l-6 22 z"/>'+
+         '<path d="M150 0 l12 0 l-6 26 z"/><path d="M176 0 l16 0 l-8 38 z"/></g>';
+    o += '<ellipse cx="100" cy="104" rx="58" ry="62" fill="url(#caveGlow)"/>';
+    o += '<path d="M0 172 q50 -10 100 0 q50 10 100 0 v28 H0 z" fill="#173F3E"/>';
+    for(gc=0;gc<5;gc++){
+      o += '<g transform="translate('+cx2[gc]+','+cy2[gc]+') rotate('+cr2[gc]+') scale('+cs2[gc]+')">'+
+        '<path d="M0 -15 L7 0 L0 13 L-7 0 Z" fill="#7FC7EE" stroke="#CDEEFF" stroke-width="1.8" stroke-linejoin="round"/>'+
+        '<path d="M0 -15 L0 13" fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity=".8"/></g>';
+    }
+    o += '<circle cx="26" cy="70" r="1.8" fill="#CDEEFF" opacity=".55"/>'+
+         '<circle cx="176" cy="84" r="1.6" fill="#CDEEFF" opacity=".5"/>'+
+         '<circle cx="34" cy="118" r="1.6" fill="#CDEEFF" opacity=".5"/>'+
+         '<circle cx="166" cy="124" r="1.8" fill="#CDEEFF" opacity=".55"/>';
+  } else if(id === 'aurorabg'){
+    var ab, tx2=[26,52,170], ty2=[150,158,152], ts2=[.9,.7,.85],
+            ta=[30,66,112,150,182,96], tb=[20,34,16,32,22,44];
+    o += '<defs>'+
+      '<linearGradient id="auroG" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0" stop-color="#24436E"/><stop offset="1" stop-color="#6E93B4"/></linearGradient>'+
+      '<radialGradient id="auroGlow" cx="50%" cy="50%" r="50%">'+
+        '<stop offset="0" stop-color="#FFFFFF" stop-opacity=".20"/>'+
+        '<stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient></defs>';
+    o += '<rect width="200" height="200" fill="url(#auroG)"/>';
+    for(ab=0;ab<6;ab++){
+      o += '<path transform="translate('+ta[ab]+','+tb[ab]+') scale(.8)" '+
+        'd="M0 -4 Q.8 -1 4 0 Q.8 1 0 4 Q-.8 1 -4 0 Q-.8 -1 0 -4 Z" fill="#FFF6DF" opacity=".85"/>';
+    }
+    o += '<path d="M-10 58 q55 -34 110 -14 q50 16 110 -8" fill="none" stroke="#8ED46E" stroke-width="16" stroke-linecap="round" opacity=".36"/>';
+    o += '<path d="M-10 74 q55 -34 110 -12 q50 16 110 -6" fill="none" stroke="#7FC7EE" stroke-width="11" stroke-linecap="round" opacity=".42"/>';
+    o += '<path d="M-10 88 q55 -30 110 -10 q50 14 110 -4" fill="none" stroke="#FFB3C8" stroke-width="7" stroke-linecap="round" opacity=".38"/>';
+    o += '<ellipse cx="100" cy="104" rx="60" ry="64" fill="url(#auroGlow)"/>';
+    o += '<path d="M0 152 q46 -14 92 -2 q46 12 108 -4 v54 H0 z" fill="#EAF3FB"/>';
+    o += '<path d="M0 174 q50 -10 100 0 q50 10 100 0 v26 H0 z" fill="#C6E7F7"/>';
+    for(ab=0;ab<3;ab++){
+      o += '<g transform="translate('+tx2[ab]+','+ty2[ab]+') scale('+ts2[ab]+')">'+
+        '<rect x="-2" y="0" width="4" height="12" rx="2" fill="#8A5A2B"/>'+
+        '<path d="M0 -26 l11 15 l-6 0 l9 12 l-28 0 l9 -12 l-6 0 z" fill="#377020"/></g>';
+    }
   } else {
     o += '<rect width="200" height="200" fill="#FFF1E0"/>';
     o += '<circle cx="100" cy="164" r="52" fill="#FFE6D5" opacity=".7"/>';
@@ -3799,7 +4129,26 @@ var PET_COSTUME_LIST = [
   {id:'butterfly',name:'蝴蝶翅膀', slot:'wing',  price:25, rarity:'legend'},
   {id:'mountain', name:'山峦背景', slot:'bg',    price:15, rarity:'rare'},
   {id:'rainbowbg',name:'彩虹背景', slot:'bg',    price:25, rarity:'legend'},
-  {id:'castle',   name:'城堡背景', slot:'bg',    price:15, rarity:'rare'}
+  {id:'castle',   name:'城堡背景', slot:'bg',    price:15, rarity:'rare'},
+  /* ---- Lv21–Lv40 高阶装扮 16 件（美术规格 v1.0，16 id 与既有 28 件零冲突）----
+     grant = 达成等级自动赠送（不走 ⭐ 购买，避免「攒够星却没到级」的挫败）；
+     grantLevelRewards 在等级达标时自动入 owned 并去重，商店里仅作展示与锁定提示。 ---- */
+  {id:'aurora',      name:'极光冠',   slot:'hat',   price:0, rarity:'myth', grant:22},
+  {id:'nebula',      name:'星云围巾', slot:'scarf', price:0, rarity:'myth', grant:23},
+  {id:'aurorawing',  name:'极光翅膀', slot:'wing',  price:0, rarity:'myth', grant:24},
+  {id:'skygarden',   name:'云上花园', slot:'bg',    price:0, rarity:'myth', grant:25},
+  {id:'gemcrown',    name:'宝石冠',   slot:'hat',   price:0, rarity:'myth', grant:27},
+  {id:'pearl',       name:'珍珠围巾', slot:'scarf', price:0, rarity:'myth', grant:28},
+  {id:'angelwing',   name:'天使之翼', slot:'wing',  price:0, rarity:'myth', grant:29},
+  {id:'starsea',     name:'星海背景', slot:'bg',    price:0, rarity:'myth', grant:30},
+  {id:'mooncrown',   name:'月牙冠',   slot:'hat',   price:0, rarity:'myth', grant:32},
+  {id:'ribbon',      name:'缎带围巾', slot:'scarf', price:0, rarity:'myth', grant:33},
+  {id:'crystalwing', name:'水晶翅膀', slot:'wing',  price:0, rarity:'myth', grant:34},
+  {id:'gemcave',     name:'宝石洞窟', slot:'bg',    price:0, rarity:'myth', grant:35},
+  {id:'phoenix',     name:'凤羽冠',   slot:'hat',   price:0, rarity:'myth', grant:37},
+  {id:'cloudscarf',  name:'云绒围巾', slot:'scarf', price:0, rarity:'myth', grant:38},
+  {id:'dragonwing',  name:'祥龙翅膀', slot:'wing',  price:0, rarity:'myth', grant:39},
+  {id:'aurorabg',    name:'极光天幕', slot:'bg',    price:0, rarity:'myth', grant:40}
 ];
 var PET_COSTUME_SLOTS = [
   {slot:'hat',   label:'帽子'}, {slot:'scarf', label:'围巾'},
@@ -3813,12 +4162,14 @@ function costumeEquipped(s,id){ var m=costumeMeta(id); return !!(m && s.pet.wear
 function costumePreviewSVG(item, lv){
   if(item.slot==='bg') return petBgSVG(item.id);
   var wears={}; wears[item.slot]=item.id;
-  var prevLv = Math.max(lv, costumeUnlockLv(item.slot));
+  /* 美术 R1②：商店卡 .pc-prev 是 overflow:hidden，scale>1.52 会裁头 —— 预览等级钳到 8 */
+  var prevLv = Math.min(8, Math.max(lv, costumeUnlockLv(item.slot)));
   return petSVG({level:prevLv, mood:'happy', wears:wears, t:0, chars:learnedCharsTop(5)});
 }
 /* 纯逻辑：购买并自动装备（GDD §5.4 #3：未拥有→花⭐→二次确认→购入后自动装备） */
 function buyCostume(s,id){
   var m=costumeMeta(id); if(!m) return {ok:false,reason:'noid'};
+  if(m.grant) return {ok:false,reason:'grant'};   /* 等级达成自动赠送件不走 ⭐ 购买 */
   if(costumeOwned(s,id)) return {ok:false,reason:'owned'};
   var lv=petStage(s.pet.bond)+1;
   if(lv < costumeUnlockLv(m.slot)) return {ok:false,reason:'locked'};
@@ -3848,23 +4199,52 @@ function applyFeed(s){
   if((s.energy||0) < 1)  return {ok:false, reason:"noenergy"};
   var prev = petStage(s.pet.bond);
   s.energy -= 1;
-  s.pet.bond += 10;
+  /* 方案 C-3：每日前 3 个果 +10，第 4 个起边际递减为 +3 —— 堵「囤果狂喂」主导策略（喂食无硬上限） */
+  var bonus = (s.pet.fedToday < 3) ? 10 : 3;
+  s.pet.bond += bonus;
   s.pet.fedToday += 1;
-  s.pet.level = bondToLevel(s.pet.bond);
+  var granted = syncPetAfterBond(s);
   var now = petStage(s.pet.bond);
-  return {ok:true, prevStage:prev, stage:now, leveledUp: now>prev, bond:s.pet.bond, energy:s.energy, name:PET_STAGES[now].name};
+  return {ok:true, prevStage:prev, stage:now, leveledUp: now>prev, gained:bonus, granted:granted, bond:s.pet.bond, energy:s.energy, name:PET_STAGES[now].name};
 }
-/* ---- 纯逻辑：抚摸一次（+1 亲密度，每日上限 10，GDD §5.4）---- */
+/* ---- 纯逻辑：抚摸一次（方案 C-1：+2 亲密度，每日上限仍 10 次 → 20/日；不增加点击次数）---- */
 function applyPetStroke(s){
   if(!s || !s.pet) return {ok:false, reason:"nopet"};
   if(s.pet.petToday >= 10) return {ok:false, reason:"cap"};
   var prev = petStage(s.pet.bond);
-  s.pet.bond += 1;
+  s.pet.bond += 2;
   s.pet.petToday += 1;
-  s.pet.level = bondToLevel(s.pet.bond);
+  var granted = syncPetAfterBond(s);
   var now = petStage(s.pet.bond);
-  return {ok:true, prevStage:prev, stage:now, leveledUp: now>prev, bond:s.pet.bond, name:PET_STAGES[now].name};
+  return {ok:true, prevStage:prev, stage:now, leveledUp: now>prev, granted:granted, bond:s.pet.bond, name:PET_STAGES[now].name};
 }
+/* ---- 方案 C 配套：bond 变化后统一同步等级 + 补发等级达成奖励（grant 装扮）----
+   老存档 bond 很高时一次升多级：grantLevelRewards 去重补发，绝无遗漏；
+   提示合并为一条 toast（由 renderPet 消费队列），不逐级弹。 ---- */
+var _petGrantToastQueue = [];
+function grantLevelRewards(s){
+  if(!s || !s.pet) return [];
+  if(!Array.isArray(s.pet.granted)) s.pet.granted = [];
+  if(!Array.isArray(s.pet.owned))   s.pet.owned = [];
+  var lv = petStage(s.pet.bond||0) + 1, got = [], i, it;
+  for(i=0;i<PET_COSTUME_LIST.length;i++){
+    it = PET_COSTUME_LIST[i];
+    if(!it.grant) continue;
+    if(lv >= it.grant && s.pet.owned.indexOf(it.id) < 0){
+      s.pet.owned.push(it.id);
+      if(s.pet.granted.indexOf(it.id) < 0) s.pet.granted.push(it.id);
+      got.push(it);
+    }
+  }
+  for(i=0;i<got.length;i++) _petGrantToastQueue.push(got[i]);
+  return got;
+}
+function syncPetAfterBond(s){
+  if(!s || !s.pet) return [];
+  s.pet.level = bondToLevel(s.pet.bond||0);
+  return grantLevelRewards(s);
+}
+function drainPetGrantToasts(){ return _petGrantToastQueue.splice(0); }
 
 var PET_LINES_HAPPY = ["你真棒！","我好喜欢和你一起学！","这个字好有趣呀～","哇，你好厉害！","我们继续吧！"];
 var _petMood = "happy", _petPraise = "";
@@ -3877,6 +4257,13 @@ function renderPet(keepScroll){
   var host = $("page-pet"); if(!host) return;
   /* 装扮交互需保留滚动位置：先在旧 .pet-page 上记录 scrollTop，重渲染后还原 */
   var _prevScroll = (keepScroll && host.querySelector('.pet-page')) ? host.querySelector('.pet-page').scrollTop : 0;
+  grantLevelRewards(state);   /* 幂等兜底：老存档 bond 已达标也能补齐 grant 装扮 */
+  var gts = drainPetGrantToasts();
+  if(gts.length){
+    var gnames = [], gi;
+    for(gi=0; gi<gts.length; gi++) gnames.push(gts[gi].name);
+    toast('🎁 墨墨长大了，送你新装扮：'+gnames.join('、')+'！');
+  }
   var bond = state.pet.bond||0, st = petStage(bond), lv = st+1, S = PET_STAGES[st];
   var lo = PET_BOND_THRESH[st], hi = (st < PET_BOND_THRESH.length-1 ? PET_BOND_THRESH[st+1] : PET_BOND_THRESH[PET_BOND_THRESH.length-1]);
   var pct = (st >= PET_BOND_THRESH.length-1) ? 100 : Math.max(0, Math.min(100, Math.round((bond-lo)/(hi-lo)*100)));
@@ -3993,7 +4380,7 @@ function costumeSectionHTML(){
     html += '<div class="pc-row"><div class="pc-label">'+label+'</div><div class="pc-grid">';
     for(var i=0;i<PET_COSTUME_LIST.length;i++){
       var it=PET_COSTUME_LIST[i]; if(it.slot!==slot) continue;
-      var locked = lv < costumeUnlockLv(slot);
+      var locked = it.grant ? (lv < it.grant) : (lv < costumeUnlockLv(slot));
       var owned = costumeOwned(state,it.id);
       var on = costumeEquipped(state,it.id);
       var cls = 'pc-card'+(on?' pc-on':'')+(locked?' pc-locked':'');
@@ -4003,7 +4390,7 @@ function costumeSectionHTML(){
         badge = '<div class="pc-confirm"><button class="pc-no" data-act="costume-cancel" type="button">取消</button>'+
                 '<button class="pc-yes" data-act="costume-buy" data-id="'+it.id+'" type="button">用 '+it.price+'⭐买</button></div>';
       } else if(locked){
-        badge = '<div class="pc-badge pc-lock">Lv'+costumeUnlockLv(slot)+' 解锁</div>';
+        badge = '<div class="pc-badge pc-lock">Lv'+(it.grant||costumeUnlockLv(slot))+' 解锁</div>';
       } else if(on){
         badge = '<div class="pc-badge pc-on">✓ 穿着</div>';
       } else if(owned){
@@ -4040,8 +4427,9 @@ function onCostume(e){
   }
   var card = e.target.closest && e.target.closest('.pc-card'); if(!card) return;
   var cid = card.getAttribute('data-id'), slot = card.getAttribute('data-slot');
-  var lv = petStage(state.pet.bond)+1;
-  if(lv < costumeUnlockLv(slot)){ toast('升到 Lv'+costumeUnlockLv(slot)+' 就能用'+card.querySelector('.pc-name').textContent+'啦'); return; }
+  var lv = petStage(state.pet.bond)+1, cm = costumeMeta(cid);
+  var gateLv = (cm && cm.grant) ? cm.grant : costumeUnlockLv(slot);
+  if(lv < gateLv){ toast('墨墨升到 Lv'+gateLv+' 就送你'+card.querySelector('.pc-name').textContent+'啦'); return; }
   if(costumeEquipped(state,cid)){
     equipCostume(state,cid); syncSave();
     toast('脱下来啦'); renderPet(true); return;   /* T5：去掉与 toast 重复的 speak */
@@ -4093,7 +4481,7 @@ function codexKnownCount(s){
 }
 function renderDex(){
   var host = $("page-dex"); if(!host) return;
-  var g = codexGroups(state), known = codexKnownCount(state), total = CHAR_DICT.length;
+  var g = codexGroups(state), known = codexKnownCount(state), total = NUM_LEVELS*5;   /* 只数关卡字；CHAR_DICT 尾部追加的宠物名用字不计入进度分母 */
   var html = '<div class="dex" data-page-node-id="'+nid('dex.page')+'">'+
     '<div class="dex-hd" data-page-node-id="'+nid('dex.hd')+'">'+
       '<div class="dex-hd-t">汉字图鉴</div>'+
@@ -4124,10 +4512,29 @@ function renderDex(){
     }
     html += '</section>';
   }
+  /* 「宠物名字」分区：Lv21–Lv40 墨墨的名字里的字当识字素材（难字随名认读）。
+     计数独立，不并入上方「已认识 x/100」；缺失字不做 picSVG 象形图（picSVG 无图会空框），用「字+拼音+点读」卡片。 */
+  var pns = petNameChars(), pc, po, pknown;
+  html += '<section class="dex-zone" data-page-node-id="'+nid('dex.petzone')+'">'+
+    '<h3 class="dex-zone-t" data-page-node-id="'+nid('dex.petzone.t')+'">宠物名字 · 墨墨的名字</h3>'+
+    '<div class="dex-grid">';
+  for(pc=0; pc<pns.length; pc++){
+    po = chObj(pns[pc]);
+    pknown = !!(state.codex && state.codex[pns[pc]]);
+    html += '<div class="dex-cell '+(pknown?'known':'todo')+' dex-pcell" data-c="'+pns[pc]+'" data-page-node-id="'+nid('codex.petname.'+pns[pc])+'">'+
+      '<div class="dex-c">'+pns[pc]+'</div>'+
+      '<div class="dex-py">'+(po ? po.py : '')+'</div>'+
+      (pknown ? '<div class="dex-badge ok">✓</div>' : '<div class="dex-badge todo">·</div>')+
+    '</div>';
+  }
+  html += '</div></section>';
   html += '</div>';
   setHTML(host, html);
   [].forEach.call(host.querySelectorAll('.dex-cell.known'), function(el){
     /* T5：孩子主动点字 → force 直通 */
+    el.addEventListener('click', function(){ if(typeof speak==="function") speak(el.getAttribute('data-c'), true); });
+  });
+  [].forEach.call(host.querySelectorAll('.dex-pcell'), function(el){
     el.addEventListener('click', function(){ if(typeof speak==="function") speak(el.getAttribute('data-c'), true); });
   });
 }
@@ -5361,15 +5768,19 @@ function applyLevelResult(s, idx, stars, hintsUsed, maxCombo, quizCorrect, quizT
   /* P5：通关即把本关 5 字写进图鉴（append-only，s 只升不降）。
      s=1 已学 / s=2 已掌握（≥2★ 视为掌握），供每日挑战遗忘权重取数（GDD §7.6） */
   if(!s.codex) s.codex = {};
-  var lvChars = levelChars(idx), ci2, cc, ce;
+  var lvChars = levelChars(idx), ci2, cc, ce, newChars = 0;
   for(ci2=0; ci2<lvChars.length; ci2++){
     cc = lvChars[ci2].c;
+    if(!s.codex[cc]) newChars++;                     /* 方案 C-2：首次学会的新字才计数（防刷同字） */
     ce = s.codex[cc] || { s:0, right:0, wrong:0, firstAt:Date.now(), masterAt:null };
     ce.s = Math.max(ce.s||0, newStars>=2 ? 2 : 1);
     if(ce.s===2 && !ce.masterAt) ce.masterAt = Date.now();
     if(!ce.firstAt) ce.firstAt = Date.now();
     s.codex[cc] = ce;
   }
+  /* 方案 C-2：宠物成长焊进核心学习循环 —— 每学会 1 个新字 +2 亲密度（此前学字给 0，宠物只靠喂苹果，错位） */
+  if(newChars > 0 && s.pet) s.pet.bond = (s.pet.bond||0) + 2*newChars;
+  syncPetAfterBond(s);
   recalcZones(s);   /* 顺带把 unlockedThrough 推进到「最高 2 星关卡 +1」 */
   /* 防刷（GDD §4.3）：星星/碎片按关卡取历史最大补差，不重复给；能量果每次都给。
      Boss 关奖励按 GDD §4.3 整体 ×2：把「本次提升的星数差」再乘 2（普通关 ×1）。 */
@@ -5500,7 +5911,7 @@ function applyDailyResult(s){
   s.energy     = (s.energy||0) + 15;   /* 能量果无上限 */
   if(s.pet){
     s.pet.bond = (s.pet.bond||0) + 5;
-    s.pet.level = bondToLevel(s.pet.bond);
+    syncPetAfterBond(s);
   }
   return {ok:true, star:1, energy:15, bond:5, petLevel: s.pet ? s.pet.level : null};
 }
