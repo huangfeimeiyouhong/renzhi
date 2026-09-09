@@ -541,13 +541,17 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
    循环动画一律 animation:none，绝不用「把时长压到接近 0」的替代写法
    —— 后者会让 infinite 循环高频重绘，是光敏性风险。 */
 @media (prefers-reduced-motion: reduce){
+  /* ★ 修复：以下选择器列表原先与 `*{ transition-duration }` 共用同一个声明块，
+     导致 7 个地图节点循环动画（lockdrift/nodehalo/nodefloat/flagwave/
+     perfectflash/crownbob/bossspin）在减弱动效下依然全速运行 —— 终局 40 关全三星
+     时是 80 个 infinite 动画，属光敏性风险（美术 §20.6 硬约束）。现独立成规则。 */
   .n-locked .lockcloud,
   .n-available .halo, .n-inProgress .halo,
   .n-available .halo--in, .n-inProgress .halo--in,
   .n-available .disc, .n-inProgress .disc,
   .n-available .flag, .n-inProgress .flag,
   .n-perfect .disc, .n-perfect .crown,
-  .n-boss .bossframe,
+  .n-boss .bossframe{ animation:none !important; }
   *{ transition-duration:.01ms !important; }
   /* P5：每日挑战弹层 / 能量果飞行 / HUD 弹跳 降级（循环/强动效一律 animation:none） */
   .lv-ask-card{ animation:none !important; }
@@ -555,6 +559,12 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
   .cur-bump{ animation:none !important; }
   /* 引导发光降级为静态描边，不依赖动画单独传达信息 */
   .lv-glow{ animation:none !important; outline:4px solid #FFC93C; outline-offset:3px; }
+  /* ★ 补齐余下 4 个循环动画。这些动画承载信息（当前格 / 提示格 / 宝箱可开 / 说话中），
+     故一律给静态兜底样式，避免「动画关掉后信息也没了」（硬约束：不能只靠动画传达信息）。 */
+  .g4-cell.cur{  animation:none !important; box-shadow:0 0 0 4px var(--c-ok) !important; }
+  .g4-cell.hint{ animation:none !important; box-shadow:0 0 0 4px var(--c-gold) !important; }
+  .chest3d.is-ready{ animation:none !important; }
+  .lv-mouth{ animation:none !important; transform:scaleY(1) !important; }
 }
 
 /* ===================== 横屏 / 平板（美术 §10.6） ===================== */

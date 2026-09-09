@@ -208,6 +208,8 @@ function levelChars(i){ return CHAR_DICT.slice((i-1)*5, i*5); }
 > ⚠️ **v1.1 修正（art-director 发现，已验算确认）**：原文写的 `2400` 会**裁掉 L20 一半**。
 > 按下面自己的 `nodePos` 公式：`L20 → z=3, k=4 → y = 1920+100+4×104 = 2436`，加 Boss 半径 `44` = `2480 > 2400`。
 > 修正为 `MAP_H = 2520`（4 区 × 600 = 2400 + 上下留白 120，几何自洽，`y0` 与间距都不用动）。**只改这一个数字。**
+>
+> ⚠️ **v1.4 再修正**：2520 仍会在终局压到「每日字灵挑战」节点。art-director 实测 L20 星框外扩 61→底边 2497，每日节点需 `y ≥ 2539` 才不压，差 42px。最终定案 **`MAP_H = 2700`**，每日节点放 `(200, 2600)`（L20 中心距 187 > 两框半径和 122 ✅，底部留白 39px）。详见 art 美术规格 §17.7 / §2.3 对照。
 
 ```
  ┌─────────────────────────────┐  ← 顶部 HUD（非地图）：⭐ 12  🍎 48  🔑 1
@@ -250,7 +252,7 @@ var ZONE_CFG=[
   {name:"云上城", y0:1320, sky:["#D6E4FF","#F0E6FF"], land:"#A9C8FF", accent:"#C9B6FF", deco:"cloud", f:LIGHT},
   {name:"星星堡", y0:1920, sky:["#2E2A5E","#5B4B9E"], land:"#6C5CE7", accent:"#FFD86B", deco:"star",  f:DARK }
 ];
-var MAP_W=400, MAP_H=2520;            // ⚠️ v1.1：2400 → 2520（见 §2.3 修正说明）
+var MAP_W=400, MAP_H=2700;            // ⚠️ v1.1：2400 → 2520；⚠️ v1.4：2520 → 2700（容纳终局「每日字灵挑战」节点，见 §2.3 修正说明）
 function nodePos(levelIndex){          // levelIndex 0..19
   var z=Math.floor(levelIndex/5), k=levelIndex%5;
   var cfg=ZONE_CFG[z];
@@ -1638,6 +1640,7 @@ function defaultStateV2(){
     stats:{ totalRight:0, totalWrong:0, playSeconds:0, sessions:0, wrongByChar:{} },  // wrongByChar:{"入":4}  只追加
     settingsNew:{
       dailyMinutes:20, restReminder:true, soundOn:true,
+      fsScale:1,                     // ⚠️ v1.4：大字号模式缩放系数（art 美术规格 §11 的 --fs-scale 需要持久化；原 GDD 漏了此字段，仅增不改）
       chestPool:{}                   // { "r1":{inPool:true, needCoupons:1, dailyLimit:1} }
     }
   };
@@ -1682,15 +1685,32 @@ function mergeSettings(){
 **(C) 三级回落读取**（保证任何情况下数据不丢）：
 
 ```js
-function applyCloudV2(row){
-  /* 第 1 级：优先读独立字段 */
-  var g = safeParse(row["关卡v2"], null);
-  var p = safeParse(row["宠物"],   null);
-  var c = safeParse(row["图鉴"],   null);
-  var r = safeParse(row["资源"],   null);
-  var s = safeParse(row["统计"],   null);
+/* ⚠️ v1.4：rowVal 同时兼容裸值与包装值，否则对象进 JSON.parse 会抛错被 safeParse 吞掉，
+   表现为「同步成功」但其实一次都没同步上（§12.3 ⚠️ 实测说明） */
+function rowVal(row, key){
+  var v = row[key];
+  if(v === undefined || v === null) return undefined;
+  if(typeof v === "string" || typeof v === "number" || typeof v === "object") {
+    if(v && typeof v === "object"){                 // 包装形态 {text|number|date|value|date:{start}}
+      if("text"   in v) return v.text;
+      if("number" in v) return v.number;
+      if("value"  in v) return v.value;
+      if(v.date && typeof v.date === "object" && "start" in v.date) return v.date.start;
+      if("date"   in v) return v.date;
+    }
+  }
+  return v;                                          // 裸值直接返回
+}
 
-  /* 第 2 级：独立字段缺失 → 回落到「设置」字段的 v2 子键 */
+function applyCloudV2(row){
+  /* 第 1 级：优先读独立字段（全部经 rowVal 解包） */
+  var g = safeParse(rowVal(row,"关卡v2"), null);
+  var p = safeParse(rowVal(row,"宠物"),   null);
+  var c = safeParse(rowVal(row,"图鉴"),   null);
+  var r = safeParse(rowVal(row,"资源"),   null);
+  var s = safeParse(rowVal(row,"统计"),   null);
+
+  /* 第 2 级：独立字段缺失 → 回落到「设置」字段的 v2 子键（applyCloud 已先把设置写进 state.settings） */
   var setV2 = (state.settings && state.settings.v2) ? state.settings.v2 : null;
   if(!g && setV2) g = setV2.g;
   if(!p && setV2) p = setV2.p;
@@ -1700,24 +1720,105 @@ function applyCloudV2(row){
 
   /* 第 3 级：都没有 → 保留本地 localStorage（load() 已载入），什么都不做 */
 
-  /* 时间戳比较：云端比本地新才覆盖（沿用 v1 的 adoptCloud 策略） */
-  var cloudTime = Date.parse(row["更新时间"]) || 0;
-  var localTime = state.updatedAt || 0;
-  if(cloudTime < localTime) return;         // 本地更新，不覆盖
+  /* ⚠️ v1.4：时间戳比较已上移到 adoptCloud（applyCloud 之前），见下方 (E)。
+     此处**不再**各自比较——否则 applyCloud 改写 state.updatedAt 后，
+     applyCloudV2 再比时恒等于 cloudTime，等于永远覆盖本地。 */
+  if(g) state.game  = mergeState(state.game,  g);
+  if(p) state.pet   = mergeState(state.pet,   p);
+  if(c) state.codex = mergeState(state.codex, c);
+  if(r){ state.stars=Math.max(state.stars, r.stars||0); state.starsTotal=Math.max(state.starsTotal,r.starsTotal||0);
+         state.energy=Math.max(state.energy,r.energy||0); state.shards=Math.max(state.shards,r.shards||0);
+         state.keys=Math.max(state.keys,r.keys||0); }
+  if(s){ state.daily=mergeState(state.daily, s.daily||{});
+         state.streak=mergeState(state.streak, s.streak||{cur:0,best:0,lastDate:""});
+         state.stats =mergeState(state.stats,  s.stats||{});
+         state.coupons=mergeState(state.coupons, s.coupons||[]);
+         state.chest =mergeState(state.chest,  s.chest||{opened:0,log:[]});
+         state.settingsNew=mergeState(state.settingsNew, s.settingsNew||{}); }
+}
 
-  if(g) state.game = mergeDeep(state.game, g);
-  if(p) state.pet  = mergeDeep(state.pet,  p);
-  if(c) state.codex= mergeDeep(state.codex,c);
-  if(r){ state.stars=r.stars||0; state.starsTotal=r.starsTotal||0; state.energy=r.energy||0;
-         state.shards=r.shards||0; state.keys=r.keys||0; }
-  if(s){ state.daily=s.daily||{}; state.streak=s.streak||{cur:0,best:0,lastDate:""};
-         state.stats=s.stats||state.stats; state.coupons=s.coupons||[];
-         state.chest=s.chest||{opened:0,log:[]};
-         state.settingsNew=mergeDeep(state.settingsNew, s.settingsNew||{}); }
+/* ⚠️ v1.4 合并策略：append-only 字段必须「并集 / 取大」，绝不能整段替换（否则双设备各玩一半会丢数据）。
+   详见 §12.3.1 合并策略表。mergeState 递归到数组（按 id 并集）/ 对象（逐键 merge）/ 标量（取大）。 */
+function mergeState(local, incoming){
+  if(incoming === undefined || incoming === null) return local;
+  if(Array.isArray(incoming)){
+    if(!Array.isArray(local)) return incoming.slice();
+    var map={}, i;
+    for(i=0;i<local.length;i++){ if(local[i]&&local[i].id!=null) map[local[i].id]=local[i]; }
+    for(i=0;i<incoming.length;i++){ var it=incoming[i];
+      if(it&&it.id!=null){ if(map[it.id]) map[it.id]=mergeState(map[it.id],it); else map[it.id]=it; } }
+    return Object.keys(map).map(function(k){return map[k];});
+  }
+  if(typeof incoming === "object" && incoming !== null && !Array.isArray(incoming)){
+    var out = local && typeof local==="object" ? local : {};
+    for(var k in incoming){ if(!incoming.hasOwnProperty(k)) continue;
+      out[k] = mergeState(out[k], incoming[k]); }
+    return out;
+  }
+  /* 标量：默认取较大值（能量/星星等只增不减；几元的偏差无害，丢数据才是事故） */
+  return (typeof local==="number" && typeof incoming==="number") ? Math.max(local, incoming) : incoming;
 }
 ```
 
-> `mergeDeep` 只需两层浅合并即可（本模型没有三层嵌套的冲突字段）。
+**⚠️ 关键背景（v1.4 实测）**：v1 的 `applyCloud` 直接 `JSON.parse(row["已学汉字"])`，但 WorkBuddy database 返回的 properties 是 `{text|number|date}` 包装对象。`JSON.parse(object)` 抛错 → `safeParse` 吞掉 → 返回 `null`/`{}` → 三级回落走到「保留本地」。同时 `Date.parse({date:...})` → `NaN` → `cloudTime=0`，而 `adoptCloud` 的 `if(cloudTime >= localTime)` 恒为假 → **`applyCloud` 永远不执行**。结论：**v1 的云端同步从头到尾是静默失效的**——每次都「同步成功」但其实用的是本地数据。
+
+> 这意味着：修好 `rowVal` 后，同步**首次真正生效**。如果 Phil 在手机和平板各玩过、本地状态不一致，**首次同步会用并联/取大策略合并，绝不丢数据**（见 §12.3.1）。这正是修法 A 必须配套 §12.3.1 的原因——只修 `rowVal` 不修合并策略，双设备场景会丢一半。
+
+**(C-1) 时间戳比较的位置（v1.4 修正）**
+
+```js
+/* ⚠️ v1.4：比较只在 adoptCloud 做一次，且在 applyCloud / applyCloudV2 之前 */
+function adoptCloud(row){
+  recordId = row._id;
+  var cloudTime = Date.parse(rowVal(row,"更新时间")) || 0;   // 经 rowVal 解包
+  var localTime = state.updatedAt || 0;
+  if(cloudTime < localTime) return;                          // 本地更新，不覆盖
+  applyCloud(row);      // v1 字段（须同步改为 rowVal 取值）
+  applyCloudV2(row);    // v2 字段（mergeState 合并）
+}
+/* applyCloud 内部原有的时间戳比较与 state.updatedAt 赋值全部删除 */
+```
+
+> 验证清单第 8 条（云端更旧 → 不覆盖本地）现已可实测通过。
+
+**(C-2) `applyCloud`（v1 遗留函数）必须同步升级**
+
+v1 的 `applyCloud` 同样直接读包装值，需全部改为 `rowVal`：
+
+```js
+function applyCloud(row){
+  state.points      = Number(rowVal(row,"积分"))||0;
+  state.learned     = mergeState(state.learned, safeParse(rowVal(row,"已学汉字"), {})); // ⚠️ v1.4 改替换→合并
+  state.settings    = mergeState(state.settings, safeParse(rowVal(row,"设置"), {}));
+  if(state.settings){ /* 课程指针照搬 v1 */
+    if(state.settings.startDate) state.startDate=state.settings.startDate;
+    if(typeof state.settings.cursor==="number") state.cursor=state.settings.cursor;
+    if(state.settings.dayStart && typeof state.settings.dayStart==="object") state.dayStart=state.settings.dayStart;
+  }
+  migrateCursor(); ensureTodayStart();
+  state.rewards     = safeParse(rowVal(row,"奖励"), state.rewards);
+  state.stagesCleared = safeParse(rowVal(row,"关卡"), state.stagesCleared);
+  state.redeemed    = safeParse(rowVal(row,"兑换"), state.redeemed);
+}
+/* 删除原 state.updatedAt = Date.parse(row["更新时间"]) —— 比较已上移 */
+```
+
+**§12.3.1 合并策略表（v1.4 新增，append-only 的硬性兜底）**
+
+`mergeState` 的逐字段语义——多设备首次同步、备份导入（`importBackup`）**共用同一函数**：
+
+| 字段 | 类型 | 策略 | 规则 | 反例（替换会怎样） |
+|---|---|---|---|---|
+| `learned` | 对象 | **并集** | 逐字并入；同字取**较早** `date` | 设备 A 学 30 字、B 学 20 不同字 → 替换丢 20 字 |
+| `codex` | 对象 | **并集 + 取大** | 逐字并入；同字 `s`（0/1/2）取**较大**，首见时间取较早 | 本地 `日`=s2、云端 `日`=s1 → 浅合并得 s1，掌握度倒退 |
+| `game.levels` | 对象 | **并集 + 取大** | 逐关并入；`stars`/`plays`/`best`/`sections` 取较大，`cleared` 取 OR，`firstClearAt` 取较早 | 本地 L3 三星、云端 L3 一星 → 覆盖成一星，已得星消失 |
+| `coupons` / `chest.log` | 数组 | **按 id 并集** | 同 id 合并，不同 id 追加 | 设备 A 核销 2 张、B 核销 1 张 → 替换丢 1 张核销记录 |
+| `stats` | 对象 | **取大** | 计数器取较大值 | 双设备各记一半 → 总数少一半 |
+| `daily` / `streak` | 对象 | 并集 + 取大 | 逐日并入；`streak.cur/best` 取大 | 平板断签 streak，手机续签 → 覆盖断签 |
+| `stars`/`starsTotal`/`energy`/`shards`/`keys` | 标量 | **取大** | `Math.max` | 任一设备清零/支出 → 覆盖掉另一设备余额 |
+| `pet.bond` | 标量 | **取大** | 取较大亲密度 | 双设备各喂一次 → 取小值丢一次投喂 |
+
+> **原则**：学习记录与成就「只增不减」，标量「取大不取小」——宁可少量膨胀，绝不丢数据。这与 §9.5 第 10 条、§11 的「数据只增不减」硬约束一致。`mergeState` 的数组分支按 `id` 去重，故 `coupons`/`chest.log` 必须带稳定 `id`（迁移时由 `s.updatedAt` 派生，见 §12.4）。
 
 **(D) 写入**（沿用现有 `syncSave()`，扩展 `buildProps()`）：
 
@@ -1952,7 +2053,9 @@ function ensureDaily(){
 | 9 | 云端写入报「字段不存在」 | 自动降级为不含 v2 独立字段的 props 重试，数据经「设置」快照同步成功 |
 | 10 | 断网 / `window.__SMART_PAGE__.database` 为 null | 全部功能可用，仅同步失效（与 v1 行为一致） |
 | 11 | 老数据 JSON 缺字段（如无 `rewards`） | `normalizeV2` 补齐默认值，不崩溃 |
-| 12 | 家长点「清空全部数据」 | 先自动导出 JSON，再 `defaultStateV2()`，`version=2` |
+| 12 | 搜索全代码库是否存在「清空/删除 append-only 字段」的可执行路径 | **断言：不存在**。`resetAllData` 桩若保留，必须**仅弹提示、不执行任何删除/重置**（工程已按此实现）。`learned`/`codex`/`stats`/`chest.log`/`coupons` **任何情况下都不可删**（§9.5 第 10 条、§11「数据只增不减」硬约束）。家长中心只提供「导出备份」，**不做清空**。转移设备用「导出 → 导入」，导入走 `mergeState` 合并非覆盖（见 §14 项 14）|
+| 13 | 双设备各玩一半（设备 A 学 日/月、设备 B 学 山/水，各 L1、L2 三星 vs L1 一星）后首次同步 | A 侧 L1 保留三星（取大）、L2 三星；B 侧 `codex` 并集得 4 字；两边 `learned`/`codex`/`game.levels` 合并后**一个字都不丢** |
+| 14 | `importBackup(json)` 导入旧备份 | 走 `mergeState`（见 §12.3.1），**合并而非覆盖**——导入后本地原有进度不丢 |
 
 ---
 
@@ -1978,12 +2081,40 @@ function nid(semanticName){
   /* 展开成 22 位 base62：每轮用 h 的不同位段，避免尾部重复 */
   var out = "";
   for(var k=0;k<22;k++){
-    out += NID_ALPHABET[(h + Math.imul(h, 31) + Math.imul(k, 7919)) % 62];
+    /* ⚠️ v1.4 必读：h 是无符号 32 位，Math.imul 返回**有符号** 32 位（可为负），
+       三者相加可能为负 → JS 的 % 保留负号 → 下标为负 → NID_ALPHABET[负]=undefined →
+       产物含字面量 "undefined" 且长度≠22，违反 §13.1 第 1 条。
+       实测 v1.3 的原式 22 个语义名里 21 个坏（如 "undefinedBcT4BM5sjIF0undefinedepadundefined9undefinedd"）。
+       修法：取模后若为负 +62 规整到 [0,61]。等效写法 (((expr)>>>0)%62) 亦可。 */
+    var idx = (h + Math.imul(h, 31) + Math.imul(k, 7919)) % 62;
+    if(idx < 0) idx += 62;
+    out += NID_ALPHABET[idx];
     h = (h >>> 3) ^ (Math.imul(h, 2654435761) >>> 0);
     h >>>= 0;
   }
   _nidCache[semanticName] = out;
   return out;
+}
+
+/* ⚠️ v1.4 强制回归测试（任何改 nid 的人都要跑）：断言 22 位、全字符在 base62 表内、互不相同。
+   实测 138 个真实语义名（20 关×3 + 4 区 + 100 图鉴格 + 24 个 UI）全过，零碰撞。 */
+function _nidSelfTest(){
+  var sample = [], i, z, k;
+  for(i=1;i<=20;i++){ sample.push("map.node.L"+i); sample.push("map.node.hit.L"+i); sample.push("map.star.L"+i); }
+  for(z=1;z<=4;z++) sample.push("map.zone."+z);
+  for(k=0;k<100;k++) sample.push("codex.cell."+k);   /* 用序号代替真实汉字，零重复名 */
+  sample = sample.concat(["tab.map","tab.codex","tab.chest","tab.pet","hud.star","hud.energy",
+    "hud.shard","btn.back","s1.card","s1.stamp","s2.board","s3.quiz","s4.settle","pet.body",
+    "pet.eye.L","pet.eye.R","pet.mouth","chest.slot","coupon.card","daily.node","boss.frame",
+    "topbar","modal","toast"]);
+  var seen = {}, bad = 0;
+  sample.forEach(function(n){
+    var x = nid(n);
+    if(x.length !== 22 || /[^0-9a-zA-Z]/.test(x) || seen[x]) bad++;
+    seen[x] = 1;
+  });
+  console.assert(bad === 0, "[nid] 自检失败, 坏="+bad);
+  return bad === 0;
 }
 ```
 
@@ -2081,7 +2212,7 @@ html += '<div class="lvnode" data-lv="'+n+'" data-page-node-id="'+nid("map.node.
 | # | 事项 | 状态 | 美术规格出处 | 本 GDD 对应 |
 |---|---|---|---|---|
 | 1 | 宠物「墨墨」5 阶段 × 4 情绪 × 8 装扮 | ✅ 完成 | §15 | §5.1–§5.5 |
-| 2 | 4 区域地图主题（含 7 项前景色字段） | ✅ 完成，**并修正 viewBox 高度** | §16 | §2.3（已并入修正） |
+| 2 | 4 区域地图主题（含 7 项前景色字段） | ✅ 完成，**并修正 viewBox 高度 2400→2520（v1.1）→ 2700（v1.4，容纳终局「每日字灵挑战」节点）** | §16 | §2.3（已并入修正） |
 | 3 | 8 件装扮 SVG | ✅ 完成 | §15.4 | §5.5 |
 | 4 | 关卡节点 5 态（含触控圈 + 贴纸描边） | ✅ 完成，**并修正两处对比度缺陷** | §17 | §2.4（已并入修正） |
 | 5 | 3 种货币图标 + 5 通道冗余反馈图标 | ✅ 完成 | §18 | §4.2 / §11.5 |
@@ -2098,12 +2229,14 @@ html += '<div class="lvnode" data-lv="'+n+'" data-page-node-id="'+nid("map.node.
 
 派生字段（**不落盘**）：`perfect` = `cleared && stars>=3`；`currentLevelIdx` = `min(19, max(0, unlockedThrough-1))`（§2.4）。
 
-**v1.3 已向 art-director 回传的两处规格内矛盾**（待其修复，实施前以本条为准）：
+**v1.3 已向 art-director 回传的两处规格内矛盾**（art v2.3 已修复 ✅，实施前仍以本节为准）：
 
 | # | 位置 | 问题 | 实施时以何为准 |
 |---|---|---|---|
-| A | 美术规格 §17.3 第 2680 行 | 仍写「`.perfectring` 加 `drop-shadow(0 0 6px …)` 做发光」，与 §17.7 ②「不用 drop-shadow」直接矛盾。§17.3 是逐态规格，工程会先读它 → 20 个 filter 层会原样回来 | **以 §17.7 ② 为准**：两道同心描边（外圈 `#FFD86B` 10px `opacity .28` + 内圈 `#FFC93C` 4px）。§17.3 该行需删 |
-| B | 美术规格 §17.6 第 2860 行 | `.n-perfect:not(.n-current) .crown{animation:none}` 被当作**正式 CSS 写进 §17.6**，但 art-director 在 §17.7 ③ 标注它是「可选兜底，等真机测了再定」。工程照抄 §17.6 会默认拿到降级效果 | **默认关闭该规则**（先按 20 个皇冠全浮动实现）。真机测出吵再开，且开了也要给 `.n-current` 兜底：终局时 `currentLevelIdx()=19` 会命中 L20，若渲染层不给它加 `.n-current`，20 个皇冠会全灭 |
+| A | 美术规格 §17.3 第 2680 行 | 仍写「`.perfectring` 加 `drop-shadow(0 0 6px …)` 做发光」，与 §17.7 ②「不用 drop-shadow」直接矛盾。§17.3 是逐态规格，工程会先读它 → 20 个 filter 层会原样回来 | **以 §17.7 ② 为准**：两道同心描边（外圈 `#FFD86B` 10px `opacity .28` + 内圈 `#FFC93C` 4px）。§17.3 该行已删 ✅ |
+| B | 美术规格 §17.6 第 2860 行 | `.n-perfect:not(.n-current) .crown{animation:none}` 被当作**正式 CSS 写进 §17.6**，但 art-director 在 §17.7 ③ 标注它是「可选兜底，等真机测了再定」。工程照抄 §17.6 会默认拿到降级效果 | **默认关闭该规则**（先按 20 个皇冠全浮动实现）。已注释移入 §17.7 ③ 标 OPTIONAL · 默认关闭 ✅。终局时 `currentLevelIdx()=19` 命中 L20，渲染层须给 L20 加 `.n-current` 兜底 |
+
+**v1.4 同步**：`MAP_H` 由 2520 升 **2700**（art v2.3 定案），每日节点放 `(200, 2600)`、复用 Boss 分支图形；终局地图实渲 65.9 KB、viewBox 2700、`drop-shadow` 残留 0、四端点（全新 / 推进 / 终局 / 异常态）全过 XML 解析。GDD §2.3 的 `MAP_H` 与 §14 体量预算同步更新。
 
 **`.n-current` 的权威定义**（此前两侧都未定义）：由 `renderMap()` 给 `currentLevelIdx()` 对应节点加，**无论该节点处于哪个状态**（含 `perfect`）。终局时它就是 L20。
 
@@ -2153,6 +2286,18 @@ html += '<div class="lvnode" data-lv="'+n+'" data-page-node-id="'+nid("map.node.
 | 17 | 🟡 核算 | 新增 §4.3.1 星星收支核算：一次性 ⭐132 vs 装扮 sink ⭐136，缺口 4 靠日常补 → **刚好闭合无余量**，立三条红线禁止削减产出/上调价格 | §4.3.1（新增） |
 | 18 | 🔵 澄清 | 终局地图的呈现语义是**奖杯陈列室**不是空屏：保留全部 20 皇冠、相位必须打散、禁 `drop-shadow`、不追加全屏「全部完成」弹层 | §2.7.3 / §16 |
 
+### v1.4（engineering-lead 落地骨架时发现的 3 处代码级缺陷 + 1 处 GDD 自身合并缺陷）
+
+| # | 类型 | 变更 | 影响章节 |
+|---|---|---|---|
+| 19 | 🔴 缺陷 | `nid()` 取模下标 `(h + imul(h,31) + imul(k,7919)) % 62`：h 无符号 32 位、imul 有符号可为负 → 下标为负 → `NID_ALPHABET[负]=undefined`，产物含字面量 "undefined" 且长度≠22。实测 v1.3 原式 **22 个语义名里 21 个坏**。修法：取模后 `if(idx<0) idx+=62`。已加 `_nidSelfTest()` 强制回归（138 名零碰撞） | §13.2 |
+| 20 | 🔴 缺陷 | 云端 `row["x"]` 是 `{text\|number\|date}` 包装对象，直接 `JSON.parse(row["x"])` 抛错被 `safeParse` 吞掉 → 三级回落全失败 → **「同步成功」其实是静默失效**（v1 从头到尾没同步上）。修法：新增 `rowVal()` 兼容裸值/包装值，`applyCloud`/`applyCloudV2`/`adoptCloud` 全部经它取值 | §12.3 (C)/(C-2) |
+| 21 | 🔴 缺陷 | 时间戳比较写在 `applyCloudV2` 内，但 `applyCloud` 已先改 `state.updatedAt=云端时间` → 再比时恒等于 cloudTime → 本地更新被云端老数据覆盖。修法：比较上移到 `adoptCloud`，在 `applyCloud` 之前一次完成 | §12.3 (C-1) |
+| 22 | 🔴 缺陷 | **GDD 自身**：`applyCloud` 对 append-only 字段 `learned` 是整段替换、对 `codex`/`game.levels` 用浅合并（`mergeDeep`）取不到 `s`/`stars` 的 max。修法 A 激活同步后，双设备各玩一半会**真丢数据**。改用 `mergeState`（并集 + 取大）作唯一合并函数，云端同步与 `importBackup` 共用；追加 §12.3.1 合并策略表 | §12.3 (C)/(C-1)/§12.3.1/§12.6 |
+| 23 | 🟡 追加 | `settingsNew` 新增 `fsScale:1`（美术 §11 `--fs-scale` 大字号模式需持久化，原 GDD 漏此字段，仅增不改） | §12.2 |
+| 24 | 🟡 修订 | 验证清单第 12 条「清空全部数据」改为负向断言：append-only 字段任何情况下不可删；家长中心只导出不清除；导入=mergeState 合并非覆盖。新增第 13（双设备合并）、14（导入合并）条 | §12.6 |
+| 25 | 🟢 同步 | `MAP_H` 2520 → **2700**（art v2.3 定案，容纳终局「每日字灵挑战」节点 `(200,2600)`）；§2.3 注记 + §14 体量 + §16 对接同步 | §2.3 / §14 / §16 |
+
 ---
 
-*文档结束 · GDD-001 v1.3 · 与 `design/art/美术规格.md` v2.2 已对齐*
+*文档结束 · GDD-001 v1.4 · 与 `design/art/美术规格.md` v2.3 已对齐*
