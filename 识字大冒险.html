@@ -3814,7 +3814,13 @@ function petSVG(opt){
   var lineC = (lv >= 5) ? '#FFC93C' : S.line;
   var phBreath = ph(t, 2600), phBlink = ph(t, 4200), phOrbit = ph(t, 4000), phHalo = ph(t, 6000);
   var out = '';
-  out += '<svg class="pet pet-lv'+lv+'" viewBox="-15 11 150 150" xmlns="http://www.w3.org/2000/svg" '+
+  /* viewBox 顶部随缩放自动扩：pk-all 内最高点是耳朵顶（未缩放 y=30.6，含描边 → 89.4=120-30.6），
+     高等级 S 大时 y' = 120-89.4S 会跑到默认视窗顶(y=11)之上，把耳朵/帽子裁掉。
+     needTop 低于安全顶(13)时向上扩视窗（底边 161 不动），宠物在容器内等比缩小但完整可见。 */
+  var needTop = 120 - 89.4*S.scale;
+  var vbY = 11, vbH = 150;
+  if(needTop < 13){ vbY = needTop - 2; vbH = 161 - vbY; }
+  out += '<svg class="pet pet-lv'+lv+'" viewBox="-15 '+vbY+' 150 '+vbH+'" xmlns="http://www.w3.org/2000/svg" '+
          'data-level="'+lv+'" data-mood="'+mood+'" aria-hidden="true">';
   out += '<defs>'+
     '<radialGradient id="'+pref+'pkBody'+lv+'" cx="36%" cy="26%" r="82%">'+
