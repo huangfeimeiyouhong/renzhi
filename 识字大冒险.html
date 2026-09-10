@@ -2148,6 +2148,54 @@ var PET_STAGES = [
   {lv:39,name:"墨墨·天王",bond:9550, scale:1.75,theme:"#7A5AB4", hi:"#FCECAA", line:"#FFE9B4", belly:"#FBFAE0"},
   {lv:40,name:"墨墨·至尊",bond:9750, scale:1.75,theme:"#7A5CAE", hi:"#FFF2A0", line:"#FFEABE", belly:"#FCFCE6"}
 ];
+
+/* 恐龙「龙宝」40 级阶段表（design/dinosaur-art-spec.md §2）
+   bond/scale 与墨墨完全一致 —— 同级所需亲密度相同，玩法对齐；
+   配色六段叙事：嫩芽绿 → 森林绿 → 湖翡翠 → 青碧 → 金曜绿 → 翠金，
+   与墨墨「紫 → 金」在缩略图上一眼区分。belly 恒暖米 #F7EBD2。
+   dark 用于阴影/描边加深；accent 暖金用于头冠晶石与尾端晶石。 */
+var PET_DINO_STAGES = [
+  {lv:1, name:"龙蛋", bond:0, scale:.75, theme:"#BCE39A", hi:"#DDF4C6", line:"#6FA84B", belly:"#F7EBD2", dark:"#4E8A36", accent:"#FFE9A8"},
+  {lv:2, name:"小芽", bond:50, scale:.85, theme:"#BCE39A", hi:"#DDF4C6", line:"#6FA84B", belly:"#F7EBD2", dark:"#4E8A36", accent:"#FFE9A8"},
+  {lv:3, name:"芽龙", bond:150, scale:1.00, theme:"#BCE39A", hi:"#DDF4C6", line:"#6FA84B", belly:"#F7EBD2", dark:"#4E8A36", accent:"#FFE9A8"},
+  {lv:4, name:"嫩芽", bond:300, scale:1.15, theme:"#BCE39A", hi:"#DDF4C6", line:"#6FA84B", belly:"#F7EBD2", dark:"#4E8A36", accent:"#FFE9A8"},
+  {lv:5, name:"绿芽", bond:500, scale:1.30, theme:"#BCE39A", hi:"#DDF4C6", line:"#6FA84B", belly:"#F7EBD2", dark:"#4E8A36", accent:"#FFE9A8"},
+  {lv:6, name:"豆豆", bond:750, scale:1.38, theme:"#BCE39A", hi:"#DDF4C6", line:"#6FA84B", belly:"#F7EBD2", dark:"#4E8A36", accent:"#FFE9A8"},
+  {lv:7, name:"森林", bond:1050, scale:1.45, theme:"#7CC15E", hi:"#A9DE8E", line:"#3E8B3A", belly:"#F7EBD2", dark:"#2C6B2A", accent:"#FFE9A8"},
+  {lv:8, name:"林宝", bond:1400, scale:1.52, theme:"#7CC15E", hi:"#A9DE8E", line:"#3E8B3A", belly:"#F7EBD2", dark:"#2C6B2A", accent:"#FFE9A8"},
+  {lv:9, name:"青芽", bond:1800, scale:1.58, theme:"#7CC15E", hi:"#A9DE8E", line:"#3E8B3A", belly:"#F7EBD2", dark:"#2C6B2A", accent:"#FFE9A8"},
+  {lv:10, name:"小棘", bond:2250, scale:1.65, theme:"#7CC15E", hi:"#A9DE8E", line:"#3E8B3A", belly:"#F7EBD2", dark:"#2C6B2A", accent:"#FFE9A8"},
+  {lv:11, name:"棘龙", bond:2550, scale:1.66, theme:"#7CC15E", hi:"#A9DE8E", line:"#3E8B3A", belly:"#F7EBD2", dark:"#2C6B2A", accent:"#FFE9A8"},
+  {lv:12, name:"湖宝", bond:2850, scale:1.67, theme:"#7CC15E", hi:"#A9DE8E", line:"#3E8B3A", belly:"#F7EBD2", dark:"#2C6B2A", accent:"#FFE9A8"},
+  {lv:13, name:"翡翠", bond:3150, scale:1.68, theme:"#7CC15E", hi:"#A9DE8E", line:"#3E8B3A", belly:"#F7EBD2", dark:"#2C6B2A", accent:"#FFE9A8"},
+  {lv:14, name:"湖玉", bond:3450, scale:1.69, theme:"#46BBA3", hi:"#84DFC9", line:"#1F7E6E", belly:"#F7EBD2", dark:"#146252", accent:"#FFE9A8"},
+  {lv:15, name:"碧波", bond:3750, scale:1.70, theme:"#46BBA3", hi:"#84DFC9", line:"#1F7E6E", belly:"#F7EBD2", dark:"#146252", accent:"#FFE9A8"},
+  {lv:16, name:"小角", bond:4050, scale:1.71, theme:"#46BBA3", hi:"#84DFC9", line:"#1F7E6E", belly:"#F7EBD2", dark:"#146252", accent:"#FFE9A8"},
+  {lv:17, name:"角龙", bond:4350, scale:1.72, theme:"#46BBA3", hi:"#84DFC9", line:"#1F7E6E", belly:"#F7EBD2", dark:"#146252", accent:"#FFE9A8"},
+  {lv:18, name:"爪爪", bond:4650, scale:1.73, theme:"#46BBA3", hi:"#84DFC9", line:"#1F7E6E", belly:"#F7EBD2", dark:"#146252", accent:"#FFE9A8"},
+  {lv:19, name:"骨纹", bond:4950, scale:1.74, theme:"#46BBA3", hi:"#84DFC9", line:"#1F7E6E", belly:"#F7EBD2", dark:"#146252", accent:"#FFE9A8"},
+  {lv:20, name:"山宝", bond:5250, scale:1.75, theme:"#46BBA3", hi:"#84DFC9", line:"#1F7E6E", belly:"#F7EBD2", dark:"#146252", accent:"#FFE9A8"},
+  {lv:21, name:"岩龙", bond:5500, scale:1.75, theme:"#3FB3C6", hi:"#84D7E6", line:"#1E7C8E", belly:"#F7EBD2", dark:"#155E6B", accent:"#FFE9A8"},
+  {lv:22, name:"青碧", bond:5750, scale:1.75, theme:"#3FB3C6", hi:"#84D7E6", line:"#1E7C8E", belly:"#F7EBD2", dark:"#155E6B", accent:"#FFE9A8"},
+  {lv:23, name:"溪龙", bond:6000, scale:1.75, theme:"#3FB3C6", hi:"#84D7E6", line:"#1E7C8E", belly:"#F7EBD2", dark:"#155E6B", accent:"#FFE9A8"},
+  {lv:24, name:"岚龙", bond:6250, scale:1.75, theme:"#3FB3C6", hi:"#84D7E6", line:"#1E7C8E", belly:"#F7EBD2", dark:"#155E6B", accent:"#FFE9A8"},
+  {lv:25, name:"云海", bond:6500, scale:1.75, theme:"#3FB3C6", hi:"#84D7E6", line:"#1E7C8E", belly:"#F7EBD2", dark:"#155E6B", accent:"#FFE9A8"},
+  {lv:26, name:"山海", bond:6750, scale:1.75, theme:"#3FB3C6", hi:"#84D7E6", line:"#1E7C8E", belly:"#F7EBD2", dark:"#155E6B", accent:"#FFE9A8"},
+  {lv:27, name:"金曜", bond:7000, scale:1.75, theme:"#93C84A", hi:"#C8E78C", line:"#FFC93C", belly:"#F7EBD2", dark:"#6E9A2E", accent:"#FFD86B"},
+  {lv:28, name:"曜龙", bond:7250, scale:1.75, theme:"#93C84A", hi:"#C8E78C", line:"#FFC93C", belly:"#F7EBD2", dark:"#6E9A2E", accent:"#FFD86B"},
+  {lv:29, name:"翠羽", bond:7500, scale:1.75, theme:"#93C84A", hi:"#C8E78C", line:"#FFC93C", belly:"#F7EBD2", dark:"#6E9A2E", accent:"#FFD86B"},
+  {lv:30, name:"祥龙", bond:7750, scale:1.75, theme:"#93C84A", hi:"#C8E78C", line:"#FFC93C", belly:"#F7EBD2", dark:"#6E9A2E", accent:"#FFD86B"},
+  {lv:31, name:"瑞龙", bond:7950, scale:1.75, theme:"#93C84A", hi:"#C8E78C", line:"#FFC93C", belly:"#F7EBD2", dark:"#6E9A2E", accent:"#FFD86B"},
+  {lv:32, name:"麟龙", bond:8150, scale:1.75, theme:"#93C84A", hi:"#C8E78C", line:"#FFC93C", belly:"#F7EBD2", dark:"#6E9A2E", accent:"#FFD86B"},
+  {lv:33, name:"玉麟", bond:8350, scale:1.75, theme:"#93C84A", hi:"#C8E78C", line:"#FFC93C", belly:"#F7EBD2", dark:"#6E9A2E", accent:"#FFD86B"},
+  {lv:34, name:"星麟", bond:8550, scale:1.75, theme:"#A6C24E", hi:"#E2D988", line:"#FFC93C", belly:"#F7EBD2", dark:"#7E9430", accent:"#FFE9A8"},
+  {lv:35, name:"金麟", bond:8750, scale:1.75, theme:"#A6C24E", hi:"#E2D988", line:"#FFC93C", belly:"#F7EBD2", dark:"#7E9430", accent:"#FFE9A8"},
+  {lv:36, name:"瑞麟", bond:8950, scale:1.75, theme:"#A6C24E", hi:"#E2D988", line:"#FFC93C", belly:"#F7EBD2", dark:"#7E9430", accent:"#FFE9A8"},
+  {lv:37, name:"祥麟", bond:9150, scale:1.75, theme:"#A6C24E", hi:"#E2D988", line:"#FFC93C", belly:"#F7EBD2", dark:"#7E9430", accent:"#FFE9A8"},
+  {lv:38, name:"宝麟", bond:9350, scale:1.75, theme:"#A6C24E", hi:"#E2D988", line:"#FFC93C", belly:"#F7EBD2", dark:"#7E9430", accent:"#FFE9A8"},
+  {lv:39, name:"圣麟", bond:9550, scale:1.75, theme:"#A6C24E", hi:"#E2D988", line:"#FFC93C", belly:"#F7EBD2", dark:"#7E9430", accent:"#FFE9A8"},
+  {lv:40, name:"至尊麟", bond:9750, scale:1.75, theme:"#A6C24E", hi:"#E2D988", line:"#FFC93C", belly:"#F7EBD2", dark:"#7E9430", accent:"#FFE9A8"}
+];
 /* Lv21–Lv40 宠物名（图鉴「宠物名字」分区的识字素材来源，难字随名认读） */
 var PET_NAMES_LV21_40 = [
   "星辰","星海","银河","宇宙","幻彩","紫霞",
@@ -2177,9 +2225,21 @@ var PET_SPECIES = [
      headDy 身体椭圆顶到基准点的距离（未缩放 y=51 → 69）—— 王冠定位 */
 var PET_GEO = {
   ink:  { topY:30.6, bodyDy:36, bodyRx:32, headDy:69 },
-  dino: { topY:30.6, bodyDy:36, bodyRx:32, headDy:69 }   /* TODO(美术规格)：填恐龙实际值 */
+  dino: { topY:18,   bodyDy:36, bodyRx:30, headDy:69 }   /* 恐龙实测值（规格 §3.1） */
 };
 function petGeo(sp){ return PET_GEO[sp] || PET_GEO.ink; }
+/* 最高点按形态查表（未缩放，含描边）—— 恐龙 8 形态头顶高度各不相同，
+   统一用封顶值 18 会让 Lv22–29 白白扩顶、宠物被压小，故按形态取实际顶端。
+   墨墨 Lv3–40 同一套画法，恒为耳朵顶 30.6。 */
+function petTopY(sp, lv){
+  if(sp !== 'dino') return PET_GEO.ink.topY;
+  if(lv <= 1)  return 43;    /* F1 龙蛋：cy82-ry39 */
+  if(lv <= 5)  return 50;    /* F2 破壳幼崽：头顶角芽 cy60-ry8 */
+  if(lv <= 9)  return 40;    /* F3 短尾圆背鳍：鳍顶 y40 */
+  if(lv <= 13) return 38;    /* F4 三角背棘：棘顶 y39 含描边 */
+  if(lv <= 29) return 36;    /* F5–F7 头顶小角：y50-14 */
+  return PET_GEO.dino.topY;  /* F8 头冠展开：y18 */
+}
 /* 阶段表路由：墨墨用 PET_STAGES；恐龙的 DINO_STAGES 由美术规格落地后加入 */
 function petStagesFor(sp){ return (sp === 'dino' && typeof PET_DINO_STAGES !== 'undefined') ? PET_DINO_STAGES : PET_STAGES; }
 function petSpeciesMeta(sp){
@@ -3809,7 +3869,7 @@ function petFxLayout(lv, sp){
   var bodyCy  = 120 - G.bodyDy*S;   /* 身体中心（未缩放 cy=84） */
   var bodyRx  = G.bodyRx*S;         /* 身体半宽（未缩放 rx=32） */
   var headTop = 120 - G.headDy*S;   /* 身体椭圆顶（未缩放 y=51） */
-  var petTop  = 120 - 89.4*S;    /* 耳朵顶：未缩放 y=30.6（含描边） */
+  var petTop  = 120 - (120 - petTopY(sp, i+1))*S;   /* 该物种该形态最高点（含描边） */
   /* 辉光：柔和径向渐变，中心跟随身体，半径插值后夹进安全盒 */
   var auraR  = lerp(44, 56);
   var auraCy = clamp(bodyCy, sf.top + auraR, sf.bottom - auraR);
@@ -3893,6 +3953,253 @@ function petSatellitesSVG(F, lv, chars, phOrbit){
            '</g></g></g>';
 }
 
+
+/* ===================== 恐龙「龙宝」美术资产 =====================
+   来源：design/dinosaur-art-spec.md v1.0（8 形态里程碑 + 16 件专属装扮）
+   坐标系与墨墨一致：未缩放坐标以 (60,120) 为基准点，身体中心 (60,84)。
+   所有片段为 ES5（var + 字符串拼接），可直接内联。 */
+/* ---- 八形态里程碑：随等级变形（恐龙区别于墨墨的最大卖点） ---- */
+/* F1 龙蛋（Lv1）：蛋壳 + 裂纹 + 蛋底探头的小尾尖；自带脸，与墨墨 Lv1 同口径 */
+function dinoEgg(lv,S,lineC,lineW,pref,phBreath){
+  return '<g class="pk-egg" style="animation-delay:'+phBreath+'ms">'
+    + '<ellipse cx="60" cy="82" rx="31" ry="39" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>'
+    + '<path d="M42 60 l9 8 -7 7 10 7" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '<path d="M72 58 l-8 9 8 6 -7 8" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '<path d="M82 112 q12 6 17 -3" fill="none" stroke="'+lineC+'" stroke-width="6" stroke-linecap="round"/>'
+    + '<circle cx="50" cy="78" r="4.2" fill="#3B2A22"/><circle cx="70" cy="78" r="4.2" fill="#3B2A22"/>'
+    + '<circle cx="51.4" cy="76.6" r="1.5" fill="#FFFFFF"/><circle cx="71.4" cy="76.6" r="1.5" fill="#FFFFFF"/>'
+    + '<ellipse cx="42" cy="90" rx="6" ry="4" fill="#FF9AA6" opacity=".5"/><ellipse cx="78" cy="90" rx="6" ry="4" fill="#FF9AA6" opacity=".5"/>'
+  + '</g>';
+}
+/* F2 破壳幼崽（Lv2–5）：下半蛋壳 + 头大身小的圆身 + 头顶两只角芽 + 探头小尾尖 */
+function dinoHatch(lv,S,lineC,lineW,pref,phBreath){
+  var o = '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+  o += '<path d="M30 96 Q60 122 90 96 Q90 112 60 117 Q30 112 30 96 Z" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<ellipse cx="60" cy="80" rx="22" ry="22" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+  o += '<ellipse cx="60" cy="88" rx="13" ry="11" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<path d="M80 92 q12 5 16 -4" fill="none" stroke="'+lineC+'" stroke-width="7" stroke-linecap="round"/>';
+  o += '<ellipse cx="50" cy="60" rx="6" ry="8" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-18 50 60)"/>';
+  o += '<ellipse cx="70" cy="60" rx="6" ry="8" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(18 70 60)"/>';
+  o += '</g>';
+  return o;
+}
+/* F3 短尾 + 圆背鳍（Lv6–9）：标准圆身、短尾、一枚软背鳍、两只小脚墩 */
+function dinoF3(lv,S,lineC,lineW,pref,phBreath){
+  var o = '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+  o += '<path d="M86 100 q16 8 18 -6" fill="none" stroke="'+lineC+'" stroke-width="13" stroke-linecap="round"/>';
+  o += '<path d="M86 100 q16 8 18 -6" fill="none" stroke="'+S.theme+'" stroke-width="9" stroke-linecap="round"/>';
+  o += '<ellipse cx="60" cy="84" rx="30" ry="32" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+  o += '<ellipse cx="60" cy="95" rx="18" ry="15" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<path d="M44 56 Q60 40 76 56 Q60 50 44 56 Z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<ellipse cx="46" cy="112" rx="9" ry="7" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+  o += '<ellipse cx="74" cy="112" rx="9" ry="7" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+  o += '</g>';
+  return o;
+}
+/* F4 三角背棘 + 后腿（Lv10–13）：三枚圆角背棘（非尖刺）、带脚后腿 */
+function dinoF4(lv,S,lineC,lineW,pref,phBreath){
+  var o = '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+  o += '<path d="M86 100 q18 10 20 -6" fill="none" stroke="'+lineC+'" stroke-width="13" stroke-linecap="round"/>';
+  o += '<path d="M86 100 q18 10 20 -6" fill="none" stroke="'+S.theme+'" stroke-width="9" stroke-linecap="round"/>';
+  o += '<ellipse cx="60" cy="84" rx="30" ry="32" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+  o += '<ellipse cx="60" cy="95" rx="18" ry="15" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<path d="M46 56 q4 -12 8 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2" stroke-linejoin="round"/>';
+  o += '<path d="M56 53 q4 -14 8 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2" stroke-linejoin="round"/>';
+  o += '<path d="M66 56 q4 -12 8 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2" stroke-linejoin="round"/>';
+  o += '<path d="M44 104 q-4 12 2 16 q10 2 12 -6 q-2 -8 -14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<path d="M76 104 q4 12 -2 16 q-10 2 -12 -6 q2 -8 14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '</g>';
+  return o;
+}
+/* F5 体形拉长 + 头顶小角 + 尾鳍（Lv14–17） */
+function dinoF5(lv,S,lineC,lineW,pref,phBreath){
+  var o = '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+  o += '<path d="M86 102 q20 10 22 -4" fill="none" stroke="'+lineC+'" stroke-width="13" stroke-linecap="round"/>';
+  o += '<path d="M86 102 q20 10 22 -4" fill="none" stroke="'+S.theme+'" stroke-width="9" stroke-linecap="round"/>';
+  o += '<path d="M104 98 q14 -10 18 4 q-10 10 -18 -4 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  o += '<ellipse cx="60" cy="84" rx="30" ry="34" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+  o += '<ellipse cx="60" cy="96" rx="18" ry="16" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<path d="M50 54 q5 -16 10 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2" stroke-linejoin="round"/>';
+  o += '<path d="M62 54 q5 -16 10 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2" stroke-linejoin="round"/>';
+  o += '<path d="M44 106 q-4 12 2 16 q10 2 12 -6 q-2 -8 -14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<path d="M76 106 q4 12 -2 16 q-10 2 -12 -6 q2 -8 14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '</g>';
+  o += '<path d="M56 50 q4 -14 8 0 q-4 4 -8 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  return o;
+}
+/* F6 前爪 + 背上骨质纹（Lv18–21）：浅色圆点骨纹，童真不恐怖 */
+function dinoF6(lv,S,lineC,lineW,pref,phBreath){
+  var o = '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+  o += '<path d="M86 102 q20 10 22 -4" fill="none" stroke="'+lineC+'" stroke-width="13" stroke-linecap="round"/>';
+  o += '<path d="M86 102 q20 10 22 -4" fill="none" stroke="'+S.theme+'" stroke-width="9" stroke-linecap="round"/>';
+  o += '<path d="M104 98 q14 -10 18 4 q-10 10 -18 -4 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  o += '<ellipse cx="60" cy="84" rx="30" ry="34" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+  o += '<ellipse cx="60" cy="96" rx="18" ry="16" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<path d="M50 54 q5 -16 10 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2" stroke-linejoin="round"/>';
+  o += '<path d="M62 54 q5 -16 10 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2" stroke-linejoin="round"/>';
+  o += '<circle cx="60" cy="70" r="2.4" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<circle cx="52" cy="74" r="2" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<circle cx="68" cy="74" r="2" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<path d="M44 106 q-4 12 2 16 q10 2 12 -6 q-2 -8 -14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<path d="M76 106 q4 12 -2 16 q-10 2 -12 -6 q2 -8 14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<ellipse cx="30" cy="92" rx="7" ry="9" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-12 30 92)"/>';
+  o += '<ellipse cx="90" cy="92" rx="7" ry="9" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(12 90 92)"/>';
+  o += '</g>';
+  o += '<path d="M56 50 q4 -14 8 0 q-4 4 -8 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  return o;
+}
+/* F7 鳍褶延伸（Lv22–29）：背棘连成波浪鳍褶、尾鳍加大 */
+function dinoF7(lv,S,lineC,lineW,pref,phBreath){
+  var o = '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+  o += '<path d="M84 102 q22 12 26 -4" fill="none" stroke="'+lineC+'" stroke-width="13" stroke-linecap="round"/>';
+  o += '<path d="M84 102 q22 12 26 -4" fill="none" stroke="'+S.theme+'" stroke-width="9" stroke-linecap="round"/>';
+  o += '<path d="M108 98 q16 -14 22 2 q-12 14 -22 -2 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  o += '<ellipse cx="60" cy="84" rx="30" ry="34" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+  o += '<ellipse cx="60" cy="96" rx="18" ry="16" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<path d="M42 58 q6 -16 12 0 q6 -16 12 0 q6 -16 12 0 q6 -14 10 2 q-12 10 -46 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  o += '<path d="M44 106 q-4 12 2 16 q10 2 12 -6 q-2 -8 -14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<path d="M76 106 q4 12 -2 16 q-10 2 -12 -6 q2 -8 14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<ellipse cx="30" cy="92" rx="7" ry="9" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-12 30 92)"/>';
+  o += '<ellipse cx="90" cy="92" rx="7" ry="9" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(12 90 92)"/>';
+  o += '</g>';
+  o += '<path d="M56 50 q4 -14 8 0 q-4 4 -8 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  return o;
+}
+/* F8 头冠 + 尾端晶石暖光（Lv30–40）：封顶形态，头冠顶 y≈18 即 PET_GEO.dino.topY */
+function dinoF8(lv,S,lineC,lineW,pref,phBreath){
+  var o = '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+  o += '<path d="M84 102 q22 12 26 -4" fill="none" stroke="'+lineC+'" stroke-width="13" stroke-linecap="round"/>';
+  o += '<path d="M84 102 q22 12 26 -4" fill="none" stroke="'+S.theme+'" stroke-width="9" stroke-linecap="round"/>';
+  o += '<path d="M108 98 q16 -14 22 2 q-12 14 -22 -2 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  o += '<path d="M120 96 l6 -10 6 10 -6 10 z" fill="'+S.accent+'" stroke="'+lineC+'" stroke-width="1.8" stroke-linejoin="round"/>';
+  o += '<ellipse cx="60" cy="84" rx="30" ry="34" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+  o += '<ellipse cx="60" cy="96" rx="18" ry="16" fill="'+S.belly+'" opacity=".9"/>';
+  o += '<path d="M42 58 q6 -16 12 0 q6 -16 12 0 q6 -16 12 0 q6 -14 10 2 q-12 10 -46 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  o += '<path d="M44 106 q-4 12 2 16 q10 2 12 -6 q-2 -8 -14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<path d="M76 106 q4 12 -2 16 q-10 2 -12 -6 q2 -8 14 -10 z" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+  o += '<ellipse cx="30" cy="92" rx="7" ry="9" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-12 30 92)"/>';
+  o += '<ellipse cx="90" cy="92" rx="7" ry="9" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(12 90 92)"/>';
+  o += '</g>';
+  o += '<path d="M56 50 q4 -14 8 0 q-4 4 -8 0 z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  o += '<g class="pk-crest">'
+    + '<path d="M40 50 Q34 24 48 20 Q54 34 60 18 Q66 34 72 20 Q86 24 80 50 Q60 42 40 50 Z" '
+    + 'fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.6" stroke-linejoin="round"/>'
+    + '<circle cx="48" cy="30" r="2.6" fill="'+S.accent+'" stroke="'+lineC+'" stroke-width="1"/>'
+    + '<circle cx="60" cy="26" r="2.6" fill="'+S.accent+'" stroke="'+lineC+'" stroke-width="1"/>'
+    + '<circle cx="72" cy="30" r="2.6" fill="'+S.accent+'" stroke="'+lineC+'" stroke-width="1"/>'
+  + '</g>';
+  return o;
+}
+/* 形态路由：8 个里程碑按等级切换（阴影由 petSVG 统一绘制，此处不含） */
+function dinoBody(lv,S,lineC,lineW,pref,phBreath){
+  if(lv <= 1)  return dinoEgg(lv,S,lineC,lineW,pref,phBreath);
+  if(lv <= 5)  return dinoHatch(lv,S,lineC,lineW,pref,phBreath);
+  if(lv <= 9)  return dinoF3(lv,S,lineC,lineW,pref,phBreath);
+  if(lv <= 13) return dinoF4(lv,S,lineC,lineW,pref,phBreath);
+  if(lv <= 17) return dinoF5(lv,S,lineC,lineW,pref,phBreath);
+  if(lv <= 21) return dinoF6(lv,S,lineC,lineW,pref,phBreath);
+  if(lv <= 29) return dinoF7(lv,S,lineC,lineW,pref,phBreath);
+  return dinoF8(lv,S,lineC,lineW,pref,phBreath);
+}
+/* ---- 16 件恐龙专属装扮（规格 §4）：头冠 6 / 颈饰 5 / 背鳍·尾饰 5 ----
+   锚点：hat(60,44) 与墨墨同；scarf(60,100) 比墨墨上移 4；wing 语义改为「背鳍/尾饰」，
+   一件同时画脊背鳍(60,60)与尾饰(98,96)两部分。每件形状剪影各异（叶/星/云/宝石/火焰），
+   带色觉障碍冗余编码，不单靠颜色区分。 */
+var DINO_HATS = {
+  dleafcrown: function(){ return '<g class="pk-hat" transform="translate(60,44)">'
+    + '<path d="M-16 4 Q0 -10 16 4 Q0 -2 -16 4 Z" fill="#8ED46E" stroke="#377020" stroke-width="1.8" stroke-linejoin="round"/>'
+    + '<path d="M-9 -2 q-7 -10 -2 -16 q9 4 9 14 z" fill="#C7EBA8" stroke="#377020" stroke-width="1.6" stroke-linejoin="round"/>'
+    + '<path d="M9 -2 q7 -10 2 -16 q-9 4 -9 14 z" fill="#C7EBA8" stroke="#377020" stroke-width="1.6" stroke-linejoin="round"/>'
+    + '<circle cx="0" cy="-4" r="2.6" fill="#FFC93C" stroke="#B87400" stroke-width="1.1"/></g>'; },
+  dblossom: function(){ return '<g class="pk-hat" transform="translate(60,44)">'
+    + '<path d="M-14 4 q14 -16 28 0 z" fill="#FFB3C8" stroke="#D96A8C" stroke-width="1.8" stroke-linejoin="round"/>'
+    + '<circle cx="-6" cy="-6" r="4.4" fill="#FFD6E4" stroke="#D96A8C" stroke-width="1.4"/>'
+    + '<circle cx="6" cy="-6" r="4.4" fill="#FFD6E4" stroke="#D96A8C" stroke-width="1.4"/>'
+    + '<circle cx="0" cy="-12" r="5" fill="#FFD6E4" stroke="#D96A8C" stroke-width="1.4"/>'
+    + '<circle cx="0" cy="-12" r="1.4" fill="#FFFFFF" opacity=".85"/></g>'; },
+  dhorn: function(){ return '<g class="pk-hat" transform="translate(60,44)">'
+    + '<path d="M-12 4 q12 -20 24 0 z" fill="#FFE9A8" stroke="#B87400" stroke-width="2" stroke-linejoin="round"/>'
+    + '<path d="M0 4 V-14" fill="none" stroke="#B87400" stroke-width="1.4"/>'
+    + '<circle cx="-7" cy="2" r="2.2" fill="#FFF6DF" stroke="#B87400" stroke-width="1"/>'
+    + '<circle cx="7" cy="2" r="2.2" fill="#FFF6DF" stroke="#B87400" stroke-width="1"/></g>'; },
+  dgemcrest: function(){ var o="", bx=[-12,-4,4,12], by=[-3,-7,-7,-3], br=[3.4,4.2,4.2,3.4], i;
+    for(i=0;i<4;i++){ o+='<ellipse cx="'+bx[i]+'" cy="'+by[i]+'" rx="'+br[i]+'" ry="'+(br[i]+1.4)+'" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.4"/>'; }
+    return '<g class="pk-hat" transform="translate(60,44)">'+o
+    + '<path d="M-16 4 Q0 -2 16 4 L16 9 Q0 4 -16 9 Z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.8" stroke-linejoin="round"/>'
+    + '<circle cx="-8" cy="5" r="2" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'
+    + '<circle cx="8" cy="5" r="2" fill="#FFC93C" stroke="#B87400" stroke-width="1"/></g>'; },
+  dstarcrest: function(){ return '<g class="pk-hat" transform="translate(60,44)">'
+    + '<path d="M0 -16 L5 -4 L18 -4 L8 5 L12 18 L0 9 L-12 18 L-8 5 L-18 -4 L-5 -4 Z" fill="#FFC93C" stroke="#B87400" stroke-width="1.8" stroke-linejoin="round"/>'
+    + '<circle cx="0" cy="-2" r="2.8" fill="#FFF0C0"/></g>'; },
+  dcloudcrest: function(){ return '<g class="pk-hat" transform="translate(60,44)">'
+    + '<ellipse cx="-9" cy="2" rx="11" ry="9" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
+    + '<ellipse cx="9" cy="2" rx="11" ry="9" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
+    + '<ellipse cx="0" cy="-3" rx="13" ry="11" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
+    + '<rect x="-20" y="2" width="40" height="7" rx="3.5" fill="#F2F7FD" stroke="#9DB8D4" stroke-width="1.6"/></g>'; }
+};
+var DINO_SCARFS = {
+  dleafscarf: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#8ED46E" stroke-width="8" stroke-linecap="round"/>'
+    + '<path d="M-10 8 q-6 -8 -2 -14 q8 4 6 14 z" fill="#B6E59A" stroke="#377020" stroke-width="1.4" stroke-linejoin="round"/>'
+    + '<path d="M10 8 q6 -8 2 -14 q-8 4 -6 14 z" fill="#B6E59A" stroke="#377020" stroke-width="1.4" stroke-linejoin="round"/></g>'; },
+  dvine: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FF9AA6" stroke-width="8" stroke-linecap="round"/>'
+    + '<circle cx="-12" cy="6" r="3" fill="#FFC4D4" stroke="#D96A8C" stroke-width="1.2"/>'
+    + '<circle cx="0" cy="8" r="3" fill="#FFC4D4" stroke="#D96A8C" stroke-width="1.2"/>'
+    + '<circle cx="12" cy="6" r="3" fill="#FFC4D4" stroke="#D96A8C" stroke-width="1.2"/></g>'; },
+  dberryscarf: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FF6B9D" stroke-width="8" stroke-linecap="round"/>'
+    + '<circle cx="-8" cy="6" r="4" fill="#FFB0C8" stroke="#C43324" stroke-width="1.4"/>'
+    + '<circle cx="8" cy="6" r="4" fill="#FFB0C8" stroke="#C43324" stroke-width="1.4"/></g>'; },
+  dpearlneck: function(){ var px=[-20,-10,0,10,20], py=[7,9,10,9,7], pr=[3,2.4,3.4,2.4,3], o="", i;
+    for(i=0;i<5;i++){ o+='<circle cx="'+px[i]+'" cy="'+py[i]+'" r="'+pr[i]+'" fill="#FFF6DF" stroke="#C9A86A" stroke-width="1.1"/>'; }
+    return '<g class="pk-scarf" transform="translate(60,100)">'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FFF6DF" stroke-width="8" stroke-linecap="round"/>'+o+'</g>'; },
+  dstarneck: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#7FC7EE" stroke-width="8" stroke-linecap="round"/>'
+    + '<path d="M0 8 l1.6 3.4 3.6 .4 -2.6 2.4 .6 3.4L0 16 l-2.8 1.8 .6 -3.4 -2.6 -2.4 3.6 -.4 z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1"/></g>'; }
+};
+var DINO_WINGS = {
+  dbackleaf: function(){ return '<g class="pk-wing">'
+      + '<path d="M44 62 Q60 40 76 62 Q60 54 44 62 Z" fill="#8ED46E" stroke="#377020" stroke-width="2" stroke-linejoin="round"/>'
+      + '<path d="M52 56 q-6 -8 -2 -13 q7 3 6 12 z" fill="#B6E59A" stroke="#377020" stroke-width="1.4" stroke-linejoin="round"/>'
+      + '<path d="M68 56 q6 -8 2 -13 q-7 3 -6 12 z" fill="#B6E59A" stroke="#377020" stroke-width="1.4" stroke-linejoin="round"/>'
+      + '<path d="M92 96 q14 -12 20 2 q-12 12 -20 -2 z" fill="#8ED46E" stroke="#377020" stroke-width="2" stroke-linejoin="round"/>'
+      + '<circle cx="104" cy="98" r="2.4" fill="#B6E59A" stroke="#377020" stroke-width="1"/></g>'; },
+  dbackcrystal: function(){ var face = '<path d="M0 -12 L5 -3 L3 11 L-3 11 L-5 -3 Z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.8" stroke-linejoin="round"/>'
+      + '<path d="M0 -12 V11" fill="none" stroke="#FFFFFF" stroke-width="1" opacity=".85"/>';
+    return '<g class="pk-wing">'
+      + '<path d="M44 62 Q60 42 76 62 Q60 56 44 62 Z" fill="#EAF6FF" stroke="#2F86B4" stroke-width="2" stroke-linejoin="round"/>'
+      + '<g transform="translate(60,50)">'+face+'</g>'
+      + '<path d="M96 96 l6 -11 6 11 -6 11 z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.8" stroke-linejoin="round"/>'
+      + '<path d="M96 96 V107" fill="none" stroke="#FFFFFF" stroke-width="1" opacity=".85"/></g>'; },
+  dbackflame: function(){ return '<g class="pk-wing">'
+      + '<path d="M44 62 Q60 38 76 62 Q60 52 44 62 Z" fill="#FF8A3D" stroke="#C4683F" stroke-width="2" stroke-linejoin="round"/>'
+      + '<path d="M52 56 q-4 -10 0 -16 q5 6 5 16 z" fill="#FFC98A" stroke="#C4683F" stroke-width="1.4" stroke-linejoin="round"/>'
+      + '<path d="M68 56 q4 -10 0 -16 q-5 6 -5 16 z" fill="#FFC98A" stroke="#C4683F" stroke-width="1.4" stroke-linejoin="round"/>'
+      + '<path d="M92 96 q14 -12 20 2 q-12 12 -20 -2 z" fill="#FF8A3D" stroke="#C4683F" stroke-width="2" stroke-linejoin="round"/></g>'; },
+  dbackstar: function(){ return '<g class="pk-wing">'
+      + '<path d="M44 62 Q60 40 76 62 Q60 54 44 62 Z" fill="#FFC93C" stroke="#B87400" stroke-width="2" stroke-linejoin="round"/>'
+      + '<path d="M60 44 l3 6 6 .6 -4.4 4.2 1 6.2L60 57l-5.6 4 1 -6.2 -4.4 -4.2 6 -.6 z" fill="#FFF0C0" stroke="#B87400" stroke-width="1"/>'
+      + '<path d="M92 96 q14 -12 20 2 q-12 12 -20 -2 z" fill="#FFC93C" stroke="#B87400" stroke-width="2" stroke-linejoin="round"/></g>'; },
+  dbackcloud: function(){ return '<g class="pk-wing">'
+      + '<ellipse cx="52" cy="56" rx="11" ry="9" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
+      + '<ellipse cx="68" cy="56" rx="11" ry="9" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
+      + '<ellipse cx="60" cy="50" rx="13" ry="11" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
+      + '<path d="M92 96 q14 -12 20 2 q-12 12 -20 -2 z" fill="#F2F7FD" stroke="#9DB8D4" stroke-width="1.8" stroke-linejoin="round"/></g>'; }
+};
+function petWearDict(slot, sp){
+  if(sp !== 'dino'){
+    return slot === 'hat' ? PET_HATS : (slot === 'scarf' ? PET_SCARFS : PET_WINGS);
+  }
+  return slot === 'hat' ? DINO_HATS : (slot === 'scarf' ? DINO_SCARFS : DINO_WINGS);
+}
+/* wing 槽在恐龙身上语义是「背鳍 / 尾饰」，商店分组标题随物种变 */
+function slotLabel(slot, sp){
+  if(sp === 'dino' && slot === 'wing') return '背鳍 / 尾饰';
+  return slot === 'hat' ? '帽子' : (slot === 'scarf' ? '围巾' : (slot === 'wing' ? '翅膀' : '背景'));
+}
+
 /* ---- 字灵「墨墨」参数化 SVG 生成器（美术 §15.5，已通过 node --check + SVG 校验）---- */
 function petSVG(opt){
   opt = opt || {};
@@ -3915,7 +4222,7 @@ function petSVG(opt){
   /* viewBox 顶部随缩放自动扩：pk-all 内最高点是耳朵顶（未缩放 y=30.6，含描边 → 89.4=120-30.6），
      高等级 S 大时 y' = 120-89.4S 会跑到默认视窗顶(y=11)之上，把耳朵/帽子裁掉。
      needTop 低于安全顶(13)时向上扩视窗（底边 161 不动），宠物在容器内等比缩小但完整可见。 */
-  var needTop = 120 - (120 - G.topY)*S.scale;   /* G.topY：该物种最高点（含描边） */
+  var needTop = 120 - (120 - petTopY(sp, lv))*S.scale;   /* 该物种该形态最高点（含描边） */
   var vbY = 11, vbH = 150;
   if(needTop < 13){ vbY = needTop - 2; vbH = 161 - vbY; }
   out += '<svg class="pet pet-lv'+lv+'" viewBox="-15 '+vbY+' 150 '+vbH+'" xmlns="http://www.w3.org/2000/svg" '+
@@ -3933,42 +4240,54 @@ function petSVG(opt){
   out += '<g class="pk-all" transform="translate(60,120) scale('+S.scale+') translate(-60,-120)">';
   out += '<g class="pk-hop">';
   out += '<ellipse cx="60" cy="124" rx="30" ry="6" fill="#5A3C28" opacity=".13"/>';
-  if(lv === 1){
-    out += '<g class="pk-egg" style="animation-delay:'+phBreath+'ms">'+
-      '<ellipse cx="60" cy="82" rx="31" ry="39" fill="url(#'+pref+'pkBody1)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>'+
-      '<path d="M42 60 l9 8 -7 7 10 7" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
-      '<path d="M72 58 l-8 9 8 6 -7 8" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
-      '<path d="M36 92 l10 -6 8 8" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
-      '<circle cx="50" cy="76" r="4.2" fill="#3B2A22"/><circle cx="70" cy="76" r="4.2" fill="#3B2A22"/>'+
-      '<circle cx="51.4" cy="74.6" r="1.5" fill="#FFFFFF"/><circle cx="71.4" cy="74.6" r="1.5" fill="#FFFFFF"/>'+
-      '<ellipse cx="42" cy="88" rx="6" ry="4" fill="#FF9AA6" opacity=".5"/>'+
-      '<ellipse cx="78" cy="88" rx="6" ry="4" fill="#FF9AA6" opacity=".5"/></g>';
-  }
-  if(lv === 2){
-    out += '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
-    out += '<ellipse cx="60" cy="76" rx="28" ry="27" fill="url(#'+pref+'pkBody2)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
-    out += '<ellipse cx="42" cy="66" rx="7" ry="13" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-22 42 66)"/>';
-    out += '<ellipse cx="78" cy="66" rx="7" ry="13" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(22 78 66)"/>';
-    out += '<ellipse cx="26" cy="86" rx="9" ry="6" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.2" transform="rotate(-20 26 86)"/>';
-    out += '<ellipse cx="94" cy="86" rx="9" ry="6" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.2" transform="rotate(20 94 86)"/>';
-    out += '</g>';
-    out += '<path d="M26 96 Q60 108 94 96 L92 106 Q84 118 60 119 Q36 118 28 106 Z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
-  }
-  if(lv >= 3){
-    if(wears.wing && PET_WINGS[wears.wing]) out += PET_WINGS[wears.wing](lineC, pref);
-    out += '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
-    out += '<path d="M88 104 C 106 112 116 98 108 82" fill="none" stroke="'+lineC+'" stroke-width="15" stroke-linecap="round"/>';
-    out += '<path d="M88 104 C 106 112 116 98 108 82" fill="none" stroke="'+S.theme+'" stroke-width="10.5" stroke-linecap="round"/>';
-    out += '<ellipse cx="41" cy="48" rx="8.5" ry="17" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-24 41 48)"/>';
-    out += '<ellipse cx="79" cy="48" rx="8.5" ry="17" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(24 79 48)"/>';
-    out += '<ellipse cx="41" cy="50" rx="4" ry="9" fill="'+S.belly+'" transform="rotate(-24 41 50)"/>';
-    out += '<ellipse cx="79" cy="50" rx="4" ry="9" fill="'+S.belly+'" transform="rotate(24 79 50)"/>';
-    out += '<ellipse cx="60" cy="84" rx="32" ry="33" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
-    out += '<ellipse cx="60" cy="94" rx="19" ry="17" fill="'+S.belly+'" opacity=".9"/>';
-    out += '</g>';
+  /* 身体：恐龙走 8 形态递进（随等级变形），墨墨走原有 Lv1/2/3+ 三档 */
+  var HATS   = petWearDict('hat',   sp);
+  var SCARFS = petWearDict('scarf', sp);
+  var WINGS  = petWearDict('wing',  sp);
+  if(sp === 'dino'){
+    out += dinoBody(lv, S, lineC, lineW, pref, phBreath);
+    /* 背鳍/尾饰画在身体之上（覆盖脊背与尾尖），与墨墨翅膀在身体之后相反 */
+    if(wears.wing && WINGS[wears.wing] && lv >= 3) out += WINGS[wears.wing](lineC, pref);
+  } else {
+    if(lv === 1){
+      out += '<g class="pk-egg" style="animation-delay:'+phBreath+'ms">'+
+        '<ellipse cx="60" cy="82" rx="31" ry="39" fill="url(#'+pref+'pkBody1)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>'+
+        '<path d="M42 60 l9 8 -7 7 10 7" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
+        '<path d="M72 58 l-8 9 8 6 -7 8" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
+        '<path d="M36 92 l10 -6 8 8" fill="none" stroke="'+lineC+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'+
+        '<circle cx="50" cy="76" r="4.2" fill="#3B2A22"/><circle cx="70" cy="76" r="4.2" fill="#3B2A22"/>'+
+        '<circle cx="51.4" cy="74.6" r="1.5" fill="#FFFFFF"/><circle cx="71.4" cy="74.6" r="1.5" fill="#FFFFFF"/>'+
+        '<ellipse cx="42" cy="88" rx="6" ry="4" fill="#FF9AA6" opacity=".5"/>'+
+        '<ellipse cx="78" cy="88" rx="6" ry="4" fill="#FF9AA6" opacity=".5"/></g>';
+    }
+    if(lv === 2){
+      out += '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+      out += '<ellipse cx="60" cy="76" rx="28" ry="27" fill="url(#'+pref+'pkBody2)" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+      out += '<ellipse cx="42" cy="66" rx="7" ry="13" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-22 42 66)"/>';
+      out += '<ellipse cx="78" cy="66" rx="7" ry="13" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(22 78 66)"/>';
+      out += '<ellipse cx="26" cy="86" rx="9" ry="6" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.2" transform="rotate(-20 26 86)"/>';
+      out += '<ellipse cx="94" cy="86" rx="9" ry="6" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="2.2" transform="rotate(20 94 86)"/>';
+      out += '</g>';
+      out += '<path d="M26 96 Q60 108 94 96 L92 106 Q84 118 60 119 Q36 118 28 106 Z" fill="'+S.hi+'" stroke="'+lineC+'" stroke-width="'+lineW+'" stroke-linejoin="round"/>';
+    }
+    if(lv >= 3){
+      if(wears.wing && WINGS[wears.wing]) out += WINGS[wears.wing](lineC, pref);
+      out += '<g class="pk-body" style="animation-delay:'+phBreath+'ms">';
+      out += '<path d="M88 104 C 106 112 116 98 108 82" fill="none" stroke="'+lineC+'" stroke-width="15" stroke-linecap="round"/>';
+      out += '<path d="M88 104 C 106 112 116 98 108 82" fill="none" stroke="'+S.theme+'" stroke-width="10.5" stroke-linecap="round"/>';
+      out += '<ellipse cx="41" cy="48" rx="8.5" ry="17" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(-24 41 48)"/>';
+      out += '<ellipse cx="79" cy="48" rx="8.5" ry="17" fill="'+S.theme+'" stroke="'+lineC+'" stroke-width="'+lineW+'" transform="rotate(24 79 48)"/>';
+      out += '<ellipse cx="41" cy="50" rx="4" ry="9" fill="'+S.belly+'" transform="rotate(-24 41 50)"/>';
+      out += '<ellipse cx="79" cy="50" rx="4" ry="9" fill="'+S.belly+'" transform="rotate(24 79 50)"/>';
+      out += '<ellipse cx="60" cy="84" rx="32" ry="33" fill="url(#'+pref+'pkBody'+lv+')" stroke="'+lineC+'" stroke-width="'+lineW+'"/>';
+      out += '<ellipse cx="60" cy="94" rx="19" ry="17" fill="'+S.belly+'" opacity=".9"/>';
+      out += '</g>';
+    }
   }
   if(lv >= 2){
-    var cy = (lv === 2) ? 74 : 82, eyes, mouth;
+    /* 恐龙 F2 身窄（rx22）且身体中心偏高，腮红内移到 39/81、幼崽段眼位上提，避免浮在身外 */
+    var cy = (sp === 'dino') ? ((lv <= 5) ? 78 : 82) : ((lv === 2) ? 74 : 82), eyes, mouth;
+    var bx = (sp === 'dino') ? 39 : 32;
     if(mood === 'sleepy'){
       eyes = '<path d="M40 '+cy+' q8 -7 16 0" fill="none" stroke="#3B2A22" stroke-width="4" stroke-linecap="round"/>'+
              '<path d="M64 '+cy+' q8 -7 16 0" fill="none" stroke="#3B2A22" stroke-width="4" stroke-linecap="round"/>';
@@ -3989,8 +4308,8 @@ function petSVG(opt){
     out += '<g class="pk-face">';
     out += '<g class="pk-eyes" style="animation-delay:'+phBlink+'ms">'+eyes+'</g>';
     out += mouth;
-    out += '<ellipse cx="32" cy="'+(cy+11)+'" rx="7" ry="4.5" fill="#FF9AA6" opacity=".5"/>';
-    out += '<ellipse cx="88" cy="'+(cy+11)+'" rx="7" ry="4.5" fill="#FF9AA6" opacity=".5"/>';
+    out += '<ellipse cx="'+bx+'" cy="'+(cy+11)+'" rx="7" ry="4.5" fill="#FF9AA6" opacity=".5"/>';
+    out += '<ellipse cx="'+(120-bx)+'" cy="'+(cy+11)+'" rx="7" ry="4.5" fill="#FF9AA6" opacity=".5"/>';
     out += '</g>';
     if(mood === 'hungry'){
       out += '<g class="pk-think"><text x="60" y="'+(cy+34)+'" text-anchor="middle" font-size="16" font-weight="800" fill="#6B6455">…</text></g>';
@@ -4003,14 +4322,14 @@ function petSVG(opt){
              '<text x="112" y="25" font-size="8" font-weight="800" fill="#6B6455">z</text></g>';
     }
     if(mood === 'excited'){
-      var sp='', a, ang2, dx, dy;
+      var spk='', a, ang2, dx, dy;
       for(a=0;a<8;a++){ ang2=a*Math.PI/4; dx=Math.round(Math.cos(ang2)*46); dy=Math.round(Math.sin(ang2)*46);
-        sp += '<circle class="pk-spark" cx="60" cy="84" r="3.4" fill="#FFC94D" style="--dx:'+dx+'px;--dy:'+dy+'px;animation-delay:'+(a*40)+'ms"/>'; }
-      out += '<g class="pk-sparks">'+sp+'</g>';
+        spk += '<circle class="pk-spark" cx="60" cy="84" r="3.4" fill="#FFC94D" style="--dx:'+dx+'px;--dy:'+dy+'px;animation-delay:'+(a*40)+'ms"/>'; }
+      out += '<g class="pk-sparks">'+spk+'</g>';
     }
   }
-  if(wears.hat && PET_HATS[wears.hat] && lv >= 2) out += PET_HATS[wears.hat](lineC);
-  if(wears.scarf && PET_SCARFS[wears.scarf] && lv >= 2) out += PET_SCARFS[wears.scarf]();
+  if(wears.hat && HATS[wears.hat] && lv >= 2) out += HATS[wears.hat](lineC);
+  if(wears.scarf && SCARFS[wears.scarf] && lv >= 2) out += SCARFS[wears.scarf]();
   /* 关闭 .pk-hop 与 .pk-all —— 王冠/星轨不再进缩放组（会被 scale 推出可视区），改用画面固定坐标 */
   out += '</g></g>';
   if(!compact){
@@ -4262,7 +4581,26 @@ var PET_COSTUME_LIST = [
   {id:'phoenix',     name:'凤羽冠',   slot:'hat',   price:0, rarity:'myth', grant:37},
   {id:'cloudscarf',  name:'云绒围巾', slot:'scarf', price:0, rarity:'myth', grant:38},
   {id:'dragonwing',  name:'祥龙翅膀', slot:'wing',  price:0, rarity:'myth', grant:39},
-  {id:'aurorabg',    name:'极光天幕', slot:'bg',    price:0, rarity:'myth', grant:40}
+  {id:'aurorabg',    name:'极光天幕', slot:'bg',    price:0, rarity:'myth', grant:40},
+
+  /* ---- 恐龙「龙宝」专属 16 件（design/dinosaur-art-spec.md §4）：sp:'dino' 与墨墨衣柜各买各的 ---- */
+  {id:'dleafcrown', name:'嫩叶冠',   slot:'hat',   grant:22, rarity:'rare',   sp:'dino'},
+  {id:'dblossom',   name:'花苞冠',   slot:'hat',   grant:32, rarity:'rare',   sp:'dino'},
+  {id:'dhorn',      name:'小角冠',   slot:'hat',   grant:40, rarity:'legend', sp:'dino'},
+  {id:'dgemcrest',  name:'宝石冠',   slot:'hat',   price:30, rarity:'legend', sp:'dino'},
+  {id:'dstarcrest', name:'星冠',     slot:'hat',   price:25, rarity:'rare',   sp:'dino'},
+  {id:'dcloudcrest',name:'云冠',     slot:'hat',   price:15, rarity:'normal', sp:'dino'},
+  {id:'dleafscarf', name:'藤叶围巾', slot:'scarf', grant:26, rarity:'rare',   sp:'dino'},
+  {id:'dvine',      name:'花藤围巾', slot:'scarf', grant:34, rarity:'rare',   sp:'dino'},
+  {id:'dberryscarf',name:'莓果围巾', slot:'scarf', grant:38, rarity:'legend', sp:'dino'},
+  {id:'dpearlneck', name:'珍珠颈圈', slot:'scarf', price:20, rarity:'rare',   sp:'dino'},
+  {id:'dstarneck',  name:'星河颈圈', slot:'scarf', price:25, rarity:'rare',   sp:'dino'},
+  {id:'dbackleaf',  name:'叶背鳍',   slot:'wing',  grant:30, rarity:'rare',   sp:'dino'},
+  {id:'dbackcrystal',name:'晶背鳍',  slot:'wing',  grant:36, rarity:'legend', sp:'dino'},
+  {id:'dbackflame', name:'焰背鳍',   slot:'wing',  price:25, rarity:'rare',   sp:'dino'},
+  {id:'dbackstar',  name:'星背鳍',   slot:'wing',  price:25, rarity:'rare',   sp:'dino'},
+  {id:'dbackcloud', name:'云背鳍',   slot:'wing',  price:15, rarity:'normal', sp:'dino'}
+
 ];
 var PET_COSTUME_SLOTS = [
   {slot:'hat',   label:'帽子'}, {slot:'scarf', label:'围巾'},
@@ -6499,6 +6837,13 @@ var __SZ__ = {
   costumePreviewSVG:costumePreviewSVG, buyCostume:buyCostume, equipCostume:equipCostume,
   /* T3 导出：装扮查表本体（供单测逐个 id 验证「列表里有 → 一定渲染得出来」） */
   PET_HATS:PET_HATS, PET_SCARFS:PET_SCARFS, PET_WINGS:PET_WINGS,
+  /* 多物种导出：物种槽位与按物种的装扮查表（恐龙上线后单测要用） */
+  PET_SPECIES:PET_SPECIES, PET_DINO_STAGES:PET_DINO_STAGES, PET_GEO:PET_GEO,
+  petSpeciesMeta:petSpeciesMeta, newPetState:newPetState, ensurePets:ensurePets, switchPet:switchPet,
+  petGeo:petGeo, petTopY:petTopY, petStagesFor:petStagesFor, petFxLayout:petFxLayout,
+  costumeSpecies:costumeSpecies, costumeFitsSpecies:costumeFitsSpecies,
+  petWearDict:petWearDict, slotLabel:slotLabel,
+  DINO_HATS:DINO_HATS, DINO_SCARFS:DINO_SCARFS, DINO_WINGS:DINO_WINGS, dinoBody:dinoBody,
   /* T4 导出：点宠物互动 */
   petTap:petTap, petBounce:petBounce, petTapEl:petTapEl, petPet:petPet,
   /* T5 导出：语音节流（供单测验证「主动直通 / 自动限流 / 单字不限流」） */
