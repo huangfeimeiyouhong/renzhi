@@ -2158,8 +2158,75 @@ function bondToLevel(bond){ var lv=1, i; for(i=0;i<PET_STAGES.length;i++) if(bon
 
 var state = null;
 
+/* ===================== 宠物物种槽位（P5：可选养哪只） =====================
+   设计：state.pets 按物种各存一份完全独立的进度（bond/level/每日额度/衣柜/已领奖账本）；
+         state.pet 永远是指向「当前在养的那只」的**同一个对象引用**（别名）。
+   这样既有 61 处 state.pet.* 读写全部保持有效，切换只是换别名指向，零改造面。
+   序列化时 s.pet 会与 pets[curPet] 冗余写出同一份；加载时 ensurePets 重建别名并丢弃冗余。 */
+var PET_SPECIES = [
+  {species:'ink',  name:'墨墨', title:'小字灵'},
+  {species:'dino', name:'龙宝', title:'小恐龙'}
+];
+function petSpeciesMeta(sp){
+  var i; for(i=0;i<PET_SPECIES.length;i++){ if(PET_SPECIES[i].species===sp) return PET_SPECIES[i]; }
+  return PET_SPECIES[0];
+}
+function newPetState(sp, name){
+  var m = petSpeciesMeta(sp);
+  return { name: name || m.name, species: sp, bond:0, level:1,
+           fedToday:0, petToday:0, lastCareDate:"",
+           wears:{hat:null,scarf:null,wing:null,bg:null},
+           owned:[], granted:[], mood:"happy", friends:[] };
+}
+/* 幂等：补齐所有物种槽位 + 迁移老存档（单只 pet → pets.ink） + 重建别名引用 */
+function ensurePets(s){
+  if(!s || typeof s !== 'object') return null;
+  /* ---- 1. migrate：老存档只有一只 state.pet ---- */
+  if((!s.pets || typeof s.pets !== 'object') && s.pet && typeof s.pet === 'object'){
+    s.pets = {}; s.pets.ink = s.pet;
+  }
+  if(!s.pets || typeof s.pets !== 'object') s.pets = {};
+  /* ---- 2. 每个物种各补一份，字段逐项兜底（老存档缺 granted / 每日额度也能自愈） ---- */
+  var i, sp, p, m;
+  for(i=0;i<PET_SPECIES.length;i++){
+    sp = PET_SPECIES[i].species; m = PET_SPECIES[i];
+    if(!s.pets[sp] || typeof s.pets[sp] !== 'object') s.pets[sp] = newPetState(sp, m.name);
+    p = s.pets[sp];
+    p.species = sp;
+    if(!p.name) p.name = m.name;
+    if(typeof p.bond !== 'number' || !isFinite(p.bond) || p.bond < 0) p.bond = 0;
+    if(typeof p.fedToday !== 'number') p.fedToday = 0;
+    if(typeof p.petToday !== 'number') p.petToday = 0;
+    if(typeof p.lastCareDate !== 'string') p.lastCareDate = "";
+    if(!p.wears) p.wears = {hat:null,scarf:null,wing:null,bg:null};
+    if(!Array.isArray(p.owned))   p.owned = [];
+    if(!Array.isArray(p.granted)) p.granted = [];   /* 等级达成奖励去重账本（append-only） */
+    if(!Array.isArray(p.friends)) p.friends = [];
+    p.level = bondToLevel(p.bond || 0);
+  }
+  /* ---- 3. 当前物种合法性 + 重建别名（序列化后的冗余 s.pet 在这里被就地丢弃） ---- */
+  var okcur = false, k;
+  for(k=0;k<PET_SPECIES.length;k++){ if(s.curPet === PET_SPECIES[k].species) okcur = true; }
+  if(!okcur) s.curPet = PET_SPECIES[0].species;
+  s.pet = s.pets[s.curPet];
+  return s.pet;
+}
+/* 切换当前宠物：各自进度互不干扰（每日额度也是每只一套） */
+function switchPet(s, sp){
+  if(!s) return {ok:false, reason:'nostate'};
+  ensurePets(s);
+  if(!s.pets[sp]) return {ok:false, reason:'nospecies'};
+  if(s.curPet === sp) return {ok:true, changed:false, species:sp, name:s.pets[sp].name};
+  s.curPet = sp;
+  s.pet = s.pets[sp];
+  _petCapToasted = false;
+  grantLevelRewards(s);            /* 换回来的那只把漏领的等级奖励补上（幂等去重） */
+  return {ok:true, changed:true, species:sp, name:s.pets[sp].name,
+          level:s.pets[sp].level, bond:s.pets[sp].bond};
+}
+
 function defaultStateV2(){
-  return {
+  var _d = {
     /* ═══ v1 字段：全部保留，语义不变 ═══ */
     version:2, pin:null, updatedAt:0, startDate:todayStr(),
     settings:{dailyCount:5},
@@ -2176,10 +2243,9 @@ function defaultStateV2(){
     /* ═══ v2 新增 ═══ */
     stars:0, starsTotal:0, energy:0, shards:0, keys:0,
     game:{ levels:{}, zones:[0,0,0,0], lastPlayedLevel:null, unlockedThrough:1 },
-    pet:{ name:"墨墨", species:"ink", bond:0, level:1,
-          fedToday:0, petToday:0, lastCareDate:"",
-          wears:{hat:null,scarf:null,wing:null,bg:null},
-          owned:[], granted:[], mood:"happy", friends:[] },
+    pet:null,      /* 别名：指向 pets[curPet]，勿直接读写，见 ensurePets/switchPet */
+    pets:{ ink:newPetState('ink','墨墨'), dino:newPetState('dino','龙宝') },
+    curPet:'ink',
     codex:{},
     chest:{ opened:0, log:[] },
     coupons:[],
@@ -2193,7 +2259,12 @@ function defaultStateV2(){
        其余字段与 GDD §12.2 完全一致。 */
     settingsNew:{ dailyMinutes:20, restReminder:true, soundOn:true, fsScale:1, soundVol:1, chestPool:{} }
   };
+  ensurePets(_d);   /* pet 必须在返回前绑定到 pets[curPet]，否则调用方拿到 null */
+  return _d;
 }
+
+/* defaultStateV2 返回的 pet 是 pets[curPet] 的别名引用，不可在此机械展开 */
+function freshStateV2(){ var d = defaultStateV2(); ensurePets(d); return d; }
 
 /* ---- 迁移：v1 → v2，幂等（GDD §12.4） ---- */
 function migrate(s){
@@ -2261,14 +2332,15 @@ function migrate(s){
                      code:"MIGRATED", migrated:true });
   }
 
-  /* 步骤 5：宠物初始亲密度按已学字数给（老用户不该从蛋重新开始） */
-  s.pet = { name:"墨墨", species:"ink",
-            bond: Math.min(490, learnedN * 5),
-            level: 1,
-            fedToday:0, petToday:0, lastCareDate:"",
-            wears:{hat:null,scarf:null,wing:null,bg:null},
-            owned:[], mood:"happy", friends:[] };
-  s.pet.level = bondToLevel(s.pet.bond);
+  /* 步骤 5：宠物初始亲密度按已学字数给（老用户不该从蛋重新开始）；
+     多物种：这份进度落在 ink（墨墨）槽位，恐龙从零开始自立一条线 */
+  s.pets = {};
+  s.pets.ink = newPetState('ink','墨墨');
+  s.pets.ink.bond = Math.min(490, learnedN * 5);
+  s.pets.ink.level = bondToLevel(s.pets.ink.bond);
+  s.pets.dino = newPetState('dino','龙宝');
+  s.curPet = 'ink';
+  s.pet = s.pets.ink;
 
   /* 步骤 6：补齐其余 v2 默认值 */
   s.chest = {opened:0, log:[]};
@@ -2302,15 +2374,16 @@ function recalcZones(s){
 /* 幂等补齐：任何字段缺失都补默认值，可重复调用 */
 function normalizeV2(s){
   var d = defaultStateV2(), k;
+  /* 老存档（只有单只 s.pet、没有 s.pets）必须先迁槽位：
+     否则会被下方「缺失字段补默认值」抢先把 s.pets 填成全新的两只，老进度当场蒸发。 */
+  if((!s.pets || typeof s.pets !== 'object') && s.pet && typeof s.pet === 'object'){
+    s.pets = {}; s.pets[s.pet.species || 'ink'] = s.pet;
+  }
   for(k in d){ if(!d.hasOwnProperty(k)) continue; if(!(k in s) || s[k]===null || s[k]===undefined) s[k]=d[k]; }
   if(!s.game) s.game = d.game;
   if(!s.game.levels) s.game.levels = {};
   if(!Array.isArray(s.game.zones) || s.game.zones.length!==NUM_ZONES) s.game.zones=new Array(NUM_ZONES).fill(0);
-  if(!s.pet) s.pet = d.pet;
-  if(!s.pet.wears) s.pet.wears = {hat:null,scarf:null,wing:null,bg:null};
-  if(!Array.isArray(s.pet.owned)) s.pet.owned = [];
-  if(!Array.isArray(s.pet.granted)) s.pet.granted = [];   /* Lv21+ 等级达成奖励去重账本（append-only） */
-  if(!Array.isArray(s.pet.friends)) s.pet.friends = [];
+  ensurePets(s);   /* 多宠物槽位：补齐 / 迁移老单只存档 / 重建 s.pet 别名（幂等） */
   if(!s.chest) s.chest = {opened:0, log:[]};
   if(!Array.isArray(s.chest.log)) s.chest.log = [];
   if(!Array.isArray(s.coupons)) s.coupons = [];
@@ -2385,10 +2458,14 @@ function ensureDaily(){
       grantLoginReward(state.streak.cur);
     }
   }
-  if(state.pet.lastCareDate !== t){
-    state.pet.fedToday = 0; state.pet.petToday = 0; state.pet.lastCareDate = t;
-    if(typeof _petCapToasted !== "undefined") _petCapToasted = false;   /* T4：跨天复位抚摸上限提示 */
+  /* 每日额度每只宠物各一套（抚摸 10 次 / 喂食递减账），互不挤占 */
+  ensurePets(state);
+  var _pk = Object.keys(state.pets), _pi, _pp;
+  for(_pi=0;_pi<_pk.length;_pi++){
+    _pp = state.pets[_pk[_pi]];
+    if(_pp.lastCareDate !== t){ _pp.fedToday = 0; _pp.petToday = 0; _pp.lastCareDate = t; }
   }
+  if(typeof _petCapToasted !== "undefined") _petCapToasted = false;   /* T4：跨天复位抚摸上限提示 */
   /* daily 是缓存不是学习记录，允许裁剪到最近 60 天 */
   var keys = Object.keys(state.daily).sort();
   while(keys.length > 60){ delete state.daily[keys.shift()]; }
@@ -4185,6 +4262,7 @@ function costumePreviewSVG(item, lv){
 /* 纯逻辑：购买并自动装备（GDD §5.4 #3：未拥有→花⭐→二次确认→购入后自动装备） */
 function buyCostume(s,id){
   var m=costumeMeta(id); if(!m) return {ok:false,reason:'noid'};
+  if(!costumeFitsSpecies(m, s && s.pet ? s.pet.species : 'ink')) return {ok:false,reason:'species'};
   if(m.grant) return {ok:false,reason:'grant'};   /* 等级达成自动赠送件不走 ⭐ 购买 */
   if(costumeOwned(s,id)) return {ok:false,reason:'owned'};
   var lv=petStage(s.pet.bond)+1;
@@ -4238,6 +4316,10 @@ function applyPetStroke(s){
    老存档 bond 很高时一次升多级：grantLevelRewards 去重补发，绝无遗漏；
    提示合并为一条 toast（由 renderPet 消费队列），不逐级弹。 ---- */
 var _petGrantToastQueue = [];
+/* 装扮归属物种：既有 44 件全部属于 ink；恐龙专属件落地时带 sp:'dino' 即可，
+   不必回填既有数据。衣柜各买各的（每只宠物有自己的 owned/wears 账本）。 */
+function costumeSpecies(it){ return (it && it.sp) ? it.sp : 'ink'; }
+function costumeFitsSpecies(it, sp){ return costumeSpecies(it) === (sp || 'ink'); }
 function grantLevelRewards(s){
   if(!s || !s.pet) return [];
   if(!Array.isArray(s.pet.granted)) s.pet.granted = [];
@@ -4246,6 +4328,7 @@ function grantLevelRewards(s){
   for(i=0;i<PET_COSTUME_LIST.length;i++){
     it = PET_COSTUME_LIST[i];
     if(!it.grant) continue;
+    if(!costumeFitsSpecies(it, s.pet.species)) continue;   /* 只发当前物种的达成奖励 */
     if(lv >= it.grant && s.pet.owned.indexOf(it.id) < 0){
       s.pet.owned.push(it.id);
       if(s.pet.granted.indexOf(it.id) < 0) s.pet.granted.push(it.id);
