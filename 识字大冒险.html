@@ -790,6 +790,24 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .pet-bar-txt{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:var(--fs-mini); font-weight:800; color:var(--c-ink); text-shadow:0 1px 0 rgba(255,255,255,.6); }
 .pet-stagetxt{ font-size:var(--fs-cap); color:var(--c-ink-2); }
 .pet-btns{ display:flex; gap:var(--sp-3); width:100%; align-items:stretch; }
+/* 多宠物：页顶物种切换条（与卡片同体系：白底 + 圆角 + 主色描边） */
+.pet-switch{ display:flex; gap:var(--sp-2); width:100%; }
+.psw{ flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+      padding:8px 6px; border-radius:var(--r-pill); border:2px solid var(--c-line);
+      background:var(--c-surface-2); font-size:var(--fs-cap); font-weight:800; color:var(--c-ink-2); cursor:pointer; }
+.psw small{ font-size:var(--fs-mini); font-weight:700; color:var(--c-ink-2); }
+.psw.on{ border-color:var(--c-lav); color:var(--c-ink); box-shadow:var(--sh-2); }
+/* 首次选蛋界面 */
+.pet-pick{ text-align:center; padding:var(--sp-6) var(--sp-4); }
+.pick-title{ font-size:var(--fs-h2); font-weight:800; color:var(--c-ink); margin-bottom:var(--sp-4); }
+.pick-row{ display:flex; gap:var(--sp-4); justify-content:center; flex-wrap:wrap; }
+.pick-card{ width:150px; padding:var(--sp-4); border-radius:var(--r-xl); background:var(--c-surface-2);
+            box-shadow:var(--sh-2); border:3px solid transparent; cursor:pointer; }
+.pick-card:hover{ border-color:var(--c-lav); }
+.pick-egg{ width:110px; height:110px; margin:0 auto; }
+.pick-name{ margin-top:6px; font-size:var(--fs-cap); font-weight:800; color:var(--c-ink); }
+.pick-desc{ font-size:var(--fs-mini); color:var(--c-ink-2); }
+.pick-hint{ margin-top:var(--sp-5); font-size:var(--fs-cap); color:var(--c-ink-2); }
 .pet-feed, .pet-stroke, .pet-dress{
   flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
   min-height:92px; padding:var(--sp-2) var(--sp-1); border-radius:var(--r-card);
@@ -2283,6 +2301,8 @@ function ensurePets(s){
   var okcur = false, k;
   for(k=0;k<PET_SPECIES.length;k++){ if(s.curPet === PET_SPECIES[k].species) okcur = true; }
   if(!okcur) s.curPet = PET_SPECIES[0].species;
+  /* 老存档：已经在养（有亲密度）就当作「早就选过了」，不该再弹选蛋界面 */
+  if(typeof s.petPicked !== 'boolean') s.petPicked = !!(s.pets[s.curPet] && s.pets[s.curPet].bond > 0);
   s.pet = s.pets[s.curPet];
   return s.pet;
 }
@@ -2321,6 +2341,7 @@ function defaultStateV2(){
     pet:null,      /* 别名：指向 pets[curPet]，勿直接读写，见 ensurePets/switchPet */
     pets:{ ink:newPetState('ink','墨墨'), dino:newPetState('dino','龙宝') },
     curPet:'ink',
+    petPicked:false,   /* 是否已选过养哪只（首次进宠物页先选蛋） */
     codex:{},
     chest:{ opened:0, log:[] },
     coupons:[],
@@ -3534,11 +3555,25 @@ var PET_BOND_THRESH = [
 ];
 /* 宠物名用字（Lv21–Lv40 名字去重），供图鉴分区派生，零新增 state */
 function petNameChars(){
-  var out = [], seen = {}, i, k, ns = PET_NAMES_LV21_40;
-  for(i=0;i<ns.length;i++){
-    for(k=0;k<ns[i].length;k++){
-      var c = ns[i].charAt(k);
-      if(!seen[c]){ seen[c] = 1; out.push(c); }
+  var out = [], seen = {}, i, k, c;
+  var pools = [PET_NAMES_LV21_40];
+  /* 恐龙 40 个名字同样当识字素材（芽/棘/翡/翠/碧/岚/麟/曜/瑞/祥/至 …）。
+     只收 CHAR_DICT 已收录的字 —— 图鉴卡片要显示拼音并支持点读，
+     字典里没有的字（如「岚」「麟」）硬塞进来只会得到一张空拼音卡。 */
+  if(typeof PET_DINO_STAGES !== 'undefined'){
+    var dn = [];
+    for(i=0;i<PET_DINO_STAGES.length;i++) dn.push(PET_DINO_STAGES[i].name);
+    pools.push(dn);
+  }
+  for(var p=0;p<pools.length;p++){
+    var ns = pools[p];
+    for(i=0;i<ns.length;i++){
+      for(k=0;k<ns[i].length;k++){
+        c = ns[i].charAt(k);
+        if(seen[c]) continue;
+        if(!chObj(c)) continue;      /* 未在字典中：不能点读，不进图鉴 */
+        seen[c] = 1; out.push(c);
+      }
     }
   }
   return out;
@@ -4711,6 +4746,51 @@ var _petShopOpen = false, _costumeConfirm = null;
 var _petCapToasted = false;
 
 /* ---- UI：渲染宠物页 ---- */
+/* 页顶物种切换条：两只各自有独立进度，随时来回换，互不干扰 */
+function petSwitchHTML(){
+  var o = '<div class="pet-switch" data-page-node-id="'+nid('pet.switch')+'">', i, m, p, plv, on;
+  for(i=0;i<PET_SPECIES.length;i++){
+    m = PET_SPECIES[i]; p = state.pets[m.species];
+    plv = p ? (petStage(p.bond||0)+1) : 1;
+    on  = (state.curPet === m.species);
+    o += '<button class="psw'+(on?' on':'')+'" data-sp="'+m.species+'" type="button" data-page-node-id="'+nid('pet.sw.'+m.species)+'">'+
+           '<span class="psw-n">'+(p && p.name ? p.name : m.name)+'</span>'+
+           '<small>Lv'+plv+' · '+m.title+'</small></button>';
+  }
+  return o + '</div>';
+}
+/* 首次进宠物页：两颗蛋选一只（之后可随时切换，进度各自保留） */
+function renderPetPick(){
+  var host = $("page-pet"); if(!host) return;
+  var o = '<div class="pet-page pet-pick" data-page-node-id="'+nid('pet.pick')+'">'+
+    '<div class="pick-title">选一只小伙伴，一起学字吧！</div>'+
+    '<div class="pick-row">', i, m;
+  for(i=0;i<PET_SPECIES.length;i++){
+    m = PET_SPECIES[i];
+    o += '<button class="pick-card" data-sp="'+m.species+'" type="button" data-page-node-id="'+nid('pet.pick.'+m.species)+'">'+
+           '<div class="pick-egg">'+petSVG({level:1, mood:'happy', wears:{}, t:Date.now(), chars:learnedCharsTop(5), species:m.species})+'</div>'+
+           '<div class="pick-name">'+m.name+'</div>'+
+           '<div class="pick-desc">'+m.title+'</div>'+
+         '</button>';
+  }
+  o += '</div>'+
+       '<div class="pick-hint">选好后随时可以在这里切换，两只的亲密度和装扮各自保留 🐾</div>'+
+    '</div>';
+  setHTML(host, o);
+  var btns = host.querySelectorAll('.pick-card'), b;
+  for(b=0;b<btns.length;b++){
+    btns[b].addEventListener('click', function(){
+      var sp = this.getAttribute('data-sp');
+      if(!sp) return;
+      switchPet(state, sp);
+      state.petPicked = true;
+      syncSave();
+      if(SFX && SFX.tap) SFX.tap();
+      toast('🎉 开始和'+(state.pet.name||'它')+'一起学字吧！');
+      renderPet();
+    });
+  }
+}
 function renderPet(keepScroll){
   var host = $("page-pet"); if(!host) return;
   /* 装扮交互需保留滚动位置：先在旧 .pet-page 上记录 scrollTop，重渲染后还原 */
@@ -4720,9 +4800,11 @@ function renderPet(keepScroll){
   if(gts.length){
     var gnames = [], gi;
     for(gi=0; gi<gts.length; gi++) gnames.push(gts[gi].name);
-    toast('🎁 墨墨长大了，送你新装扮：'+gnames.join('、')+'！');
+    toast('🎁 '+(state.pet.name||'墨墨')+'长大了，送你新装扮：'+gnames.join('、')+'！');
   }
-  var bond = state.pet.bond||0, st = petStage(bond), lv = st+1, S = PET_STAGES[st];
+  if(!state.petPicked){ renderPetPick(); return; }   /* 首次进宠物页：先选养哪只 */
+  var bond = state.pet.bond||0, st = petStage(bond), lv = st+1;
+  var S = petStagesFor(state.pet.species||'ink')[st];   /* 阶段名/配色按物种取 */
   var lo = PET_BOND_THRESH[st], hi = (st < PET_BOND_THRESH.length-1 ? PET_BOND_THRESH[st+1] : PET_BOND_THRESH[PET_BOND_THRESH.length-1]);
   var pct = (st >= PET_BOND_THRESH.length-1) ? 100 : Math.max(0, Math.min(100, Math.round((bond-lo)/(hi-lo)*100)));
   var mood = (_petMood && _petMood!=="happy") ? _petMood : "happy";
@@ -4740,6 +4822,7 @@ function renderPet(keepScroll){
         (mood==="excited" ? '<div class="pet-praise" data-page-node-id="'+nid('pet.praise')+'">'+_petPraise+'</div>' : '')+
       '</div>'+
       '<div class="pet-card" data-page-node-id="'+nid('pet.card')+'">'+
+        petSwitchHTML()+
         '<div class="pet-name" data-page-node-id="'+nid('pet.name')+'">'+(state.pet.name||"墨墨")+
           ' <span class="pet-lv" data-page-node-id="'+nid('pet.lvtag')+'">'+S.name+' · Lv'+lv+'</span></div>'+
         '<div class="pet-bar" data-page-node-id="'+nid('pet.bar')+'">'+
@@ -4768,6 +4851,20 @@ function renderPet(keepScroll){
   /* T4：点宠物本体 → 弹跳互动。绑 .pet-slot（在 .pet-bg 之上，不与背景层抢事件） */
   var ps = host.querySelector('.pet-slot');
   if(ps) ps.addEventListener('click', petTap);
+  /* 物种切换条 */
+  var sws = host.querySelectorAll('.psw'), w;
+  for(w=0;w<sws.length;w++){
+    sws[w].addEventListener('click', function(){
+      var sp = this.getAttribute('data-sp');
+      if(!sp || sp === state.curPet) return;
+      var r = switchPet(state, sp);
+      if(!r.ok) return;
+      syncSave();
+      if(SFX && SFX.tap) SFX.tap();
+      _costumeConfirm = null;
+      renderPet();
+    });
+  }
 }
 function feedPet(){
   var r = applyFeed(state);
@@ -4830,14 +4927,17 @@ function petPet(){ return petTap(); }
 /* ---- 装扮商店 UI（P4）---- */
 function costumeSectionHTML(){
   var lv = petStage(state.pet.bond)+1, html = '';
+  var curSp = state.pet.species || 'ink';
   html += '<section class="pet-costume" id="petCostume" data-page-node-id="'+nid('pet.costume')+'">'+
-    '<div class="pc-head"><span class="pc-title">🎀 给墨墨换装</span>'+
+    '<div class="pc-head"><span class="pc-title">🎀 给'+(state.pet.name||'墨墨')+'换装</span>'+
       '<span class="pc-star">⭐ '+state.stars+'</span></div>';
   for(var s=0;s<PET_COSTUME_SLOTS.length;s++){
-    var slot=PET_COSTUME_SLOTS[s].slot, label=PET_COSTUME_SLOTS[s].label;
+    var slot=PET_COSTUME_SLOTS[s].slot, label=slotLabel(slot, curSp);
     html += '<div class="pc-row"><div class="pc-label">'+label+'</div><div class="pc-grid">';
     for(var i=0;i<PET_COSTUME_LIST.length;i++){
       var it=PET_COSTUME_LIST[i]; if(it.slot!==slot) continue;
+      /* 衣柜各买各的：只列当前物种的件；背景槽是独立图层，两物种共用 */
+      if(slot !== 'bg' && !costumeFitsSpecies(it, curSp)) continue;
       var locked = it.grant ? (lv < it.grant) : (lv < costumeUnlockLv(slot));
       var owned = costumeOwned(state,it.id);
       var on = costumeEquipped(state,it.id);
@@ -4974,7 +5074,7 @@ function renderDex(){
      计数独立，不并入上方「已认识 x/100」；缺失字不做 picSVG 象形图（picSVG 无图会空框），用「字+拼音+点读」卡片。 */
   var pns = petNameChars(), pc, po, pknown;
   html += '<section class="dex-zone" data-page-node-id="'+nid('dex.petzone')+'">'+
-    '<h3 class="dex-zone-t" data-page-node-id="'+nid('dex.petzone.t')+'">宠物名字 · 墨墨的名字</h3>'+
+    '<h3 class="dex-zone-t" data-page-node-id="'+nid('dex.petzone.t')+'">宠物名字 · 墨墨和龙宝的名字</h3>'+
     '<div class="dex-grid">';
   for(pc=0; pc<pns.length; pc++){
     po = chObj(pns[pc]);
