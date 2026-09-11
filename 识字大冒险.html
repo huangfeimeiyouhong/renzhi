@@ -7721,20 +7721,33 @@ function bindFirstInteractionFullscreen(){
   function once(){ tryFullscreen(); }
   document.addEventListener('click', once, {once:true});
 }
-/* 拦截浏览器原生「返回手势」，避免写字/游戏时一横划就退出应用。
-   识字大冒险是纯单页应用（无路由）：iOS Safari 左边缘右滑返回、安卓 Chrome 的
-   横向 overscroll / 系统手势返回，都无法被 preventDefault 拦住，且优先级高于网页。
-   做法：压一个历史哨兵，popstate 时再补一个，使「返回」只弹掉哨兵、留在应用内；
-   应用内的 ✕ / 返回地图 按钮走 JS 视图切换，不受此影响。 */
+/* 拦截浏览器原生「返回手势」，进入程序后全程禁止右滑/边缘返回退出应用。
+   识字大冒险是纯单页应用（无路由）。难点在于：
+   - iOS Safari 左边缘右滑返回、安卓 Chrome 的横向 overscroll / 系统手势返回，
+     优先级都高于网页，canvas 的 preventDefault 拦不住；
+   - 安卓 Chrome 的「系统返回手势」是 OS 级，且带「预测式返回」——popstate 哨兵补回太晚，
+     上一页已经被滑出来显示了，纯 history 哨兵在安卓不顶用。
+   做法（双保险）：
+   1. Navigation API：Chrome/Edge（安卓主用）在 navigate 事件里 preventDefault 取消「后退/前进」遍历，
+      这是唯一能在系统返回手势真正生效前拦住它的前端手段；
+   2. history 哨兵兜底：iOS Safari 不支持 Navigation API，靠 popstate 补回哨兵留在应用内；
+   应用内的 ✕ / 返回地图 按钮走 JS 视图切换，不触发历史遍历，不受影响。 */
 function installSwipeGuard(){
   var SENTINEL = { szGuard: 1 };
-  try{
-    history.pushState(SENTINEL, '');
-    window.addEventListener('popstate', function(){
-      /* 任何返回尝试都补回哨兵，避免真正离开应用而丢失当前活动 */
-      try { history.pushState(SENTINEL, ''); } catch(e){}
+  try { history.pushState(SENTINEL, ''); } catch(e){}
+  /* 兜底：iOS Safari 等不支持 Navigation API 的环境，靠 popstate 补回哨兵 */
+  window.addEventListener('popstate', function(){
+    try { history.pushState(SENTINEL, ''); } catch(e){}
+  });
+  /* 主修：安卓 Chrome/Edge 系统返回手势（在真正生效前取消） */
+  if(window.navigation && typeof window.navigation.addEventListener === 'function'){
+    window.navigation.addEventListener('navigate', function(e){
+      /* 仅拦截「前进/后退」类遍历（traverse）；应用内无路由，不会触发其它类型 */
+      if(e && e.navigationType === 'traverse' && e.canIntercept){
+        e.preventDefault();
+      }
     });
-  } catch(e){ /* 沙箱/iframe 跨源或无 history 能力时静默降级 */ }
+  }
 }
 
 function boot(){
