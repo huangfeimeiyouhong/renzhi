@@ -205,6 +205,7 @@ html,body{
   font-size: calc(var(--fs-body) * var(--fs-scale));
   line-height: var(--lh-base);
   overscroll-behavior-y: none;
+  overscroll-behavior-x: none;   /* 干掉横向 overscroll 返回（安卓 Chrome 旧导航条模式） */
 }
 /* 本版用 flex 100dvh 三段式布局（HUD / 主区 / Tab），底部安全区由 #tabbar 承担，
    故覆盖美术 §11 的 body padding-bottom，避免与 tabbar 高度叠加。 */
@@ -7720,6 +7721,22 @@ function bindFirstInteractionFullscreen(){
   function once(){ tryFullscreen(); }
   document.addEventListener('click', once, {once:true});
 }
+/* 拦截浏览器原生「返回手势」，避免写字/游戏时一横划就退出应用。
+   识字大冒险是纯单页应用（无路由）：iOS Safari 左边缘右滑返回、安卓 Chrome 的
+   横向 overscroll / 系统手势返回，都无法被 preventDefault 拦住，且优先级高于网页。
+   做法：压一个历史哨兵，popstate 时再补一个，使「返回」只弹掉哨兵、留在应用内；
+   应用内的 ✕ / 返回地图 按钮走 JS 视图切换，不受此影响。 */
+function installSwipeGuard(){
+  var SENTINEL = { szGuard: 1 };
+  try{
+    history.pushState(SENTINEL, '');
+    window.addEventListener('popstate', function(){
+      /* 任何返回尝试都补回哨兵，避免真正离开应用而丢失当前活动 */
+      try { history.pushState(SENTINEL, ''); } catch(e){}
+    });
+  } catch(e){ /* 沙箱/iframe 跨源或无 history 能力时静默降级 */ }
+}
+
 function boot(){
   load();
   SFX.setEnabled(state.settingsNew.soundOn !== false);
@@ -7735,6 +7752,7 @@ function boot(){
   bindMap();
   bindParent();
   scrollToCurrent();
+  installSwipeGuard();
   bindFirstInteractionFullscreen();
   /* REQ-201：横竖屏切换后重新居中当前关卡节点 */
   window.addEventListener('orientationchange', function(){ setTimeout(scrollToCurrent, 320); });
