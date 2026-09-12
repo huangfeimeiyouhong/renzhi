@@ -442,6 +442,21 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
 .btn[aria-pressed="false"]{ color:var(--c-ink-3); background:var(--c-disabled-bg);
   border:var(--bw-btn-2) solid var(--c-line); box-shadow:none; }
 .seg{ display:flex; gap:var(--sp-2); flex-wrap:wrap; }
+/* 解锁激活：输入框与按钮沿用面板既有 token，不新增配色 */
+.btn:disabled{ opacity:.55; cursor:default; }
+.lic-row{ display:flex; align-items:center; gap:var(--sp-3); margin-bottom:var(--sp-2); }
+.lic-input{
+  flex:1 1 auto; min-width:0; min-height:52px; padding:0 var(--sp-5);
+  font-family:inherit; font-size:var(--fs-body); font-weight:800;
+  letter-spacing:.08em; text-transform:uppercase;
+  color:var(--c-ink); background:var(--c-surface);
+  border:var(--bw-btn-2) solid var(--c-line-2); border-radius:var(--r-pill);
+  outline:none;
+}
+.lic-input:focus{ border-color:var(--c-pri); }
+.lic-input:disabled{ background:var(--c-disabled-bg); color:var(--c-ink-2); }
+.lic-input::placeholder{ color:var(--c-ink-3); font-weight:600; letter-spacing:.04em; }
+.lic-err{ color:var(--c-err-d) !important; }
 
 /* ===================== 家长中心面板 ===================== */
 .scrim{
@@ -1294,6 +1309,18 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
       <h3 data-nid="panel.sec.report.t">📊 学习报告</h3>
       <div class="statgrid" id="parentStats" data-nid="panel.stats"></div>
       <p class="sec-d" id="parentDictLine" data-nid="panel.dictline"></p>
+    </div>
+
+    <div class="panel-sec" data-nid="panel.sec.license">
+      <h3 data-nid="panel.sec.license.t">🔓 解锁全部字库</h3>
+      <p class="sec-d" id="licStateLine" data-nid="panel.license.state">免费版：只开放前 6 关（30 个字）</p>
+      <div class="lic-row" data-nid="panel.row.license">
+        <input type="text" id="licInput" class="lic-input" placeholder="XXXX-XXXX-XXXX-XXXX"
+               autocomplete="off" autocapitalize="characters" spellcheck="false"
+               aria-label="激活码" data-nid="panel.license.input">
+        <button class="btn" id="licBtn" type="button" data-nid="panel.license.activate">激活</button>
+      </div>
+      <div class="saved" id="licTip" data-nid="panel.license.tip"></div>
     </div>
 
     <div class="panel-sec" data-nid="panel.sec.data">
@@ -2933,7 +2960,9 @@ function defaultStateV2(){
     stats:{ totalRight:0, totalWrong:0, playSeconds:0, sessions:0, wrongByChar:{} },
     /* fsScale 是本阶段工程追加项（对应美术 §11 的 --fs-scale 大字号模式），
        其余字段与 GDD §12.2 完全一致。 */
-    settingsNew:{ dailyMinutes:20, restReminder:true, soundOn:true, fsScale:1, soundVol:1, chestPool:{} }
+    settingsNew:{ dailyMinutes:20, restReminder:true, soundOn:true, fsScale:1, soundVol:1, chestPool:{} },
+    /* 买断授权：code 非空 = 已解锁全部字库（normalizeV2 会自动补齐本字段，老存档不受影响） */
+    license:{ code:"", at:0 }
   };
   ensurePets(_d);   /* pet 必须在返回前绑定到 pets[curPet]，否则调用方拿到 null */
   return _d;
@@ -3171,6 +3200,186 @@ function load(){
   loadCloud();                     /* 云端回来后再次 normalizeV2 */
 }
 /* ===== /JS-BLOCK: STATE ===== */
+
+/* ===== JS-BLOCK: LICENSE ===== */
+/* 一次买断 · 离线激活码校验（零后端、零请求）
+   ---------------------------------------------------------------------------
+   码制：16 位 Crockford base32（字母表去掉易混淆的 I / L / O / U），
+        写作 XXXX-XXXX-XXXX-XXXX，方便家长手抄或粘贴。
+     · 前 8 位 payload —— 发卡器随机生成
+     · 后 8 位 mac     —— HMAC-SHA256(盐, payload) 取前 5 字节再编码
+   校验：本地用同一盐重算 mac 并比对，不联网、不产生任何网络请求，
+        与「数据全在本地、服务器零记录」的主张一致。
+   ⚠️ 强度定位：这是「门槛级」防伪 —— 挡得住手编假码与网上流传的码表，
+      但盐随代码公开，懂逆向的人理论上能提取并批量造码。
+      一人公司冷启动阶段够用；后续接入在线支付时，只需把 licVerify 改为
+      请求 /api/activate（其余逻辑完全不动）即可升级为服务端强校验。
+   ============================================================================ */
+var LIC_FREE_LEVELS = 6;                    /* 免费版开放前 6 关 = 30 个字 */
+var LIC_GROUPS = 4, LIC_GROUP_LEN = 4;
+var LIC_LEN = LIC_GROUPS * LIC_GROUP_LEN;    /* 16 位 */
+var LIC_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+/* 校验盐（32 字节，分片存放，运行时重组） */
+var _LIC_SALT = ["8b4a9d09137b60d4", "e38df51342f92762", "0dacfac4ed3f7bd2", "6ee5ad70d3fcfed3"];
+
+function _licSaltBytes(){
+  var hex = _LIC_SALT.join(""), out = new Uint8Array(hex.length/2), i;
+  for(i=0;i<out.length;i++) out[i] = parseInt(hex.substr(i*2,2), 16) & 0xff;
+  return out;
+}
+function _licAscii(str){
+  var out = new Uint8Array(str.length), i;
+  for(i=0;i<str.length;i++) out[i] = str.charCodeAt(i) & 0xff;
+  return out;
+}
+function _licRor(x,n){ return ((x>>>n) | (x<<(32-n))) >>> 0; }
+/* SHA-256 —— 纯 JS 实现（crypto.subtle 在部分本地/非安全上下文不可用，
+   自带一份保证 file:// 打开也能校验，且同步执行不引入 Promise） */
+function _licSha256(data){
+  var K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+           0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+           0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+           0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+           0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+           0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+           0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+           0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  var H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  var l = data.length, i, j;
+  var padLen = (((l + 9) + 63) >> 6) << 6;      /* 补 0x80 + 8 字节长度，凑 64 倍数 */
+  var msg = new Uint8Array(padLen);
+  msg.set(data);
+  msg[l] = 0x80;
+  var bitHi = Math.floor(l / 536870912), bitLo = (l << 3) >>> 0;
+  msg[padLen-8]=(bitHi>>>24)&255; msg[padLen-7]=(bitHi>>>16)&255;
+  msg[padLen-6]=(bitHi>>>8)&255;  msg[padLen-5]=bitHi&255;
+  msg[padLen-4]=(bitLo>>>24)&255; msg[padLen-3]=(bitLo>>>16)&255;
+  msg[padLen-2]=(bitLo>>>8)&255;  msg[padLen-1]=bitLo&255;
+  var w = new Array(64);
+  for(var off=0; off<padLen; off+=64){
+    for(i=0;i<16;i++){
+      j = off + i*4;
+      w[i] = ((msg[j]<<24) | (msg[j+1]<<16) | (msg[j+2]<<8) | msg[j+3]) | 0;
+    }
+    for(i=16;i<64;i++){
+      var s0 = (_licRor(w[i-15],7) ^ _licRor(w[i-15],18) ^ (w[i-15]>>>3));
+      var s1 = (_licRor(w[i-2],17) ^ _licRor(w[i-2],19) ^ (w[i-2]>>>10));
+      w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0;
+    }
+    var a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+    for(i=0;i<64;i++){
+      var S1 = _licRor(e,6) ^ _licRor(e,11) ^ _licRor(e,25);
+      var ch = (e & f) ^ (~e & g);
+      var t1 = (h + S1 + ch + K[i] + w[i]) | 0;
+      var S0 = _licRor(a,2) ^ _licRor(a,13) ^ _licRor(a,22);
+      var mj = (a & b) ^ (a & c) ^ (b & c);
+      var t2 = (S0 + mj) | 0;
+      h=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+    }
+    H[0]=(H[0]+a)|0; H[1]=(H[1]+b)|0; H[2]=(H[2]+c)|0; H[3]=(H[3]+d)|0;
+    H[4]=(H[4]+e)|0; H[5]=(H[5]+f)|0; H[6]=(H[6]+g)|0; H[7]=(H[7]+h)|0;
+  }
+  var out = new Uint8Array(32);
+  for(i=0;i<8;i++){
+    out[i*4]=(H[i]>>>24)&255; out[i*4+1]=(H[i]>>>16)&255;
+    out[i*4+2]=(H[i]>>>8)&255; out[i*4+3]=H[i]&255;
+  }
+  return out;
+}
+function _licHmac(key, msg){
+  var BS = 64, i, k = key;
+  if(k.length > BS) k = _licSha256(k);
+  var kp = new Uint8Array(BS); kp.set(k);
+  var ip = new Uint8Array(BS + msg.length), op = new Uint8Array(BS + 32);
+  for(i=0;i<BS;i++){ ip[i] = kp[i] ^ 0x36; op[i] = kp[i] ^ 0x5c; }
+  ip.set(msg, BS);
+  var inner = _licSha256(ip);
+  op.set(inner, BS);
+  return _licSha256(op);
+}
+/* Crockford base32 编码，want 指定截取长度 */
+function _licEnc(bytes, want){
+  var out = "", bits = 0, val = 0, i;
+  for(i=0;i<bytes.length;i++){
+    val = ((val << 8) | (bytes[i] & 0xff)) & 0xFFFF;
+    bits += 8;
+    while(bits >= 5){ out += LIC_ALPHABET[(val >>> (bits-5)) & 31]; bits -= 5; }
+  }
+  if(bits > 0) out += LIC_ALPHABET[(val << (5-bits)) & 31];
+  return want ? out.slice(0, want) : out;
+}
+/* 算 payload 对应的 8 位校验段（5 字节 = 40 bit） */
+function _licMac(payload){
+  return _licEnc(_licHmac(_licSaltBytes(), _licAscii(payload)).subarray(0,5), 8);
+}
+/* 归一化：大写 + 常见误抄修正（O→0、I/L→1）+ 去分隔符 */
+function licNormalize(code){
+  return String(code==null?"":code).toUpperCase()
+    .replace(/O/g,"0").replace(/[IL]/g,"1")
+    .replace(/[^0-9A-HJKMNP-TV-Z]/g,"");
+}
+function licFormat(code){
+  var c = licNormalize(code), out = [], i;
+  for(i=0;i<c.length;i+=LIC_GROUP_LEN) out.push(c.substr(i, LIC_GROUP_LEN));
+  return out.join("-");
+}
+function licVerify(code){
+  var c = licNormalize(code);
+  if(c.length !== LIC_LEN) return false;
+  var expect = _licMac(c.slice(0,8)), got = c.slice(8), diff = 0, i;
+  if(expect.length !== got.length) return false;
+  for(i=0;i<expect.length;i++) diff |= expect.charCodeAt(i) ^ got.charCodeAt(i);
+  return diff === 0;
+}
+function licIsPaid(){
+  return !!(state && state.license && state.license.code);
+}
+/* 激活：校验通过后写入本地存档（一次性、永久有效） */
+function licActivate(code){
+  var c = licNormalize(code);
+  if(!c)                return { ok:false, msg:'请输入激活码' };
+  if(c.length !== LIC_LEN) return { ok:false, msg:'激活码是 '+LIC_LEN+' 位，请检查有没有抄漏' };
+  if(!licVerify(c))     return { ok:false, msg:'这个激活码无效，请核对后重试' };
+  if(licIsPaid() && state.license.code === c) return { ok:true, msg:'这台设备已经解锁过啦' };
+  state.license = { code:c, at: Date.now() };
+  save();
+  return { ok:true, msg:'解锁成功！全部 400 个字都开放啦' };
+}
+/* 面板激活按钮的处理 + 状态刷新（家长中心「解锁全部字库」段落） */
+function licDoActivate(){
+  var inp = $('licInput'), tip = $('licTip');
+  var r = licActivate(inp ? inp.value : '');
+  if(tip){
+    tip.textContent = r.msg;
+    tip.className = 'saved' + (r.ok ? '' : ' lic-err');
+  }
+  if(r.ok){
+    try { SFX.tap(); } catch(e){}
+    licRenderState();
+    renderMap();               /* 地图重渲染：超范围关卡的提示随解锁放行 */
+    showPage('page-map');
+    closeParent();
+  }
+  toast(r.msg);
+  return r.ok;
+}
+function licRenderState(){
+  var line = $('licStateLine'), box = $('licInput'), btn = $('licBtn'), tip = $('licTip');
+  var paid = licIsPaid();
+  if(line) line.textContent = paid
+    ? '已解锁全部 400 个字（本机永久有效）'
+    : ('免费版：只开放前 '+LIC_FREE_LEVELS+' 关（'+(LIC_FREE_LEVELS*5)+' 个字）');
+  if(box){
+    box.disabled = paid;
+    if(paid) box.value = licFormat(state.license.code);
+  }
+  if(btn){ btn.textContent = paid ? '已激活' : '激活'; btn.disabled = paid; }
+  if(tip){
+    tip.className = 'saved';
+    tip.textContent = paid ? '换新设备时，输入同一个激活码即可再次解锁' : '';
+  }
+}
+/* ===== /JS-BLOCK: LICENSE ===== */
 
 /* ===== JS-BLOCK: CLOUD ===== */
 /* GDD §12.3：独立字段 + 「设置」兜底袋双写 + 三级回落读取。
@@ -3947,6 +4156,14 @@ function tapNode(n){
     toast('先把上一关闯过去吧！');
     return;
   }
+  /* 买断闸门：免费版只开放前 LIC_FREE_LEVELS 关，再往后引导家长去解锁 */
+  if(!licIsPaid() && n > LIC_FREE_LEVELS){
+    el = document.querySelector('.node[data-lv="'+n+'"]');
+    if(el){ el.classList.remove('locked-shake'); void el.offsetWidth; el.classList.add('locked-shake');
+            setTimeout(function(){ el.classList.remove('locked-shake'); }, 460); }
+    toast('先解锁才能继续闯关，请爸爸妈妈到「家长中心」输入激活码');
+    return;
+  }
   enterLevel(n, st);
 }
 /* P1：地图节点点击 → 进入关卡流水线（BLOCK: LEVEL-FLOW）。
@@ -4070,6 +4287,7 @@ function openParent(){
   var p = $("parentPanel"), s = $("scrim");
   if(p){ p.classList.add('on'); p.setAttribute('aria-hidden', 'false'); }
   if(s) s.classList.add('on');
+  licRenderState();      /* 每次打开刷新解锁状态（未定义时不报错） */
   SFX.tap();
 }
 /* 家长入口：点击「家长」按钮进入。未设 PIN → 先设置；已设 → 验证；
@@ -4098,6 +4316,20 @@ function bindParent(){
 
   var x = $("parentX"); if(x) x.addEventListener('click', closeParent);
   var sc = $("scrim"); if(sc) sc.addEventListener('click', closeParent);
+  /* 解锁激活：点「激活」或按回车提交；输入时自动转大写并按 4 位分组 */
+  var licBtn = $("licBtn");
+  if(licBtn) licBtn.addEventListener('click', function(e){ e.preventDefault(); licDoActivate(); });
+  var licIn = $("licInput");
+  if(licIn){
+    licIn.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){ e.preventDefault(); licDoActivate(); }
+    });
+    licIn.addEventListener('input', function(){
+      var atEnd = this.selectionStart >= this.value.length;
+      this.value = licFormat(this.value).slice(0, LIC_LEN + LIC_GROUPS - 1);
+      if(atEnd) this.setSelectionRange(this.value.length, this.value.length);
+    });
+  }
   var fsBtns = document.querySelectorAll('[data-fs]'), i;
   for(i=0;i<fsBtns.length;i++){
     fsBtns[i].addEventListener('click', function(){
@@ -7033,6 +7265,12 @@ function openLevel(idx){
   if(idx<0 || idx>=NUM_LEVELS) return;   /* 关卡数已随 NUM_ZONES 扩展到 40，idx 上限随之放开 */
   var st = levelStates()[idx];
   if(st.state === 'locked'){ toast('先把上一关闯过去吧！'); return; }
+  /* 买断闸门（第二道，防止绕过地图直接调用）：免费版只开放前 LIC_FREE_LEVELS 关。
+     温故知新复习的是已学过的旧关卡（idx 落在免费范围内），不受影响。 */
+  if(!licIsPaid() && idx >= LIC_FREE_LEVELS){
+    toast('先解锁才能继续闯关，请爸爸妈妈到「家长中心」输入激活码');
+    return;
+  }
   var pl = buildChoicePool(idx);
   LV = {
     idx: idx,
