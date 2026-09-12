@@ -3334,6 +3334,15 @@ function licVerify(code){
 function licIsPaid(){
   return !!(state && state.license && state.license.code);
 }
+/* 关卡是否放行（n 从 1 开始）：
+   付费墙上线前「已经玩过」的关卡一律保留可访问 —— 遵循本项目一贯的不降级原则，
+   不把已经学过的进度锁回去。只拦「免费层之外、且从没碰过」的新关卡。 */
+function licLevelAllowed(n){
+  if(licIsPaid()) return true;
+  if(n <= LIC_FREE_LEVELS) return true;
+  var L = (state.game && state.game.levels && state.game.levels["L"+n]) || null;
+  return !!(L && (L.cleared || (L.sections|0) > 0));
+}
 /* 激活：校验通过后写入本地存档（一次性、永久有效） */
 function licActivate(code){
   var c = licNormalize(code);
@@ -4156,8 +4165,8 @@ function tapNode(n){
     toast('先把上一关闯过去吧！');
     return;
   }
-  /* 买断闸门：免费版只开放前 LIC_FREE_LEVELS 关，再往后引导家长去解锁 */
-  if(!licIsPaid() && n > LIC_FREE_LEVELS){
+  /* 买断闸门：免费版只开放前 LIC_FREE_LEVELS 关；已玩过的关卡不回收 */
+  if(!licLevelAllowed(n)){
     el = document.querySelector('.node[data-lv="'+n+'"]');
     if(el){ el.classList.remove('locked-shake'); void el.offsetWidth; el.classList.add('locked-shake');
             setTimeout(function(){ el.classList.remove('locked-shake'); }, 460); }
@@ -7265,9 +7274,9 @@ function openLevel(idx){
   if(idx<0 || idx>=NUM_LEVELS) return;   /* 关卡数已随 NUM_ZONES 扩展到 40，idx 上限随之放开 */
   var st = levelStates()[idx];
   if(st.state === 'locked'){ toast('先把上一关闯过去吧！'); return; }
-  /* 买断闸门（第二道，防止绕过地图直接调用）：免费版只开放前 LIC_FREE_LEVELS 关。
-     温故知新复习的是已学过的旧关卡（idx 落在免费范围内），不受影响。 */
-  if(!licIsPaid() && idx >= LIC_FREE_LEVELS){
+  /* 买断闸门（第二道，防止绕过地图直接调用）：同上，已玩过的关卡不回收。
+     温故知新复习的是已学过的旧关卡，因此不受影响。 */
+  if(!licLevelAllowed(idx+1)){
     toast('先解锁才能继续闯关，请爸爸妈妈到「家长中心」输入激活码');
     return;
   }
