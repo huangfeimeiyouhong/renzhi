@@ -5540,7 +5540,8 @@ function costumePreviewSVG(item, lv){
 /* 纯逻辑：购买并自动装备（GDD §5.4 #3：未拥有→花⭐→二次确认→购入后自动装备） */
 function buyCostume(s,id){
   var m=costumeMeta(id); if(!m) return {ok:false,reason:'noid'};
-  if(!costumeFitsSpecies(m, s && s.pet ? s.pet.species : 'ink')) return {ok:false,reason:'species'};
+  /* 背景槽是独立图层、两物种共用（与商店展示口径一致 line 5824）—— 不按物种过滤，龙宝也能买墨墨的背景 */
+  if(m.slot!=='bg' && !costumeFitsSpecies(m, s && s.pet ? s.pet.species : 'ink')) return {ok:false,reason:'species'};
   if(m.grant) return {ok:false,reason:'grant'};   /* 等级达成自动赠送件不走 ⭐ 购买 */
   if(costumeOwned(s,id)) return {ok:false,reason:'owned'};
   var lv=petStage(s.pet.bond)+1;
@@ -5864,6 +5865,10 @@ function onCostume(e){
       renderHUD();            /* 购买后立即刷新顶部星星计数 */
     } else if(r.reason==='nostar'){
       _costumeConfirm=null; toast('⭐ 星星不够，去学字赚星星吧～');
+    } else if(r.reason==='species'){
+      _costumeConfirm=null; toast('这个装扮是墨墨的专属哦，换回墨墨再买～');
+    } else if(r.reason==='locked'){
+      _costumeConfirm=null; toast('墨墨还要再长大一点才能穿哦～');
     } else { _costumeConfirm=null; }
     renderPet(true); return;
   }
