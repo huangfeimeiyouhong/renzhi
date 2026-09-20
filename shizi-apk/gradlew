@@ -1,0 +1,53 @@
+#!/bin/sh
+
+# Gradle start up script for POSIX (simplified wrapper launcher)
+# Delegates to gradle/wrapper/gradle-wrapper.jar which downloads the configured Gradle.
+
+APP_HOME=$( cd "$(dirname "$0")" >/dev/null 2>&1 && pwd -P ) || exit
+APP_BASE_NAME=$( basename "$0" )
+
+MAX_FD="maximum"
+
+warn () { echo "$*" >&2 ; }
+die () { echo ; echo "$*" ; echo ; exit 1 ; } >&2
+
+# OS specific support
+cygwin=false
+msys=false
+darwin=false
+nonstop=false
+case "$( uname )" in
+  CYGWIN* ) cygwin=true ;;
+  Darwin* ) darwin=true ;;
+  MSYS* | MINGW* ) msys=true ;;
+  NONSTOP* ) nonstop=true ;;
+esac
+
+CLASSPATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+
+# Determine the Java command to use to start the JVM.
+if [ -n "$JAVA_HOME" ] ; then
+  JAVACMD="$JAVA_HOME/bin/java"
+  if [ ! -x "$JAVACMD" ] ; then
+    die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME"
+  fi
+else
+  JAVACMD="java"
+  command -v java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH."
+fi
+
+DEFAULT_JVM_OPTS="-Xmx64m -Xms64m"
+
+# Increase the maximum file descriptors if we can.
+if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
+  MAX_FD_LIMIT=$( ulimit -H -n ) || true
+  if [ "$MAX_FD" = "maximum" ] || [ "$MAX_FD" = "max" ] ; then
+    MAX_FD="$MAX_FD_LIMIT"
+  fi
+  case $MAX_FD in
+    '' | *[!0-9]*) warn "MAX_FD is invalid; must be an integer or 'maximum'" ;;
+    *) ulimit -n "$MAX_FD" || warn "Cannot set MAX_FD to $MAX_FD" ;;
+  esac
+fi
+
+exec "$JAVACMD" $DEFAULT_JVM_OPTS "-Dorg.gradle.appname=$APP_BASE_NAME" -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"

@@ -1,0 +1,12 @@
+# 编译产物
+*.apk
+*.aab
+app/build/
+build/
+.gradle/
+
+# 本地 IDE
+*.iml
+.idea/
+captures/
+local.properties

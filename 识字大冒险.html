@@ -4369,7 +4369,13 @@ function bindParent(){
   /* 家长端功能按钮（JS-BLOCK: PARENT-FEATURES） */
   var ar = $("addRewardBtn");    if(ar) ar.addEventListener('click', addReward);
   var sr = $("saveRewardsBtn");  if(sr) sr.addEventListener('click', saveRewards);
-  var ex = $("exportBtn");       if(ex) ex.addEventListener('click', function(){ doExportBackup(); toast('已导出备份 ✓'); });
+  var ex = $("exportBtn");       if(ex) ex.addEventListener('click', function(){
+    var r = doExportBackup();
+    if(r.method === 'shell')        toast('已保存备份到本机下载目录 ✓');
+    else if(r.method === 'download') toast('已导出备份 ✓');
+    else if(r.method === 'clipboard') toast('当前环境无法直接下载，备份内容已复制到剪贴板，请粘贴到备忘录保存');
+    else toast('导出失败，请稍后再试');
+  });
   var im = $("importBtn");       if(im) im.addEventListener('click', function(){ var f=$("importFile"); if(f) f.click(); });
   var iff = $("importFile");     if(iff) iff.addEventListener('change', function(){ if(this.files && this.files[0]) importBackup(this.files[0]); });
   var cl = $("clearBtn");        if(cl) cl.addEventListener('click', resetAllData);
@@ -6962,7 +6968,13 @@ function saveRewards(){
 }
 
 /* ---------- 学习报告：进度统计 + 字库完成度 ---------- */
-function learnedCount(){ return Object.keys(state.learned || {}).length; }
+function learnedCount(){
+  /* v2 把「已学字」记在 state.codex（每学会一个字写一条），state.learned 是 v1 遗留、
+     v2 不再写入；所以已学汉字数应取 codex 的键数（v1 老存档兜底取 learned）。 */
+  var n = Object.keys(state.codex || {}).length;
+  if(!n) n = Object.keys(state.learned || {}).length;
+  return n;
+}
 function clearedCount(){
   var n = 0, lv = state.game && state.game.levels;
   if(lv) for(var k in lv){ if(lv.hasOwnProperty(k) && lv[k] && lv[k].cleared) n++; }
@@ -6978,7 +6990,10 @@ function renderParentStats(){
   var daily = (state.settings && state.settings.dailyCount) || 5;
   var days = total ? Math.ceil(total/daily) : 0;
   box.innerHTML =
-    statBox(state.points, '总积分') +
+    /* 总积分：v2 经济系统主货币是「星星 ⭐」（每关奖励、装扮/宝箱都绕星星走），
+       state.points 是 v1 迁移遗留字段、v2 不再累加，故这里用累计获得的星星数
+       （starsTotal = 历史累计、永不下降）作为孩子的「总积分」。 */
+    statBox(state.starsTotal || state.stars || 0, '总积分') +
     statBox(learned, '已学汉字') +
     statBox(clearedCount(), '闯关数') +
     statBox((state.streak ? state.streak.cur : 0), '连续天数');
@@ -6989,17 +7004,38 @@ function renderParentStats(){
 function buildBackupJSON(){ return JSON.stringify(state, null, 2); }
 function doExportBackup(){
   var json = buildBackupJSON();
+  var name = '识字大冒险备份_' + todayStr() + '.json';
+  var method = '';   /* '', 'shell', 'download', 'clipboard' */
+  /* ① 原生壳（APK）：让原生层把文件写到下载目录，最可靠；返回 true 才算成功 */
   try{
-    var blob = new Blob([json], {type:'application/json'});
-    var a = document.createElement('a');
-    a.href = (typeof URL !== 'undefined' && URL.createObjectURL) ? URL.createObjectURL(blob) : '';
-    a.download = '识字大冒险备份_' + todayStr() + '.json';
-    if(a.href) a.click();
-    if(typeof URL !== 'undefined' && URL.revokeObjectURL && a.href) URL.revokeObjectURL(a.href);
-  }catch(e){ /* 沙箱/旧浏览器无下载能力：caller 仍可通过返回值拿到 json */ }
-  return json;
+    if(window.ShiziShell && typeof window.ShiziShell.saveBackup === 'function'){
+      if(window.ShiziShell.saveBackup(name, json)) method = 'shell';
+    }
+  }catch(e){ method = ''; }
+  /* ② 普通浏览器：blob + a[download] 触发下载 */
+  if(!method){
+    try{
+      var blob = new Blob([json], {type:'application/json'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      if(URL.revokeObjectURL) URL.revokeObjectURL(a.href);
+      method = 'download';
+    }catch(e){ method = ''; }
+  }
+  /* ③ 兜底：无下载能力（如 iOS Safari / 部分 WebView）复制到剪贴板，用户可粘贴保存 */
+  if(!method){
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(json);
+      method = 'clipboard';
+    }catch(e){ method = ''; }
+  }
+  return {json:json, method:method};
 }
-function exportBackup(){ return doExportBackup(); }
+function exportBackup(){ return doExportBackup().json; }
 /* 解析并采用备份数据（与 v1/v2 兼容：老数据走 migrate，新数据走 normalizeV2） */
 function adoptBackup(data){
   if(!data || typeof data !== 'object'){ toast('导入失败：文件无效'); return false; }
