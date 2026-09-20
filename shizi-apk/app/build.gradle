@@ -11,8 +11,13 @@ android {
         applicationId "com.example.shizi"
         minSdk 26
         targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
+    }
+
+    buildFeatures {
+        // AGP 8+ 默认不生成 BuildConfig，在线升级需读取当前 versionCode
+        buildConfig = true
     }
 
     buildTypes {

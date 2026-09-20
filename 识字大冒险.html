@@ -1329,6 +1329,7 @@ button{ font-family:inherit; font-size:inherit; color:inherit; }
       <button class="btn btn-sec" id="exportBtn" type="button" data-nid="panel.data.export">导出备份 (JSON)</button>
       <button class="btn btn-sec" id="importBtn" type="button" data-nid="panel.data.import">导入恢复</button>
       <input type="file" id="importFile" accept="application/json" hidden data-nid="panel.data.file">
+      <button class="btn btn-sec" id="checkUpdateBtn" type="button" data-nid="panel.data.update">检查更新</button>
       <button class="btn btn-danger" id="clearBtn" type="button" data-nid="panel.data.clear">清空全部数据</button>
     </div>
   </div>
@@ -4378,6 +4379,11 @@ function bindParent(){
   });
   var im = $("importBtn");       if(im) im.addEventListener('click', function(){ var f=$("importFile"); if(f) f.click(); });
   var iff = $("importFile");     if(iff) iff.addEventListener('change', function(){ if(this.files && this.files[0]) importBackup(this.files[0]); });
+  var cu = $("checkUpdateBtn");  if(cu) cu.addEventListener('click', function(){
+    /* App（原生壳）内：交给原生检查线上内容更新 + APK 升级；浏览器里打开本就是最新，无需更新 */
+    if(window.ShiziShell && typeof window.ShiziShell.checkUpdate === 'function'){ window.ShiziShell.checkUpdate(); return; }
+    toast('浏览器打开即为最新版本 ✓');
+  });
   var cl = $("clearBtn");        if(cl) cl.addEventListener('click', resetAllData);
 
   if(typeof document !== "undefined" && document.addEventListener){

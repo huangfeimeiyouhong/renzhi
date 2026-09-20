@@ -1,0 +1,7 @@
+{
+  "_usage": "启用 APK 在线升级时：把本文件改好，重命名为 app-update.json，放到站点根目录（https://renzhi.coolai.space/app-update.json）。versionCode 必须大于已安装 APK 的 versionCode（当前 APK 为 2）才会弹窗提示；站点没有这个文件时 App 会静默跳过，完全不影响使用。",
+  "versionCode": 3,
+  "versionName": "1.2",
+  "apkUrl": "https://renzhi.coolai.space/downloads/shizi-1.2.apk",
+  "notes": "修复若干问题，优化体验"
+}
