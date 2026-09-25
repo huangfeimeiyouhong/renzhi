@@ -138,9 +138,29 @@ public class MainActivity extends Activity {
         setContentView(root);
 
         loadApp(false);
+        warnOldWebView();
 
         // 启动 2 秒后静默检查 APK 自身是否有新版本（站点没放配置就自动跳过）
         new Handler(Looper.getMainLooper()).postDelayed(this::checkAppUpdate, 2000);
+    }
+
+    /* ===== 旧设备 WebView 内核兼容提示 =====
+       Android 7.0 自带的 WebView 内核约等于 Chrome 50，可能渲染不出新版页面。
+       这里检测内核版本，过旧时给家长一句明确提示（而不是白屏让人猜）。 ===== */
+    private void warnOldWebView() {
+        try {
+            String ua = webView.getSettings().getUserAgentString();
+            java.util.regex.Matcher m =
+                    java.util.regex.Pattern.compile("Chrome/(\\d+)").matcher(ua);
+            if (m.find()) {
+                int ver = Integer.parseInt(m.group(1));
+                if (ver < 70) {
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> toast(
+                            "本机浏览器组件较旧（Chrome " + ver + "），若页面显示异常，"
+                                    + "请到「设置→应用→Android WebView」更新后重试"), 3500);
+                }
+            }
+        } catch (Exception ignore) { /* 检测失败不影响使用 */ }
     }
 
     // ===== 在线更新：加载线上内容（带 cache-buster，绕过 WebView 与 CDN 缓存）=====

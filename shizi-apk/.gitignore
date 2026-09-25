@@ -10,3 +10,10 @@ build/
 .idea/
 captures/
 local.properties
+
+# 发布签名密钥（务必自行备份，丢失将无法再给已安装的应用更新）
+*.keystore
+
+# 其他
+.DS_Store
+*.idsig
