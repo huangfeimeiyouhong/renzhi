@@ -4546,6 +4546,66 @@ var PET_HATS = {
       '<circle cx="-12" cy="5.8" r="2.2" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'+
       '<circle cx="0" cy="4" r="2.2" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'+
       '<circle cx="12" cy="5.8" r="2.2" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'+
+    '</g>'; },
+  /* ---- Lv41–100 终极形态帽（美术 §Lv41-100 v1.0）：题材升到神话层级，靠材质+光效做"终极感"，不用暗黑/酷炫
+     帽子安全盒：局部 x ∈ [-26,26]、峰顶 y ≥ -12、箍下沿 y ≤ +10；四顶全部登记进 PET_HAT_CROWN 跳内建王冠。 ---- */
+  /* 鲲鹏冠（Lv45）—— 上古神鸟，中层鹏喙 + 外层羽冠 + 金箍；冰蓝取"碧霄"意象，与 Lv41 碧霄同族 */
+  kunpeng: function(){
+    return '<g class="pk-hat" transform="translate(60,44)">'+
+      '<path d="M-22 2 C -26 -3 -24 -8 -19 -7 C -18 -2 -19 0 -22 2 Z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M22 2 C 26 -3 24 -8 19 -7 C 18 -2 19 0 22 2 Z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M-11 3 C -16 -2 -15 -9 -10 -10 C -6 -8 -6 0 -11 3 Z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.5" stroke-linejoin="round"/>'+
+      '<path d="M11 3 C 16 -2 15 -9 10 -10 C 6 -8 6 0 11 3 Z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.5" stroke-linejoin="round"/>'+
+      '<path d="M0 4 C -6 -2 -5 -10 0 -11 C 5 -10 6 -2 0 4 Z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.6" stroke-linejoin="round"/>'+
+      '<path d="M0 3 V-8" fill="none" stroke="#2F86B4" stroke-width="1" stroke-linecap="round"/>'+
+      '<path d="M-23 4 Q0 -2 23 4 L23 10 Q0 4 -23 10 Z" fill="#FFD86B" stroke="#B87400" stroke-width="1.8" stroke-linejoin="round"/>'+
+      '<circle cx="-13" cy="5.8" r="2.2" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1"/>'+
+      '<circle cx="0" cy="4" r="2.4" fill="#FFC93C" stroke="#B87400" stroke-width="1"/>'+
+      '<circle cx="13" cy="5.8" r="2.2" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1"/>'+
+    '</g>'; },
+  /* 应龙冕（Lv60）—— 东方应龙，龙角 + 垂鳞，中层玉白龙角 + 外层蜜桃鳞片 + 金箍 */
+  yinglong: function(){
+    return '<g class="pk-hat" transform="translate(60,44)">'+
+      '<path d="M-13 4 C -20 -1 -19 -8 -14 -8 C -12 -4 -12 0 -13 4 Z" fill="#FFDCC9" stroke="#C4683F" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M13 4 C 20 -1 19 -8 14 -8 C 12 -4 12 0 13 4 Z" fill="#FFDCC9" stroke="#C4683F" stroke-width="1.4" stroke-linejoin="round"/>'+
+      '<path d="M-8 3 C -13 -2 -12 -9 -8 -10 C -4 -8 -4 -1 -8 3 Z" fill="#FFB79B" stroke="#C4683F" stroke-width="1.5" stroke-linejoin="round"/>'+
+      '<path d="M8 3 C 13 -2 12 -9 8 -10 C 4 -8 4 -1 8 3 Z" fill="#FFB79B" stroke="#C4683F" stroke-width="1.5" stroke-linejoin="round"/>'+
+      '<path d="M0 4 C -4 -3 -3 -11 0 -11 C 3 -11 4 -3 0 4 Z" fill="#FFDCC9" stroke="#C4683F" stroke-width="1.6" stroke-linejoin="round"/>'+
+      '<path d="M-19 3 Q0 -5 19 3 L19 9 Q0 1 -19 9 Z" fill="#FFD86B" stroke="#B87400" stroke-width="1.8" stroke-linejoin="round"/>'+
+      '<circle cx="-10" cy="4.6" r="1.8" fill="#E8604C" stroke="#A33528" stroke-width="1"/>'+
+      '<circle cx="0" cy="2.6" r="2.2" fill="#E8604C" stroke="#A33528" stroke-width="1"/>'+
+      '<circle cx="10" cy="4.6" r="1.8" fill="#E8604C" stroke="#A33528" stroke-width="1"/>'+
+    '</g>'; },
+  /* 鲲元冠（Lv80）—— 终焉层：太极双鱼化形，暮天深底 + 冰蓝双鱼 + 金环，高明度设计确保压住 Lv80 赤红本体 */
+  kunyuan: function(){
+    var o='', i, ang=[0,90,180,270], cx=[-7,7], j, k;
+    for(j=0;j<2;j++){
+      for(i=0;i<4;i++){
+        o += '<ellipse cx="'+(cx[j]+Math.cos(ang[i]*Math.PI/180)*7)+'" cy="'+(-2+Math.sin(ang[i]*Math.PI/180)*7)+'" rx="6.2" ry="4.6" fill="'+(i<2?'#7FC7EE':'#CDEEFF')+'" stroke="#2F86B4" stroke-width="1.2" transform="rotate('+((cx[j]>0?90:270)+i*90)+' '+(cx[j]+Math.cos(ang[i]*Math.PI/180)*7)+' '+(-2+Math.sin(ang[i]*Math.PI/180)*7)+')"/>';
+      }
+    }
+    o += '<circle cx="-7" cy="-2" r="2.6" fill="#24436E" stroke="#2F86B4" stroke-width="1"/>'+
+         '<circle cx="7" cy="-2" r="2.6" fill="#6E93B4" stroke="#2F86B4" stroke-width="1"/>';
+    return '<g class="pk-hat" transform="translate(60,44)">'+o+
+      '<path d="M-24 3 Q0 -3 24 3 L24 10 Q0 4 -24 10 Z" fill="#FFD86B" stroke="#B87400" stroke-width="1.8" stroke-linejoin="round"/>'+
+      '<circle cx="-15" cy="5" r="2" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1"/>'+
+      '<circle cx="15" cy="5" r="2" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1"/>'+
+    '</g>'; },
+  /* 大道冠（Lv100）—— 满级终极：八卦环 + 中心太极球，暮天深环 + 冰蓝玉珠 + 金顶，最大气但仍在安全盒内 */
+  daoguan: function(){
+    var o='', i, ang=[0,45,90,135,180,225,270,315], j, k, a;
+    for(i=0;i<8;i++){
+      a = ang[i]*Math.PI/180;
+      j = Math.cos(a)*17; k = Math.sin(a)*7;
+      o += '<circle cx="'+j.toFixed(1)+'" cy="'+(-3+k).toFixed(1)+'" r="'+(i%2?2:2.6)+'" fill="'+(i%2?'#CDEEFF':'#FFD86B')+'" stroke="'+(i%2?'#2F86B4':'#B87400')+'" stroke-width="1"/>';
+    }
+    return '<g class="pk-hat" transform="translate(60,44)">'+
+      '<ellipse cx="0" cy="-3" rx="17" ry="7" fill="none" stroke="#9FC0E0" stroke-width="2.4"/>'+
+      o+
+      '<circle cx="0" cy="-3" r="5.6" fill="#E4F2FB" stroke="#2F86B4" stroke-width="1.6"/>'+
+      '<path d="M0 -8.6 A 5.6 5.6 0 0 1 0 2.6 A 2.8 2.8 0 0 0 0 -3 A 2.8 2.8 0 0 1 0 -8.6 Z" fill="#2F86B4" stroke="#1E4A78" stroke-width="1.1" stroke-linejoin="round"/>'+
+      '<circle cx="0" cy="-5.8" r="1.2" fill="#FFF6DF"/><circle cx="0" cy="-0.2" r="1.2" fill="#1E4A78"/>'+
+      '<path d="M-25 3 Q0 -2 25 3 L25 10 Q0 5 -25 10 Z" fill="#FFD86B" stroke="#B87400" stroke-width="1.8" stroke-linejoin="round"/>'+
     '</g>'; }
 };
 var PET_SCARFS = {
@@ -4747,7 +4807,90 @@ var PET_WINGS = {
         '<circle cx="103" cy="64" r="2.4" fill="#FFDCC9" stroke="#C4683F" stroke-width="1"/>'+
         '<circle cx="96" cy="74" r="2" fill="#FFDCC9" stroke="#C4683F" stroke-width="1"/>'+
         '<circle cx="101" cy="84" r="2.2" fill="#FFDCC9" stroke="#C4683F" stroke-width="1"/>'+
-      '</g></g>'; }
+      '</g></g>'; },
+  /* ---- Lv41–100 终极形态翼（美术 §Lv41-100 v1.0）：神兽/天象题材，材质感做体积
+     硬约束：翅膀在身体之前绘制 → 永远在身体背后；绕 (26,80)/(94,80) 各 rotate(∓18~22)；不新增循环动画。
+     配色一律高明度浅色 + 深描边，确保压住 Lv90 地煞(#2A2740) / Lv100 大道(#100E1C) 的近黑本体。
+     左右翼用 mir(x) 做 x 镜像（绕 x=60），不靠字符串 replace —— 避免 "2.5" 被误改成 "9.5"。 */
+  /* 鲲鹏翼（Lv45）—— 三层大鹏羽 + 冰蓝羽脉，最舒展的一只 */
+  kunpengwing: function(lineC, pref){
+    function mir(x){ return 120-x; }
+    function wing(flip){
+      function X(x){ return flip? mir(x) : x; }
+      var o='', i, tilt=[0,-15,-30], i2, veins='';
+      for(i=0;i<3;i++){
+        o += '<path d="M'+X(25)+' '+(76+tilt[i])+
+             ' C '+X(10)+' '+(56+tilt[i])+', '+X(3)+' '+(66+tilt[i])+', '+X(5)+' '+(92+tilt[i])+
+             ' C '+X(11)+' '+(100+tilt[i])+', '+X(19)+' '+(97+tilt[i])+', '+X(24)+' '+(88+tilt[i])+' Z" '+
+             'fill="'+(i===1?'#CDEEFF':'#7FC7EE')+'" stroke="#2F86B4" stroke-width="2" stroke-linejoin="round"/>';
+        veins += '<path d="M'+X(24)+' '+(86+tilt[i])+' Q '+X(13)+' '+((62+tilt[i]+84+tilt[i])/2).toFixed(1)+', '+X(6)+' '+((58+tilt[i]+76+tilt[i])/2).toFixed(1)+'" fill="none" stroke="#2F86B4" stroke-width="1.3" opacity=".8"/>';
+      }
+      i2 = 0;
+      return o+veins+'<circle cx="'+X(17)+'" cy="72" r="2.6" fill="#FFD86B" stroke="#B87400" stroke-width="1"/>';
+    }
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-21 25 80)">'+wing(false)+'</g>'+
+      '<g transform="rotate(21 95 80)">'+wing(true)+'</g></g>'; },
+  /* 龙渊翼（Lv60）—— 应龙垂鳞翼：Lv70 本体是金色 #E0A93C，蜜桃与它明度过近会糊，
+     故主面改「暖白 + 深橘红描边 + 橘红脉络」，全组最高明度，确保压住金色本体 */
+  longyuanwing: function(lineC, pref){
+    function mir(x){ return 120-x; }
+    function wing(flip){
+      function X(x){ return flip? mir(x) : x; }
+      var o='', i;
+      for(i=0;i<3;i++){
+        o += '<path d="M'+X(25)+' '+(58+i*7)+
+             ' C '+X(9-i*2)+' '+(66+i*7)+', '+X(3-i*2)+' '+(92+i*4)+', '+X(11-i*3)+' '+(110-i*4)+
+             ' C '+X(17-i*2)+' '+(100-i*3)+', '+X(22)+' '+(88-i*2)+', '+X(25)+' '+(78+i*2)+' Z" '+
+             'fill="'+(i===1?'#FFFFFF':'#FFF6DF')+'" stroke="#B8452E" stroke-width="2.2" stroke-linejoin="round"/>';
+      }
+      return o+
+        '<path d="M'+X(25)+' 62 L'+X(10)+' 68 M'+X(25)+' 74 L'+X(8)+' 90 M'+X(25)+' 86 L'+X(12)+' 104" fill="none" stroke="#E8604C" stroke-width="1.8" stroke-linecap="round" opacity=".95"/>'+
+        '<circle cx="'+X(17)+'" cy="74" r="2.4" fill="#FFDCC9" stroke="#B8452E" stroke-width="1"/>'+
+        '<circle cx="'+X(14)+'" cy="93" r="2" fill="#FFDCC9" stroke="#B8452E" stroke-width="1"/>';
+    }
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-20 25 80)">'+wing(false)+'</g>'+
+      '<g transform="rotate(20 95 80)">'+wing(true)+'</g></g>'; },
+  /* 星河翼（Lv80）—— 银河横贯双翼：Lv90 本体 #2A2740 近黑，故底色提到靛蓝 #3A5FA8（非暮天深底），
+     叠亮青银河带 + 白星点；描边压到 #1E4A78 保证暗底上的轮廓 */
+  xinghewing: function(lineC, pref){
+    function mir(x){ return 120-x; }
+    function wing(flip){
+      function X(x){ return flip? mir(x) : x; }
+      var o='', i, sx=[12,7,16,10,19,14,8,17], sy=[64,74,82,92,70,86,100,58];
+      for(i=0;i<8;i++){
+        o += '<circle cx="'+X(sx[i])+'" cy="'+sy[i]+'" r="'+(i%3?1.5:2.2)+'" fill="#FFF6DF" opacity=".95"/>';
+      }
+      return '<path d="M'+X(25)+' 52 C '+X(8)+' 60, '+X(2)+' 84, '+X(8)+' 104 C '+X(12)+' 114, '+X(20)+' 114, '+X(25)+' 106 C '+X(27)+' 88, '+X(27)+' 66, '+X(25)+' 52 Z" fill="#3A5FA8" stroke="#1E4A78" stroke-width="2.2" stroke-linejoin="round"/>'+
+        '<path d="M'+X(24)+' 58 C '+X(14)+' 68, '+X(10)+' 86, '+X(14)+' 100" fill="none" stroke="#9FC0E0" stroke-width="2.6" stroke-linecap="round"/>'+
+        '<path d="M'+X(23)+' 70 C '+X(16)+' 78, '+X(13)+' 88, '+X(16)+' 96" fill="none" stroke="#E4F2FB" stroke-width="1.8" stroke-linecap="round" opacity=".9"/>'+
+        o;
+    }
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-22 25 80)">'+wing(false)+'</g>'+
+      '<g transform="rotate(22 95 80)">'+wing(true)+'</g></g>'; },
+  /* 大道翼（Lv100）—— 满级终极八卦双翼：本体 #100E1C 近黑，底色改冰蓝 #7FC7EE（全组最亮）+
+     白爻 + 金边；满级件必须在最深的本体上最跳，不能反过来发闷 */
+  dadaowing: function(lineC, pref){
+    function mir(x){ return 120-x; }
+    function wing(flip){
+      function X(x){ return flip? mir(x) : x; }
+      var o='', i, ang=[0,60,120,180,240,300], a, px, py;
+      for(i=0;i<6;i++){
+        a = ang[i]*Math.PI/180;
+        px = 25 + Math.cos(a)*19; py = (80 + Math.sin(a)*26).toFixed(1);
+        o += '<line x1="'+X(25)+'" y1="80" x2="'+X(px.toFixed(1))+'" y2="'+py+'" stroke="'+(i%2?'#FFFFFF':'#2F86B4')+'" stroke-width="'+(i%2?2.6:1.8)+'" stroke-linecap="round" opacity=".95"/>';
+      }
+      o += '<circle cx="'+X(25)+'" cy="80" r="4.6" fill="#FFD86B" stroke="#B87400" stroke-width="1.4"/>'+
+           '<circle cx="'+X(25)+'" cy="80" r="2" fill="#FFF6DF"/>';
+      return '<path d="M'+X(25)+' 50 C '+X(6)+' 58, '+X(0)+' 84, '+X(7)+' 106 C '+X(11)+' 116, '+X(20)+' 116, '+X(25)+' 107 C '+X(27)+' 88, '+X(27)+' 64, '+X(25)+' 50 Z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="2.4" stroke-linejoin="round"/>'+
+        '<path d="M'+X(25)+' 50 C '+X(6)+' 58, '+X(0)+' 84, '+X(7)+' 106 C '+X(11)+' 116, '+X(20)+' 116, '+X(25)+' 107" fill="none" stroke="#FFD86B" stroke-width="1.6" opacity=".95"/>'+
+        o;
+    }
+    return '<g class="pk-wing">'+
+      '<g transform="rotate(-22 25 80)">'+wing(false)+'</g>'+
+      '<g transform="rotate(22 95 80)">'+wing(true)+'</g></g>'; }
 };
 /* 相位：用负 delay 让重绘后动画不跳帧 */
 function ph(t, period){ return t ? -(t % period) : 0; }
@@ -4833,7 +4976,8 @@ function petFxBackSVG(F, lv, pref, phHalo){
   return o + '</g>';
 }
 /* 冠冕类帽子：戴上时内建王冠会与帽区完全重叠且盖住帽子（美术 R4）→ 跳过内建王冠 */
-var PET_HAT_CROWN = { aurora:1, gemcrown:1, mooncrown:1, phoenix:1 };
+var PET_HAT_CROWN = { aurora:1, gemcrown:1, mooncrown:1, phoenix:1,
+                      kunpeng:1, yinglong:1, kunyuan:1, daoguan:1 };
 /* 王冠（画在宠物前面；Lv5 起才有）。定位放在外层 g 的属性上，内层 .pk-crown 只负责佩戴动画 */
 function petCrownSVG(F, lv, wears){
   if(lv < 5) return '';
@@ -5530,7 +5674,21 @@ var PET_COSTUME_LIST = [
   {id:'dbackcrystal',name:'晶背鳍',  slot:'wing',  grant:36, rarity:'legend', sp:'dino'},
   {id:'dbackflame', name:'焰背鳍',   slot:'wing',  price:25, rarity:'rare',   sp:'dino'},
   {id:'dbackstar',  name:'星背鳍',   slot:'wing',  price:25, rarity:'rare',   sp:'dino'},
-  {id:'dbackcloud', name:'云背鳍',   slot:'wing',  price:15, rarity:'normal', sp:'dino'}
+  {id:'dbackcloud', name:'云背鳍',   slot:'wing',  price:15, rarity:'normal', sp:'dino'},
+
+  /* ---- 墨墨 Lv41–100 终极形态 8 件（美术 §Lv41-100 v1.0）：补齐 Lv41→Lv100 的奖励空窗 ----
+     grant = 等级达标自动赠送，沿用 Lv21–40 同一机制，不动 ⭐ 经济池（总星数 5565 保持不变）。
+     密度：Lv45 / 50 / 60 / 70 / 80 / 90 / 95 / 100 —— 前半段每 10 级一件、后半段加密到每 5 级；
+     越接近满级升级越慢，需要更密的正反馈托住「再来几级」的劲头。
+     全部属于墨墨（ink），故不写 sp 字段。 */
+  {id:'kunpeng',      name:'鲲鹏冠', slot:'hat',  price:0, rarity:'myth', grant:45},
+  {id:'kunpengwing',  name:'鲲鹏翼', slot:'wing', price:0, rarity:'myth', grant:50},
+  {id:'yinglong',     name:'应龙冕', slot:'hat',  price:0, rarity:'myth', grant:60},
+  {id:'longyuanwing', name:'龙渊翼', slot:'wing', price:0, rarity:'myth', grant:70},
+  {id:'kunyuan',      name:'鲲元冠', slot:'hat',  price:0, rarity:'myth', grant:80},
+  {id:'xinghewing',   name:'星河翼', slot:'wing', price:0, rarity:'myth', grant:90},
+  {id:'daoguan',      name:'大道冠', slot:'hat',  price:0, rarity:'myth', grant:95},
+  {id:'dadaowing',    name:'大道翼', slot:'wing', price:0, rarity:'myth', grant:100}
 
 ];
 var PET_COSTUME_SLOTS = [
