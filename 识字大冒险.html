@@ -4692,6 +4692,47 @@ var PET_SCARFS = {
       '<circle cx="0" cy="17" r="3.2" fill="#E8F1FB" stroke="#9DB8D4" stroke-width="1.4"/>'+
       '<circle cx="14" cy="15" r="2.8" fill="#E8F1FB" stroke="#9DB8D4" stroke-width="1.4"/>'+
       '<ellipse cx="-4" cy="5" rx="5.4" ry="3.2" fill="#FFFFFF" opacity=".85"/>'+
+    '</g>'; },
+  /* ---- Lv41–100 终极围巾（美术 §Lv41-100 v1.0）：与同层帽子同题材，材质感做体积
+     硬约束：scarf 锚点 translate(60,104) 与既有墨墨围巾一致；高明度浅色 + 深描边，
+     压住 Lv45 紫(#606EDC) / Lv60 青(#2FA9B8) / Lv80 红(#E04A55) / Lv95 近黑(#191629) 的本体。 ---- */
+  /* 鲲鹏绫巾（Lv45）—— 冰晶蓝绫带 + 雪珠 + 北冥羽坠 */
+  kunpengscarf: function(){
+    return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#CDEEFF" stroke-width="9" stroke-linecap="round"/>'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#2F86B4" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>'+
+      '<circle cx="-15" cy="4" r="2" fill="#FFF6DF" stroke="#2F86B4" stroke-width=".8"/>'+
+      '<circle cx="15" cy="4" r="2" fill="#FFF6DF" stroke="#2F86B4" stroke-width=".8"/>'+
+      '<path d="M0 8 c-5 -6 -11 -1 -11 4 c0 5 7 9 11 12 c4 -3 11 -7 11 -12 c0 -5 -6 -10 -11 -4 z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.4" stroke-linejoin="round"/>'+
+    '</g>'; },
+  /* 应龙鳞巾（Lv60）—— 玉青绫带 + 叠鳞纹 + 金鳞坠 */
+  yinglongscarf: function(){
+    var sc='', i, sx=[-22,-11,0,11,22];
+    for(i=0;i<5;i++){ sc += '<path d="M'+sx[i]+' 2 a3.4 3.4 0 1 0 0 6.8 a3.4 3.4 0 1 0 0 -6.8 Z" fill="#BBEAD9" stroke="#1F7E6E" stroke-width="1.2"/>'; }
+    return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#9FE0D0" stroke-width="9" stroke-linecap="round"/>'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#1F7E6E" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>'+
+      sc+
+      '<circle cx="0" cy="9" r="2.6" fill="#FFD86B" stroke="#B87400" stroke-width="1"/>'+
+    '</g>'; },
+  /* 鲲元云巾（Lv80）—— 暖白绫带 + 云涡 + 珊瑚坠（红本体上提亮） */
+  kunyuanscarf: function(){
+    return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FFF3E6" stroke-width="9" stroke-linecap="round"/>'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#E0927A" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>'+
+      '<path d="M-14 5 q5 -5 10 0 q-5 4 -10 0 Z" fill="#FFFFFF" stroke="#E0927A" stroke-width="1"/>'+
+      '<path d="M4 5 q5 -5 10 0 q-5 4 -10 0 Z" fill="#FFFFFF" stroke="#E0927A" stroke-width="1"/>'+
+      '<circle cx="0" cy="9" r="2.6" fill="#FF8A7A" stroke="#C4544A" stroke-width="1"/>'+
+    '</g>'; },
+  /* 大道帛巾（Lv95）—— 月白帛带 + 玄星点 + 太虚坠（近黑本体 #191629 上最高明度） */
+  daoguanscarf: function(){
+    return '<g class="pk-scarf" transform="translate(60,104)">'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>'+
+      '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#24436E" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>'+
+      '<circle cx="-13" cy="4" r="2" fill="#24436E"/>'+
+      '<circle cx="13" cy="4" r="2" fill="#24436E"/>'+
+      '<circle cx="0" cy="9" r="3" fill="#24436E"/>'+
+      '<circle cx="0" cy="9" r="1.4" fill="#FFFFFF"/>'+
     '</g>'; }
 };
 var PET_WINGS = {
@@ -4977,7 +5018,8 @@ function petFxBackSVG(F, lv, pref, phHalo){
 }
 /* 冠冕类帽子：戴上时内建王冠会与帽区完全重叠且盖住帽子（美术 R4）→ 跳过内建王冠 */
 var PET_HAT_CROWN = { aurora:1, gemcrown:1, mooncrown:1, phoenix:1,
-                      kunpeng:1, yinglong:1, kunyuan:1, daoguan:1 };
+                      kunpeng:1, yinglong:1, kunyuan:1, daoguan:1,
+                      dkunpeng:1, dyinglong:1, dkunyuan:1, ddaoguan:1 };
 /* 王冠（画在宠物前面；Lv5 起才有）。定位放在外层 g 的属性上，内层 .pk-crown 只负责佩戴动画 */
 function petCrownSVG(F, lv, wears){
   if(lv < 5) return '';
@@ -5210,7 +5252,31 @@ var DINO_HATS = {
     + '<ellipse cx="-9" cy="2" rx="11" ry="9" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
     + '<ellipse cx="9" cy="2" rx="11" ry="9" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
     + '<ellipse cx="0" cy="-3" rx="13" ry="11" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
-    + '<rect x="-20" y="2" width="40" height="7" rx="3.5" fill="#F2F7FD" stroke="#9DB8D4" stroke-width="1.6"/></g>'; }
+      + '<rect x="-20" y="2" width="40" height="7" rx="3.5" fill="#F2F7FD" stroke="#9DB8D4" stroke-width="1.6"/></g>'; },
+  /* ---- 龙宝 Lv41–100 终极冠（myth，与墨墨同档发放；戴上时跳过内建王冠，登记进 PET_HAT_CROWN）---- */
+  dkunpeng: function(){ return '<g class="pk-hat" transform="translate(60,44)">'
+    + '<path d="M-18 6 Q-12 -10 -4 -6 Q0 -16 4 -6 Q12 -10 18 6 Q0 0 -18 6 Z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="2" stroke-linejoin="round"/>'
+    + '<path d="M-12 -2 q-6 -12 0 -18 q6 8 6 18 z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.6" stroke-linejoin="round"/>'
+    + '<path d="M12 -2 q6 -12 0 -18 q-6 8 -6 18 z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.6" stroke-linejoin="round"/>'
+    + '<circle cx="0" cy="-8" r="3.4" fill="#FFF6DF" stroke="#2F86B4" stroke-width="1.2"/>'
+    + '<circle cx="-9" cy="4" r="2" fill="#2F86B4"/>'
+    + '<circle cx="9" cy="4" r="2" fill="#2F86B4"/></g>'; },
+  dyinglong: function(){ return '<g class="pk-hat" transform="translate(60,44)">'
+    + '<path d="M-16 6 Q0 -14 16 6 Q0 -2 -16 6 Z" fill="#9FE0D0" stroke="#1F7E6E" stroke-width="2" stroke-linejoin="round"/>'
+    + '<path d="M-8 -4 a4 4 0 1 0 0 8 a4 4 0 1 0 0 -8 Z" fill="#BBEAD9" stroke="#1F7E6E" stroke-width="1.2"/>'
+    + '<path d="M8 -4 a4 4 0 1 0 0 8 a4 4 0 1 0 0 -8 Z" fill="#BBEAD9" stroke="#1F7E6E" stroke-width="1.2"/>'
+    + '<circle cx="0" cy="-6" r="3" fill="#FFD86B" stroke="#B87400" stroke-width="1.2"/></g>'; },
+  dkunyuan: function(){ return '<g class="pk-hat" transform="translate(60,44)">'
+    + '<path d="M-16 6 Q0 -16 16 6 Q0 0 -16 6 Z" fill="#FFF3E6" stroke="#E0927A" stroke-width="2" stroke-linejoin="round"/>'
+    + '<ellipse cx="-7" cy="-3" rx="6" ry="5" fill="#FFFFFF" stroke="#E0927A" stroke-width="1.4"/>'
+    + '<ellipse cx="7" cy="-3" rx="6" ry="5" fill="#FFFFFF" stroke="#E0927A" stroke-width="1.4"/>'
+    + '<circle cx="0" cy="-9" r="3.2" fill="#FF8A7A" stroke="#C4544A" stroke-width="1.2"/></g>'; },
+  ddaoguan: function(){ return '<g class="pk-hat" transform="translate(60,44)">'
+    + '<path d="M-17 6 Q0 -18 17 6 Q0 2 -17 6 Z" fill="#FFFFFF" stroke="#24436E" stroke-width="2.2" stroke-linejoin="round"/>'
+    + '<circle cx="0" cy="-8" r="4" fill="#24436E"/>'
+    + '<circle cx="0" cy="-8" r="1.6" fill="#FFFFFF"/>'
+    + '<circle cx="-9" cy="3" r="1.8" fill="#24436E"/>'
+    + '<circle cx="9" cy="3" r="1.8" fill="#24436E"/></g>'; }
 };
 var DINO_SCARFS = {
   dleafscarf: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
@@ -5232,7 +5298,33 @@ var DINO_SCARFS = {
     + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FFF6DF" stroke-width="8" stroke-linecap="round"/>'+o+'</g>'; },
   dstarneck: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
     + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#7FC7EE" stroke-width="8" stroke-linecap="round"/>'
-    + '<path d="M0 8 l1.6 3.4 3.6 .4 -2.6 2.4 .6 3.4L0 16 l-2.8 1.8 .6 -3.4 -2.6 -2.4 3.6 -.4 z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1"/></g>'; }
+      + '<path d="M0 8 l1.6 3.4 3.6 .4 -2.6 2.4 .6 3.4L0 16 l-2.8 1.8 .6 -3.4 -2.6 -2.4 3.6 -.4 z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1"/></g>'; },
+  /* ---- 龙宝 Lv41–100 终极围巾（myth，锚点 translate(60,100) 与既有龙宝围巾一致）---- */
+  dkunpengscarf: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#CDEEFF" stroke-width="9" stroke-linecap="round"/>'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#2F86B4" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>'
+    + '<circle cx="-15" cy="4" r="2" fill="#FFF6DF" stroke="#2F86B4" stroke-width=".8"/>'
+    + '<circle cx="15" cy="4" r="2" fill="#FFF6DF" stroke="#2F86B4" stroke-width=".8"/>'
+    + '<path d="M0 8 c-5 -6 -11 -1 -11 4 c0 5 7 9 11 12 c4 -3 11 -7 11 -12 c0 -5 -6 -10 -11 -4 z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.4" stroke-linejoin="round"/></g>'; },
+  dyinglongscarf: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#9FE0D0" stroke-width="9" stroke-linecap="round"/>'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#1F7E6E" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>'
+    + '<path d="M-22 2 a3.4 3.4 0 1 0 0 6.8 a3.4 3.4 0 1 0 0 -6.8 Z" fill="#BBEAD9" stroke="#1F7E6E" stroke-width="1.2"/>'
+    + '<path d="M-11 2 a3.4 3.4 0 1 0 0 6.8 a3.4 3.4 0 1 0 0 -6.8 Z" fill="#BBEAD9" stroke="#1F7E6E" stroke-width="1.2"/>'
+    + '<circle cx="0" cy="9" r="2.6" fill="#FFD86B" stroke="#B87400" stroke-width="1"/></g>'; },
+  dkunyuanscarf: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FFF3E6" stroke-width="9" stroke-linecap="round"/>'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#E0927A" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>'
+    + '<path d="M-14 5 q5 -5 10 0 q-5 4 -10 0 Z" fill="#FFFFFF" stroke="#E0927A" stroke-width="1"/>'
+    + '<path d="M4 5 q5 -5 10 0 q-5 4 -10 0 Z" fill="#FFFFFF" stroke="#E0927A" stroke-width="1"/>'
+    + '<circle cx="0" cy="9" r="2.6" fill="#FF8A7A" stroke="#C4544A" stroke-width="1"/></g>'; },
+  ddaoguanscarf: function(){ return '<g class="pk-scarf" transform="translate(60,100)">'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>'
+    + '<path d="M-30 0 q30 14 60 0" fill="none" stroke="#24436E" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>'
+    + '<circle cx="-13" cy="4" r="2" fill="#24436E"/>'
+    + '<circle cx="13" cy="4" r="2" fill="#24436E"/>'
+    + '<circle cx="0" cy="9" r="3" fill="#24436E"/>'
+    + '<circle cx="0" cy="9" r="1.4" fill="#FFFFFF"/></g>'; }
 };
 var DINO_WINGS = {
   dbackleaf: function(){ return '<g class="pk-wing">'
@@ -5261,7 +5353,34 @@ var DINO_WINGS = {
       + '<ellipse cx="52" cy="56" rx="11" ry="9" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
       + '<ellipse cx="68" cy="56" rx="11" ry="9" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
       + '<ellipse cx="60" cy="50" rx="13" ry="11" fill="#FFFFFF" stroke="#9DB8D4" stroke-width="1.6"/>'
-      + '<path d="M92 96 q14 -12 20 2 q-12 12 -20 -2 z" fill="#F2F7FD" stroke="#9DB8D4" stroke-width="1.8" stroke-linejoin="round"/></g>'; }
+      + '<path d="M92 96 q14 -12 20 2 q-12 12 -20 -2 z" fill="#F2F7FD" stroke="#9DB8D4" stroke-width="1.8" stroke-linejoin="round"/></g>'; },
+  /* ---- 龙宝 Lv41–100 终极背鳍/尾饰（myth，语义同既有龙宝 wing=背鳍+尾饰）---- */
+  dkunpengwing: function(){ return '<g class="pk-wing">'
+      + '<path d="M44 62 Q60 36 76 62 Q60 54 44 62 Z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="2" stroke-linejoin="round"/>'
+      + '<path d="M52 56 q-6 -12 -2 -18 q7 6 6 18 z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.6" stroke-linejoin="round"/>'
+      + '<path d="M68 56 q6 -12 2 -18 q-7 6 -6 18 z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="1.6" stroke-linejoin="round"/>'
+      + '<path d="M92 96 q14 -14 22 0 q-12 14 -22 0 z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="2" stroke-linejoin="round"/>'
+      + '<circle cx="105" cy="98" r="2.6" fill="#FFF6DF" stroke="#2F86B4" stroke-width="1"/></g>'; },
+  dlongyuanwing: function(){ return '<g class="pk-wing">'
+      + '<path d="M44 62 Q60 40 76 62 Q60 55 44 62 Z" fill="#9FE0D0" stroke="#1F7E6E" stroke-width="2" stroke-linejoin="round"/>'
+      + '<path d="M52 56 q-5 -10 0 -16 q5 6 5 16 z" fill="#BBEAD9" stroke="#1F7E6E" stroke-width="1.4" stroke-linejoin="round"/>'
+      + '<path d="M68 56 q5 -10 0 -16 q-5 6 -5 16 z" fill="#BBEAD9" stroke="#1F7E6E" stroke-width="1.4" stroke-linejoin="round"/>'
+      + '<path d="M92 96 q14 -14 22 0 q-12 14 -22 0 z" fill="#9FE0D0" stroke="#1F7E6E" stroke-width="2" stroke-linejoin="round"/>'
+      + '<circle cx="105" cy="98" r="2.6" fill="#FFD86B" stroke="#B87400" stroke-width="1"/></g>'; },
+  dxinghewing: function(){ return '<g class="pk-wing">'
+      + '<path d="M44 62 Q60 38 76 62 Q60 53 44 62 Z" fill="#3A5FA8" stroke="#1E4A78" stroke-width="2" stroke-linejoin="round"/>'
+      + '<path d="M52 54 q-5 -10 0 -15 q5 5 5 15 z" fill="#5B7FC8" stroke="#1E4A78" stroke-width="1.4" stroke-linejoin="round"/>'
+      + '<path d="M68 54 q5 -10 0 -15 q-5 5 -5 15 z" fill="#5B7FC8" stroke="#1E4A78" stroke-width="1.4" stroke-linejoin="round"/>'
+      + '<circle cx="56" cy="50" r="1.6" fill="#FFF6DF"/><circle cx="64" cy="48" r="1.3" fill="#FFF6DF"/>'
+      + '<path d="M92 96 q14 -14 22 0 q-12 14 -22 0 z" fill="#3A5FA8" stroke="#1E4A78" stroke-width="2" stroke-linejoin="round"/>'
+      + '<circle cx="103" cy="92" r="1.6" fill="#FFF6DF"/></g>'; },
+  ddadaowing: function(){ return '<g class="pk-wing">'
+      + '<path d="M44 62 Q60 34 76 62 Q60 52 44 62 Z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="2.2" stroke-linejoin="round"/>'
+      + '<path d="M52 54 q-6 -12 -2 -18 q7 6 6 18 z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.6" stroke-linejoin="round"/>'
+      + '<path d="M68 54 q6 -12 2 -18 q-7 6 -6 18 z" fill="#CDEEFF" stroke="#2F86B4" stroke-width="1.6" stroke-linejoin="round"/>'
+      + '<circle cx="60" cy="48" r="2.8" fill="#FFD86B" stroke="#B87400" stroke-width="1"/>'
+      + '<path d="M92 96 q14 -14 22 0 q-12 14 -22 0 z" fill="#7FC7EE" stroke="#2F86B4" stroke-width="2.2" stroke-linejoin="round"/>'
+      + '<circle cx="105" cy="98" r="2.8" fill="#FFD86B" stroke="#B87400" stroke-width="1"/></g>'; }
 };
 function petWearDict(slot, sp){
   if(sp !== 'dino'){
@@ -5582,6 +5701,48 @@ function petBgSVG(id){
         '<rect x="-2" y="0" width="4" height="12" rx="2" fill="#8A5A2B"/>'+
         '<path d="M0 -26 l11 15 l-6 0 l9 12 l-28 0 l9 -12 l-6 0 z" fill="#377020"/></g>';
     }
+  } else if(id === 'kunpengbg' || id === 'dkunpengbg'){
+    /* 鲲鹏天幕（Lv50）：北冥冰海。浅冰蓝底 + 远冰脊 + 落雪 + 鹏影 + 中央柔光 */
+    var kp, kps=[[20,30],[60,18],[110,40],[160,24],[180,60],[40,70],[90,82],[140,70],[30,110],[170,112]];
+    o += '<defs><linearGradient id="kpFrost" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAF6FF"/><stop offset="1" stop-color="#C6E7F7"/></linearGradient></defs>';
+    o += '<rect width="200" height="200" fill="url(#kpFrost)"/>';
+    o += '<path d="M0 150 L50 110 L90 138 L140 104 L200 140 L200 200 L0 200 Z" fill="#9DB8D4" opacity=".55"/>';
+    o += '<path d="M50 110 L62 124 L40 124 Z" fill="#FFFFFF"/>';
+    o += '<path d="M140 104 L152 120 L130 120 Z" fill="#FFFFFF"/>';
+    o += '<path d="M64 92 q16 -12 30 0 q14 -12 30 0" fill="none" stroke="#2F86B4" stroke-width="2" opacity=".28" stroke-linecap="round"/>';
+    for(kp=0;kp<kps.length;kp++){ o += '<g transform="translate('+kps[kp][0]+','+kps[kp][1]+')"><circle r="2.2" fill="#FFFFFF" stroke="#9DB8D4" stroke-width=".8"/><path d="M0 -3.4 L.9 -1 L3.4 0 L.9 1 L0 3.4 L-.9 1 L-3.4 0 L-.9 -1 Z" fill="#CDEEFF"/></g>'; }
+    o += '<ellipse cx="100" cy="104" rx="64" ry="68" fill="#FFFFFF" opacity=".25"/>';
+  } else if(id === 'longyuanbg' || id === 'dlongyuanbg'){
+    /* 龙渊天幕（Lv70）：暖金暮色。暖彩光带 + 龙渊旋纹 + 暖阳 + 落英 + 中央柔光 */
+    var ly, lys=[[30,120],[70,150],[120,140],[160,150],[50,170],[100,182],[150,176],[20,92],[180,100],[40,60],[170,40]];
+    o += '<defs><linearGradient id="lyDusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3E6"/><stop offset="1" stop-color="#FFE0CC"/></linearGradient></defs>';
+    o += '<rect width="200" height="200" fill="url(#lyDusk)"/>';
+    o += '<path d="M-10 60 q60 -20 120 0 q60 20 120 0" fill="none" stroke="#FFB79B" stroke-width="14" stroke-linecap="round" opacity=".32"/>';
+    o += '<path d="M-10 86 q60 -20 120 0 q60 20 120 0" fill="none" stroke="#FFDCC9" stroke-width="10" stroke-linecap="round" opacity=".4"/>';
+    o += '<path d="M148 38 q32 10 26 42 q-6 30 -36 28 q-28 -2 -22 -30" fill="none" stroke="#E0A93C" stroke-width="3" opacity=".5" stroke-linecap="round"/>';
+    o += '<circle cx="38" cy="44" r="20" fill="#FFE9A8" opacity=".8"/>';
+    for(ly=0;ly<lys.length;ly++){ o += '<circle cx="'+lys[ly][0]+'" cy="'+lys[ly][1]+'" r="2" fill="#FFB79B" opacity=".6"/>'; }
+    o += '<ellipse cx="100" cy="104" rx="64" ry="68" fill="#FFFFFF" opacity=".28"/>';
+  } else if(id === 'xinghebg' || id === 'dxinghebg'){
+    /* 星河天幕（Lv90）：暮穹银河。靛蓝径向 + 银河带 + 星点（白/金） + 中央补亮（压住近黑本体）*/
+    var xh, xhs=[[20,40,2.4],[50,24,1.6],[80,50,2],[120,30,1.4],[160,46,2.2],[180,70,1.6],[30,80,1.4],[60,102,2],[100,70,1.6],[140,90,2.2],[170,110,1.8],[40,140,2],[90,150,1.6],[150,150,2.4],[185,150,1.6],[20,170,1.8]];
+    o += '<defs><radialGradient id="xhG" cx="50%" cy="50%" r="62%"><stop offset="0" stop-color="#5B7FC8"/><stop offset="1" stop-color="#1E3A5E"/></radialGradient></defs>';
+    o += '<rect width="200" height="200" fill="url(#xhG)"/>';
+    o += '<path d="M-10 30 q120 60 220 30" fill="none" stroke="#9FC0E0" stroke-width="22" stroke-linecap="round" opacity=".4"/>';
+    o += '<path d="M-10 30 q120 60 220 30" fill="none" stroke="#E4F2FB" stroke-width="8" stroke-linecap="round" opacity=".55"/>';
+    for(xh=0;xh<xhs.length;xh++){ o += '<path transform="translate('+xhs[xh][0]+','+xhs[xh][1]+') scale('+(xhs[xh][2]/4)+')" d="M0 -4 Q.8 -1 4 0 Q.8 1 0 4 Q-.8 1 -4 0 Q-.8 -1 0 -4 Z" fill="#FFF6DF" opacity=".95"/>'; }
+    o += '<circle cx="120" cy="30" r="2.6" fill="#FFD86B" opacity=".9"/>';
+    o += '<circle cx="40" cy="140" r="2.4" fill="#FFD86B" opacity=".85"/>';
+    o += '<ellipse cx="100" cy="104" rx="58" ry="62" fill="#FFFFFF" opacity=".14"/>';
+  } else if(id === 'daodaobg' || id === 'ddaodaobg'){
+    /* 大道天幕（Lv100）：太虚明境。浅蓝白径向（非纯白，兼顾龙宝金身对比）+ 太极 + 金环 + 八星 + 中央柔光 */
+    var dd, dds=[[28,30],[170,34],[40,160],[160,160],[100,20],[20,100],[180,100],[100,182]];
+    o += '<defs><radialGradient id="ddVoid" cx="50%" cy="48%" r="60%"><stop offset="0" stop-color="#EAF6FF"/><stop offset="45%" stop-color="#CFE4F5"/><stop offset="100%" stop-color="#9DBEDC"/></radialGradient></defs>';
+    o += '<rect width="200" height="200" fill="url(#ddVoid)"/>';
+    o += '<g transform="translate(100,44)" opacity=".2"><circle r="20" fill="none" stroke="#24436E" stroke-width="2"/><path d="M0 -20 a10 10 0 0 1 0 20 a10 10 0 0 0 0 -20 z" fill="#24436E"/><circle cx="0" cy="-10" r="2.6" fill="#24436E"/><circle cx="0" cy="10" r="2.6" fill="#FFFFFF" stroke="#24436E" stroke-width="1.2"/></g>';
+    o += '<circle cx="100" cy="100" r="40" fill="none" stroke="#FFD86B" stroke-width="1.6" opacity=".5"/>';
+    for(dd=0;dd<dds.length;dd++){ o += '<path transform="translate('+dds[dd][0]+','+dds[dd][1]+')" d="M0 -3.4 L.9 -1 L3.4 0 L.9 1 L0 3.4 L-.9 1 L-3.4 0 L-.9 -1 Z" fill="#2F86B4" opacity=".7"/>'; }
+    o += '<ellipse cx="100" cy="104" rx="60" ry="64" fill="#FFFFFF" opacity=".3"/>';
   } else {
     o += '<rect width="200" height="200" fill="#FFF1E0"/>';
     o += '<circle cx="100" cy="164" r="52" fill="#FFE6D5" opacity=".7"/>';
@@ -5676,19 +5837,48 @@ var PET_COSTUME_LIST = [
   {id:'dbackstar',  name:'星背鳍',   slot:'wing',  price:25, rarity:'rare',   sp:'dino'},
   {id:'dbackcloud', name:'云背鳍',   slot:'wing',  price:15, rarity:'normal', sp:'dino'},
 
-  /* ---- 墨墨 Lv41–100 终极形态 8 件（美术 §Lv41-100 v1.0）：补齐 Lv41→Lv100 的奖励空窗 ----
+  /* ---- 恐龙「龙宝」Lv41–100 终极形态 16 件（与墨墨同 8 档发放，对齐等级曲线）----
+     grant 同墨墨：hat/scarf @ 45/60/80/95，wing(背鳍)/bg @ 50/70/90/100；sp:'dino' 各买各的。
+     rarity 全 myth，price:0，不动 ⭐ 池。背景复用墨墨同题材 petBgSVG 分支（dkunpengbg 等）。 ---- */
+  {id:'dkunpeng',       name:'霜鳍冠',   slot:'hat',   price:0, rarity:'myth', grant:45, sp:'dino'},
+  {id:'dkunpengscarf',  name:'霜鳍围巾', slot:'scarf', price:0, rarity:'myth', grant:45, sp:'dino'},
+  {id:'dkunpengwing',   name:'霜鳍背鳍', slot:'wing',  price:0, rarity:'myth', grant:50, sp:'dino'},
+  {id:'dkunpengbg',     name:'鲲鹏天幕', slot:'bg',    price:0, rarity:'myth', grant:50, sp:'dino'},
+  {id:'dyinglong',      name:'碧鳞冠',   slot:'hat',   price:0, rarity:'myth', grant:60, sp:'dino'},
+  {id:'dyinglongscarf', name:'碧鳞围巾', slot:'scarf', price:0, rarity:'myth', grant:60, sp:'dino'},
+  {id:'dlongyuanwing',  name:'龙渊背鳍', slot:'wing',  price:0, rarity:'myth', grant:70, sp:'dino'},
+  {id:'dlongyuanbg',    name:'龙渊天幕', slot:'bg',    price:0, rarity:'myth', grant:70, sp:'dino'},
+  {id:'dkunyuan',       name:'云涡冠',   slot:'hat',   price:0, rarity:'myth', grant:80, sp:'dino'},
+  {id:'dkunyuanscarf',  name:'云涡围巾', slot:'scarf', price:0, rarity:'myth', grant:80, sp:'dino'},
+  {id:'dxinghewing',    name:'星河背鳍', slot:'wing',  price:0, rarity:'myth', grant:90, sp:'dino'},
+  {id:'dxinghebg',      name:'星河天幕', slot:'bg',    price:0, rarity:'myth', grant:90, sp:'dino'},
+  {id:'ddaoguan',       name:'太虚冠',   slot:'hat',   price:0, rarity:'myth', grant:95, sp:'dino'},
+  {id:'ddaoguanscarf',  name:'太虚围巾', slot:'scarf', price:0, rarity:'myth', grant:95, sp:'dino'},
+  {id:'ddadaowing',     name:'大道背鳍', slot:'wing',  price:0, rarity:'myth', grant:100, sp:'dino'},
+  {id:'ddaodaobg',      name:'大道天幕', slot:'bg',    price:0, rarity:'myth', grant:100, sp:'dino'},
+
+  /* ---- 墨墨 Lv41–100 终极形态 16 件（美术 §Lv41-100 v1.0）：补齐 Lv41→Lv100 的奖励空窗 ----
      grant = 等级达标自动赠送，沿用 Lv21–40 同一机制，不动 ⭐ 经济池（总星数 5565 保持不变）。
-     密度：Lv45 / 50 / 60 / 70 / 80 / 90 / 95 / 100 —— 前半段每 10 级一件、后半段加密到每 5 级；
-     越接近满级升级越慢，需要更密的正反馈托住「再来几级」的劲头。
+     密度：Lv45/50/60/70/80/90/95/100 共 8 档，每档 2 件——奇数档(45/60/80/95)发 帽+围巾，
+     偶数档(50/70/90/100)发 翼+背景，与「龙宝」Lv41–100 完全对齐（两宠曲线一致）。
+     围巾 SVG 函数上一轮已入 PET_SCARFS，本轮补登目录使其真正发放。
      全部属于墨墨（ink），故不写 sp 字段。 */
-  {id:'kunpeng',      name:'鲲鹏冠', slot:'hat',  price:0, rarity:'myth', grant:45},
-  {id:'kunpengwing',  name:'鲲鹏翼', slot:'wing', price:0, rarity:'myth', grant:50},
-  {id:'yinglong',     name:'应龙冕', slot:'hat',  price:0, rarity:'myth', grant:60},
-  {id:'longyuanwing', name:'龙渊翼', slot:'wing', price:0, rarity:'myth', grant:70},
-  {id:'kunyuan',      name:'鲲元冠', slot:'hat',  price:0, rarity:'myth', grant:80},
-  {id:'xinghewing',   name:'星河翼', slot:'wing', price:0, rarity:'myth', grant:90},
-  {id:'daoguan',      name:'大道冠', slot:'hat',  price:0, rarity:'myth', grant:95},
-  {id:'dadaowing',    name:'大道翼', slot:'wing', price:0, rarity:'myth', grant:100}
+  {id:'kunpeng',       name:'鲲鹏冠', slot:'hat',  price:0, rarity:'myth', grant:45},
+  {id:'kunpengscarf',  name:'鲲鹏绫巾', slot:'scarf', price:0, rarity:'myth', grant:45},
+  {id:'kunpengwing',   name:'鲲鹏翼', slot:'wing', price:0, rarity:'myth', grant:50},
+  {id:'kunpengbg',     name:'鲲鹏天幕', slot:'bg', price:0, rarity:'myth', grant:50},
+  {id:'yinglong',      name:'应龙冕', slot:'hat',  price:0, rarity:'myth', grant:60},
+  {id:'yinglongscarf', name:'应龙鳞巾', slot:'scarf', price:0, rarity:'myth', grant:60},
+  {id:'longyuanwing',  name:'龙渊翼', slot:'wing', price:0, rarity:'myth', grant:70},
+  {id:'longyuanbg',    name:'龙渊天幕', slot:'bg', price:0, rarity:'myth', grant:70},
+  {id:'kunyuan',       name:'鲲元冠', slot:'hat',  price:0, rarity:'myth', grant:80},
+  {id:'kunyuanscarf',  name:'鲲元云巾', slot:'scarf', price:0, rarity:'myth', grant:80},
+  {id:'xinghewing',    name:'星河翼', slot:'wing', price:0, rarity:'myth', grant:90},
+  {id:'xinghebg',      name:'星河天幕', slot:'bg', price:0, rarity:'myth', grant:90},
+  {id:'daoguan',       name:'大道冠', slot:'hat',  price:0, rarity:'myth', grant:95},
+  {id:'daoguanscarf',  name:'大道帛巾', slot:'scarf', price:0, rarity:'myth', grant:95},
+  {id:'dadaowing',     name:'大道翼', slot:'wing', price:0, rarity:'myth', grant:100},
+  {id:'daodaobg',      name:'大道天幕', slot:'bg', price:0, rarity:'myth', grant:100}
 
 ];
 var PET_COSTUME_SLOTS = [
